@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+    express:
+        build: ./
+        restart: always
+        ports:
+            - "3300:3000"
+        volumes:
+            - ./:/var/www/app
+        links:
+            - database
+        networks:
+            - default
+        depends_on:
+            - database
+
+    database:
+        image: mongo:latest
+        restart: always
+        volumes:
+            - ./mongodb_data/:/data/db
+        expose:
+            - "27017"
+        networks:
+            - default
+networks:
+    default:

@@ -1,0 +1,2 @@
+rootProject.name = "OpenSyncedLists"
+include ':app'

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/export_chat"
+        android:title="@string/menu_export_share" />
+    <item android:id="@+id/export_qr"
+        android:title="@string/menu_export_qr" />
+    <item android:id="@+id/export_more"
+        android:title="@string/menu_export_more" />
+
+    <item android:id="@+id/list_settings"
+        android:title="@string/menu_list_settings" />
+
+    <item android:id="@+id/settings"
+        android:title="@string/menu_settings" />
+</menu>
