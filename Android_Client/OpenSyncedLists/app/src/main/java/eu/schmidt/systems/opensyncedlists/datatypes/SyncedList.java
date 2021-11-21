@@ -1,96 +1,119 @@
 package eu.schmidt.systems.opensyncedlists.datatypes;
 
-import static eu.schmidt.systems.opensyncedlists.ListActivity.DEBUG;
-
 import android.util.Log;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 
+/**
+ * A synced list
+ */
 public class SyncedList {
-    String id;
-    String name;
-    private byte[] secret;
-    private ArrayList<SyncedListElement> elementsBuffer = new ArrayList<>();
+    SyncedListHeader syncedListHeader;
+    public ArrayList<SyncedListElement> elementsBuffer;
     ArrayList<SyncedListStep> elementSteps;
 
-    public SyncedList() {
+    public SyncedList(SyncedListHeader syncedListHeader, JSONObject jsonObject)
+            throws JSONException {
+        this.syncedListHeader = syncedListHeader;
+        elementSteps = new ArrayList<>();
+        JSONArray jsonArraySteps = jsonObject.getJSONArray("steps");
+        for (int i = 0; i < jsonArraySteps.length(); i++) {
+            JSONObject step = (JSONObject) jsonArraySteps.get(i);
+            elementSteps.add(new SyncedListStep(step));
+        }
+        elementsBuffer = getReformatElements();
     }
 
-    public SyncedList(String id,
-                      String name,
-                      byte[] secret,
+    public SyncedList(SyncedListHeader syncedListHeader,
                       ArrayList<SyncedListStep> elementSteps) {
-        this.id = id;
-        this.name = name;
-        this.secret = secret;
+        this.syncedListHeader = syncedListHeader;
         this.elementSteps = elementSteps;
+        this.elementsBuffer = new ArrayList<>();
     }
 
     public ArrayList<SyncedListElement> getReformatElements() {
+        Log.d(Constant.LOG_TITLE_BUILDING,
+              "Build list with " + this.elementSteps.size() + " Steps");
         ArrayList<SyncedListElement> result = new ArrayList<>();
-        for (int i=0; i < this.elementSteps.size(); i++) {
+        for (int i = 0; i < this.elementSteps.size(); i++) {
             SyncedListStep currentStep = this.elementSteps.get(i);
             switch (currentStep.getChangeAction()) {
                 case ADD:
-                    result.add((SyncedListElement) currentStep.getChangeValue());
+                    result.add(
+                            (SyncedListElement) currentStep.getChangeValue());
                     break;
                 case UPDATE:
                     SyncedListElement changeElement =
                             (SyncedListElement) currentStep.getChangeValue();
-                    for(int x=0; x < result.size(); x++) {
-                        if (result.get(x).getId().equals(currentStep.getChangeId())) {
+                    for (int x = 0; x < result.size(); x++) {
+                        if (result.get(x).getId()
+                                .equals(currentStep.getChangeId())) {
                             result.set(x, changeElement);
                             break;
                         }
                     }
                     break;
                 case SWAP:
-                    for(int x=0; x < result.size(); x++) {
-                        if (result.get(x).getId().equals(currentStep.getChangeId())) {
-                            int swap=0;
-                            for(swap=0; swap < result.size(); swap++) {
-                                if (result.get(swap).getId().equals(currentStep.getChangeValue())) {
+                    for (int x = 0; x < result.size(); x++) {
+                        if (result.get(x).getId()
+                                .equals(currentStep.getChangeId())) {
+                            int swap = 0;
+                            for (swap = 0; swap < result.size(); swap++) {
+                                if (result.get(swap).getId()
+                                        .equals(currentStep.getChangeValue())) {
                                     break;
                                 }
                             }
-                            if(x >= 0 && swap >= 0 && x < result.size() && swap < result
-                                    .size()) {
+                            if (x >= 0 && swap >= 0 && x < result.size() &&
+                                    swap < result.size()) {
                                 SyncedListElement inX = result.get(x);
                                 SyncedListElement inSwap = result.get(swap);
                                 result.set(x, inSwap);
                                 result.set(swap, inX);
-                                Log.v(DEBUG, "Swap");
                             }
                             break;
                         }
                     }
                     break;
                 case REMOVE:
-                    for(int x=0; x < result.size(); x++) {
-                        if (result.get(x).getId().equals(currentStep.getChangeId())) {
+                    for (int x = 0; x < result.size(); x++) {
+                        if (result.get(x).getId()
+                                .equals(currentStep.getChangeId())) {
                             result.remove(x);
                             break;
                         }
                     }
                     break;
                 case MOVE:
-                    /*for(int x=0; x < result.size(); x++) {
-                        if (result.get(x).getId().equals(currentStep.getChangeId())) {
+                    int srcIndex = -1;
+                    int dstIndex;
 
-                            if(x > 0 && (int)currentStep.getChangeValue() + x > 0) {
-                                SyncedListElement inX = result.get(x);
-                                SyncedListElement inSwap = result.get(swap);
-                                result.set(x, inSwap);
-                                result.set(swap, inX);
-                            }
+                    for (int x = 0; x < result.size(); x++) {
+                        if (result.get(x).getId()
+                                .equals(currentStep.getChangeId())) {
+                            srcIndex = x;
                             break;
                         }
-                    }*/
+                    }
+                    if (srcIndex != -1) {
+                        dstIndex = (int) currentStep.getChangeValue();
+                        moveItem(srcIndex, dstIndex, result);
+                    }
                     break;
                 default:
-
+                    Log.e(Constant.LOG_TITLE_BUILDING,
+                          "Cant found step action");
             }
         }
 
@@ -98,33 +121,35 @@ public class SyncedList {
     }
 
     public ArrayList<SyncedListElement> getElements() {
+        if (elementsBuffer == null) {
+            elementsBuffer = getReformatElements();
+        }
         return elementsBuffer;
     }
 
     public String getId() {
-        return id;
+        return syncedListHeader.getId();
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.syncedListHeader.setId(id);
     }
 
     public String getName() {
-        return name;
+        return syncedListHeader.getName();
     }
 
     public void setName(String name) {
-        this.name = name;
+        syncedListHeader.setName(name);
     }
 
     public byte[] getSecret() {
-        return secret;
+        return syncedListHeader.getSecret();
     }
 
     public boolean compareSecret(byte[] target) {
-        for (int i=0; i < target.length; i++) {
-            if(this.secret[i] != target[i])
-            {
+        for (int i = 0; i < target.length; i++) {
+            if (this.syncedListHeader.getSecret()[i] != target[i]) {
                 return false;
             }
         }
@@ -132,7 +157,11 @@ public class SyncedList {
     }
 
     public void setSecret(String secret) {
-        this.secret = Cryptography.getSHA(secret);
+        this.syncedListHeader.setSecret(Cryptography.getSHA(secret));
+    }
+
+    public void setLocalSecret(String secret) {
+        this.syncedListHeader.setLocalSecret(Cryptography.getSHA(secret));
     }
 
     public ArrayList<SyncedListStep> getElementSteps() {
@@ -147,5 +176,46 @@ public class SyncedList {
     public void addElementStep(SyncedListStep elementStep) {
         this.elementSteps.add(elementStep);
         this.elementsBuffer = this.getReformatElements();
+    }
+
+    public static <T> void moveItem(int sourceIndex,
+                                    int targetIndex,
+                                    List<T> list) {
+        if (sourceIndex <= targetIndex) {
+            Collections.rotate(list.subList(sourceIndex, targetIndex + 1), -1);
+        } else {
+            Collections.rotate(list.subList(targetIndex, sourceIndex + 1), 1);
+        }
+    }
+
+    public String generateUniqueElementId() {
+        String newId = Cryptography.generatingRandomString(50);
+        for (int i = 0; i < elementsBuffer.size(); i++) {
+            if (newId.equals(elementsBuffer.get(i).getId())) {
+                i = -1;
+                newId = Cryptography.generatingRandomString(50);
+            }
+        }
+        return newId;
+    }
+
+    /**
+     * Convert to JSON (HEADER not included)
+     *
+     * @return
+     * @throws JSONException
+     */
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArraySteps = new JSONArray();
+        for (SyncedListStep step : elementSteps) {
+            jsonArraySteps.put(step.toJSON());
+        }
+        jsonObject.put("steps", jsonArraySteps);
+        return jsonObject;
+    }
+
+    public SyncedListHeader getSyncedListHeader() {
+        return syncedListHeader;
     }
 }

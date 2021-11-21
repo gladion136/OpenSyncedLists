@@ -1,36 +1,47 @@
 package eu.schmidt.systems.opensyncedlists.datatypes;
 
-import android.graphics.RadialGradient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.Random;
+import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 
+/**
+ * An Element of a SyncedList
+ */
 public class SyncedListElement {
-    String id;
-    String name;
-    String description;
+    private String id;
+    private Boolean checked;
+    private String name;
+    private String description;
 
-    public SyncedListElement() {
+    public SyncedListElement(JSONObject jsonObject) throws JSONException {
+        id = jsonObject.getString("id");
+        checked = jsonObject.getBoolean("checked");
+        name = jsonObject.getString("name");
+        description = jsonObject.getString("description");
     }
 
-    public SyncedListElement(String name, String description) {
+    public SyncedListElement(String id, String name, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
-        calcNewId();
+        this.checked = false;
     }
 
     public String getId() {
         return id;
     }
 
-    public String calcNewId() {
-        Random random = new Random(new Random().nextInt(1999999999));
-        this.id =
-                random.nextInt(1999999999) + " - "
-                        + random.nextInt(1999999999) + " - "
-                        + random.nextInt(1999999999) + " - "
-                        + random.nextInt(1999999999) + " - "
-                        + random.nextInt(1999999999);
-        return this.id;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Boolean getChecked() {
+        return checked;
+    }
+
+    public void setChecked(Boolean checked) {
+        this.checked = checked;
     }
 
     public String getName() {
@@ -47,5 +58,14 @@ public class SyncedListElement {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        jsonObject.put("checked", checked);
+        jsonObject.put("name", name);
+        jsonObject.put("description", description);
+        return jsonObject;
     }
 }

@@ -1,6 +1,6 @@
 package eu.schmidt.systems.opensyncedlists;
 
-import androidx.appcompat.app.ActionBar;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,49 +9,63 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.ImageView;
 
-import java.util.ArrayList;
-import java.util.Random;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 import eu.schmidt.systems.opensyncedlists.adapter.SyncedListAdapter;
 import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
+import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
-import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
+import eu.schmidt.systems.opensyncedlists.utils.Constant;
+import eu.schmidt.systems.opensyncedlists.utils.LocalStorage;
 
+/**
+ * ListActivity displays one list
+ */
 public class ListActivity extends AppCompatActivity {
 
-    public static final String DEBUG = "DEBUG_MAINACTIVITY";
-
+    LocalStorage localStorage;
     SyncedList syncedList;
     RecyclerView recyclerView;
+    EditText eTNewElement;
+    ImageView iVNewElementTop, iVNewElementBottom;
     protected RecyclerView.LayoutManager mLayoutManager;
+    SyncedListAdapter syncedListAdapter;
 
     /**
      * onCreate
      *
      * @param savedInstanceState
      */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         recyclerView = findViewById(R.id.recyclerView);
+        eTNewElement = findViewById(R.id.eTNewElement);
+        iVNewElementTop = findViewById(R.id.iVNewElementTop);
+        iVNewElementBottom = findViewById(R.id.iVNewElementBottom);
         mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        int scrollPosition = 0;
-
-        // If a layout manager has already been set, get current scroll position.
-        if (recyclerView.getLayoutManager() != null) {
-            scrollPosition = ((LinearLayoutManager) recyclerView.getLayoutManager())
-                    .findFirstCompletelyVisibleItemPosition();
-        }
-        recyclerView.scrollToPosition(scrollPosition);
-
+        eTNewElement.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                createNewElement(false); // Need to read default from
+                return true;
+            }
+            return false;
+        });
+        iVNewElementTop.setOnClickListener(v -> createNewElement(true));
+        iVNewElementBottom.setOnClickListener(v -> createNewElement(false));
+        localStorage = new LocalStorage(this);
         init();
-        createTestData();
-        updateListView();
     }
 
     /**
@@ -60,75 +74,98 @@ public class ListActivity extends AppCompatActivity {
      * @param menu Menu
      * @return true
      */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.one_list_menu, menu);
         return true;
     }
 
     /**
+     * onOptionsItemSelected (events for actionbar)
+     *
+     * @param item selected item
+     * @return action handled?
+     */
+    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
      * Initialize
      */
     public void init() {
-        syncedList = new SyncedList("12", "List 1", null,
-                new ArrayList<>());
-        syncedList.setSecret("Test");
-        Log.d(DEBUG, Cryptography.bytesToString(syncedList.getSecret()));
-        setTitle(getIntent().getExtras().getString("Name"));
-    }
-
-    /**
-     * update Listview
-     */
-    public void updateListView() {
-        recyclerView.setAdapter(new SyncedListAdapter(this, syncedList.getElements(),
-                recyclerView) {
-            @Override public void onAddStep(SyncedListStep syncedListStep) {
-                syncedList.addElementStep(syncedListStep);
-                updateListView();
-            }
-        });
-    }
-
-    /**
-     * Create test data
-     */
-    public void createTestData() {
-        SyncedListStep syncedListStep = new SyncedListStep("1",
-                ACTION.ADD,
-                new SyncedListElement("Brot", "Vollkorn"));
-        syncedList.addElementStep(syncedListStep);
-
-        SyncedListStep syncedListStep2 = new SyncedListStep("2",
-                ACTION.ADD,
-                new SyncedListElement("Salat", "Eisberg"));
-        syncedList.addElementStep(syncedListStep2);
-
-        SyncedListStep syncedListStep3 = new SyncedListStep("1",
-                ACTION.REMOVE, null);
-        syncedList.addElementStep(syncedListStep3);
-
-        for(int x=0; x < 30; x++) {
-            int leftLimit = 48; // numeral '0'
-            int rightLimit = 220; // letter 'z'
-            int targetStringLength = 10 + 5 * x;
-            Random random = new Random();
-
-            String generatedString = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                generatedString = random.ints(leftLimit, rightLimit + 1)
-                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                        .limit(targetStringLength)
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString();
-            }
-
-            SyncedListStep syncedListStepi = new SyncedListStep("2",
-                    ACTION.ADD,
-                    new SyncedListElement("Placeholder: " + x,
-                            "Test description - " + generatedString));
-            syncedList.addElementStep(syncedListStepi);
+        try {
+            SyncedListHeader syncedListHeader = new SyncedListHeader(
+                    new JSONObject(
+                            getIntent().getExtras().getString("header")));
+            syncedList = localStorage.getList(syncedListHeader);
+        } catch (IOException | JSONException e) {
+            Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
+            e.printStackTrace();
         }
+        setTitle(syncedList.getName());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        syncedListAdapter =
+                new SyncedListAdapter(this, syncedList.getElements(),
+                                      recyclerView) {
+                    @Override
+                    public void onAddStep(SyncedListStep syncedListStep) {
+                        syncedList.addElementStep(syncedListStep);
+                        syncedListAdapter.updateItems(syncedList.getElements());
+                        save();
+                    }
+                };
+        recyclerView.setAdapter(syncedListAdapter);
+    }
+
+    /**
+     * Read name from edittext on bottom and create new element inside list
+     * Returns: success(true)
+     */
+    public boolean createNewElement(boolean top) {
+        String id = syncedList.generateUniqueElementId();
+        SyncedListStep syncedListStep = new SyncedListStep(id, ACTION.ADD,
+                                                           new SyncedListElement(
+                                                                   id,
+                                                                   eTNewElement
+                                                                           .getText()
+                                                                           .toString(),
+                                                                   ""));
+        syncedList.addElementStep(syncedListStep);
+        if (top) {
+            SyncedListStep syncedListStepMove =
+                    new SyncedListStep(id, ACTION.MOVE, 0);
+            syncedList.addElementStep(syncedListStepMove);
+        }
+        if (!save()) {
+            return false;
+        }
+        syncedListAdapter.updateItems(syncedList.getElements());
+        eTNewElement.setText("");
+        recyclerView.scrollToPosition(
+                top ? 0 : syncedList.getElements().size() - 1);
+        Log.d(Constant.LOG_TITLE_DEFAULT, "New element added to list");
+        return true;
+    }
+
+    public boolean save() {
+        try {
+            localStorage.setList(syncedList);
+        } catch (IOException | JSONException e) {
+            Log.e(Constant.LOG_TITLE_DEFAULT,
+                  "Local storage " + "write" + " error: " + e);
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @Override public void onBackPressed() {
+        finish();
     }
 }

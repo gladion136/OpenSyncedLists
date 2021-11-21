@@ -8,7 +8,7 @@ import { IList } from "../util/structures/list";
 export const listRouter = express.Router();
 
 listRouter.get("/test", (req, res) => {
-    res.send("OK");
+    res.send('{"status":"OK"}');
 });
 
 listRouter.get("/get", async (req, res) => {

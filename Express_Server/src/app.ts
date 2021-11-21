@@ -29,7 +29,7 @@ initDB();
  * Handle routes
  */
 app.get("/test", (req, res) => {
-    res.send("OK");
+    res.send('{"status":"OK"}');
 });
 
 app.use("/list", listRouter);
