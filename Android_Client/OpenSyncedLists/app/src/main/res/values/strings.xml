@@ -1,5 +1,8 @@
 <resources>
+    <!--     Global              -->
     <string name="app_name">OpenSyncedLists</string>
+    <string name="apply_changes">Änderungen übernehmen</string>
+    <string name="delete">Löschen</string>
 
     <!--     Menus               -->
     <string name="menu_new_list">Neue Liste erstellen</string>
@@ -13,7 +16,12 @@
     <string name="menu_export_more">Weitere Export Formate..</string>
     <string name="menu_about">Über</string>
 
+    <!--     SyncedList   -->
+    <string name="edit_element_title">Element bearbeiten</string>
+    <string name="edit_element_name">Name</string>
+    <string name="edit_element_description">Beschreibung</string>
 
+    <!--     About        -->
     <string name="text_about">Enstanden während des Moduls Mobile
         Systeme an der Technischen Hochschule Ostwestfahlen Lippe.\n\n\n
         Entwickelt von Etienne Schmidt\n\n

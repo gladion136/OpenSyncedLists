@@ -119,7 +119,7 @@ public class ListActivity extends AppCompatActivity {
                     public void onAddStep(SyncedListStep syncedListStep,
                                           boolean notify) {
                         syncedList.addElementStep(syncedListStep);
-                        syncedListAdapter.updateItems(syncedList.getElements(), false);
+                        syncedListAdapter.updateItems(syncedList.getElements(), notify);
                         save();
                     }
                 };
@@ -171,4 +171,6 @@ public class ListActivity extends AppCompatActivity {
     @Override public void onBackPressed() {
         finish();
     }
+
+
 }

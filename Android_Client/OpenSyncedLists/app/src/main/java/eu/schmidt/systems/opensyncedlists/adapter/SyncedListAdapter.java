@@ -15,8 +15,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,13 +28,15 @@ import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
+import eu.schmidt.systems.opensyncedlists.fragments.ElementEditorFragment;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 /**
  * RecyclerView Adapter for ListActivity
  */
 public abstract class SyncedListAdapter
-        extends RecyclerView.Adapter<SyncedListAdapter.ViewHolder> {
+        extends RecyclerView.Adapter<SyncedListAdapter.ViewHolder>
+        implements View.OnClickListener {
     private Context context;
     private RecyclerView recyclerView;
     private ArrayList<SyncedListElement> listData;
@@ -147,7 +152,7 @@ public abstract class SyncedListAdapter
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_element, viewGroup, false);
-
+        view.setOnClickListener(this);
         return new ViewHolder(view);
     }
 
@@ -261,6 +266,24 @@ public abstract class SyncedListAdapter
                                        ACTION.UPDATE, updated);
             onAddStep(newStep, true);
         }
+    }
+
+    /**
+     * OnClick on Element
+     *
+     * @param v View of Element
+     */
+    @Override public void onClick(View v) {
+        int itemPosition = recyclerView.getChildLayoutPosition(v);
+        SyncedListElement syncedListElement = listData.get(itemPosition);
+        BottomSheetDialogFragment bottomSheetDialogFragment =
+                new ElementEditorFragment()
+                        .newInstance(syncedListElement, syncedListStep -> {
+                            onAddStep(syncedListStep, true);
+                        });
+        bottomSheetDialogFragment
+                .show(((AppCompatActivity) context).getSupportFragmentManager(),
+                      bottomSheetDialogFragment.getTag());
     }
 
     /**

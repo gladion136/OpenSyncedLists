@@ -23,7 +23,7 @@ public class SyncedListStep {
         if (jsonObject.has("changeValueElement")) {
             this.changeValue = new SyncedListElement(
                     jsonObject.getJSONObject("changeValueElement"));
-        } else {
+        } else if (jsonObject.has("changeValue")) {
             this.changeValue = jsonObject.get("changeValue");
         }
     }
