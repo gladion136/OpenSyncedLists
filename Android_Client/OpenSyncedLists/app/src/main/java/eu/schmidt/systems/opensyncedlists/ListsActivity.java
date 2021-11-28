@@ -44,40 +44,7 @@ public class ListsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lists);
         lVLists = findViewById(R.id.lVLists);
         fab = findViewById(R.id.floatingActionButton);
-        fab.setOnClickListener(v -> {
-            DialogBuilder.editTextDialog(this, "Create new " + "list",
-                                         "Enter list name:", "Create list",
-                                         "Cancel", result -> {
-                        if (result != null) {
-                            if (result.equals("")) {
-                                Toast.makeText(this,
-                                               "Please enter a name " + "first",
-                                               Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            SyncedList newList = new SyncedList(
-                                    new SyncedListHeader(getUniqueListId(),
-                                                         result, null, null),
-                                    new ArrayList<>());
-                            newList.setSecret(
-                                    Cryptography.generatingRandomString(50));
-                            newList.setLocalSecret(
-                                    Cryptography.generatingRandomString(50));
-                            syncedListsHeaders
-                                    .add(newList.getSyncedListHeader());
-                            try {
-                                localStorage.setList(newList);
-                                localStorage
-                                        .setListsHeaders(syncedListsHeaders);
-                                listsAdapter.updateItems(syncedListsHeaders);
-                            } catch (Exception e) {
-                                Log.e(Constant.LOG_TITLE_DEFAULT,
-                                      "Local storage write" + " error: " + e);
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-        });
+        fab.setOnClickListener(v -> showCreateListDialog());
         init();
     }
 
@@ -140,11 +107,50 @@ public class ListsActivity extends AppCompatActivity {
 
     @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.new_list:
+                showCreateListDialog();
+                return true;
             case R.id.about:
                 Intent intent = new Intent(this, AboutActivity.class);
                 startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Show and handle create list dialog
+     */
+    public void showCreateListDialog() {
+        DialogBuilder.editTextDialog(this, "Create new " + "list",
+                                     "Enter list name:", "Create list",
+                                     "Cancel", result -> {
+                    if (result != null) {
+                        if (result.equals("")) {
+                            Toast.makeText(this,
+                                           "Please enter a name " + "first",
+                                           Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        SyncedList newList = new SyncedList(
+                                new SyncedListHeader(getUniqueListId(), result,
+                                                     null, null),
+                                new ArrayList<>());
+                        newList.setSecret(
+                                Cryptography.generatingRandomString(50));
+                        newList.setLocalSecret(
+                                Cryptography.generatingRandomString(50));
+                        syncedListsHeaders.add(newList.getSyncedListHeader());
+                        try {
+                            localStorage.setList(newList);
+                            localStorage.setListsHeaders(syncedListsHeaders);
+                            listsAdapter.updateItems(syncedListsHeaders);
+                        } catch (Exception e) {
+                            Log.e(Constant.LOG_TITLE_DEFAULT,
+                                  "Local storage write" + " error: " + e);
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 }

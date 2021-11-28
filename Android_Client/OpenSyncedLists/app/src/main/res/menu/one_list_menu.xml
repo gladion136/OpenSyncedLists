@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/list_clear"
+        android:title="@string/menu_list_clear" />
+
     <item android:id="@+id/export_chat"
         android:title="@string/menu_export_share" />
     <item android:id="@+id/export_qr"

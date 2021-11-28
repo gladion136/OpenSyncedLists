@@ -11,24 +11,24 @@
     <string name="menu_settings">Einstellungen</string>
 
     <string name="menu_list_settings">Listen Einstellungen</string>
+    <string name="menu_list_clear">Listen leeren</string>
     <string name="menu_export_share">Teilen</string>
     <string name="menu_export_qr">Als QR-Code exportieren</string>
     <string name="menu_export_more">Weitere Export Formate..</string>
     <string name="menu_about">Über</string>
 
-    <!--     SyncedList   -->
+    <!--     SyncedList          -->
     <string name="edit_element_title">Element bearbeiten</string>
     <string name="edit_element_name">Name</string>
     <string name="edit_element_description">Beschreibung</string>
 
-    <!--     About        -->
-    <string name="text_about">Enstanden während des Moduls Mobile
-        Systeme an der Technischen Hochschule Ostwestfahlen Lippe.\n\n\n
+    <!--     About               -->
+    <string name="text_about">Enstanden während des Moduls "Mobile
+        Systeme" an der Technischen Hochschule Ostwestfalen-Lippe.\n\n\n
         Entwickelt von Etienne Schmidt\n\n
         Lizensiert unter GNU GPL v3</string>
 
-
-    <!-- Change before publish! -->
+    <!-- Change before publish!  -->
     <string name="preference_file_key">asdkjbIG(CTDchabscTEc89iuHC87C</string>
 
 </resources>

@@ -119,6 +119,7 @@ public abstract class SyncedListAdapter
      * Update all elements
      *
      * @param listData new elements
+     * @param notify notify to reload visible views
      */
     public void updateItems(ArrayList<SyncedListElement> listData,
                             boolean notify) {
@@ -201,7 +202,7 @@ public abstract class SyncedListAdapter
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
                                        ACTION.UPDATE, updated);
-            onAddStep(newStep, true);
+            onAddStep(newStep, false);
         });
 
         // on move to top
