@@ -139,7 +139,7 @@ public class ListsActivity extends AppCompatActivity {
     }
 
     @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.about:
                 Intent intent = new Intent(this, AboutActivity.class);
                 startActivity(intent);

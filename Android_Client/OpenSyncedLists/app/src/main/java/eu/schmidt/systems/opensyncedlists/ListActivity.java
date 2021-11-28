@@ -2,6 +2,7 @@ package eu.schmidt.systems.opensyncedlists;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import eu.schmidt.systems.opensyncedlists.adapter.SyncedListAdapter;
 import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
@@ -114,9 +116,10 @@ public class ListActivity extends AppCompatActivity {
                 new SyncedListAdapter(this, syncedList.getElements(),
                                       recyclerView) {
                     @Override
-                    public void onAddStep(SyncedListStep syncedListStep) {
+                    public void onAddStep(SyncedListStep syncedListStep,
+                                          boolean notify) {
                         syncedList.addElementStep(syncedListStep);
-                        syncedListAdapter.updateItems(syncedList.getElements());
+                        syncedListAdapter.updateItems(syncedList.getElements(), false);
                         save();
                     }
                 };
@@ -145,7 +148,7 @@ public class ListActivity extends AppCompatActivity {
         if (!save()) {
             return false;
         }
-        syncedListAdapter.updateItems(syncedList.getElements());
+        syncedListAdapter.updateItems(syncedList.getElements(), true);
         eTNewElement.setText("");
         recyclerView.scrollToPosition(
                 top ? 0 : syncedList.getElements().size() - 1);

@@ -15,9 +15,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
@@ -71,6 +73,41 @@ public abstract class SyncedListAdapter
         this.recyclerView = recyclerView;
         this.listData = listData;
         layoutInflater = LayoutInflater.from(context);
+
+        // Add ItemTouchHelper for drag and drop events
+        ItemTouchHelper itemTouchHelper =
+                new ItemTouchHelper(new ItemTouchHelper.Callback() {
+                    public boolean onMove(RecyclerView recyclerView,
+                                          RecyclerView.ViewHolder viewHolder,
+                                          RecyclerView.ViewHolder target) {
+                        SyncedListStep newStep = new SyncedListStep(
+                                listData.get(viewHolder.getAdapterPosition())
+                                        .getId(), ACTION.SWAP,
+                                listData.get(target.getAdapterPosition())
+                                        .getId());
+                        onAddStep(newStep, false);
+
+                        notifyItemMoved(viewHolder.getAdapterPosition(),
+                                        target.getAdapterPosition());
+                        return true;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder,
+                                         int direction) {
+                        Log.d(Constant.LOG_TITLE_DEFAULT,
+                              "SWIPED: " + direction);
+                    }
+
+                    @Override
+                    public int getMovementFlags(RecyclerView recyclerView,
+                                                RecyclerView.ViewHolder viewHolder) {
+                        return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                                        ItemTouchHelper.DOWN |
+                                                ItemTouchHelper.UP);
+                    }
+                });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     /**
@@ -78,11 +115,14 @@ public abstract class SyncedListAdapter
      *
      * @param listData new elements
      */
-    public void updateItems(ArrayList<SyncedListElement> listData) {
+    public void updateItems(ArrayList<SyncedListElement> listData,
+                            boolean notify) {
         this.listData.clear();
         this.listData.addAll(listData);
-        this.recyclerView
-                .post(() -> SyncedListAdapter.this.notifyDataSetChanged());
+        if (notify) {
+            this.recyclerView
+                    .post(() -> SyncedListAdapter.this.notifyDataSetChanged());
+        }
     }
 
     /**
@@ -156,7 +196,7 @@ public abstract class SyncedListAdapter
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
                                        ACTION.UPDATE, updated);
-            onAddStep(newStep);
+            onAddStep(newStep, true);
         });
 
         // on move to top
@@ -164,7 +204,7 @@ public abstract class SyncedListAdapter
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
                                        ACTION.SWAP, listData.get(0).getId());
-            onAddStep(newStep);
+            onAddStep(newStep, true);
             recyclerView.scrollToPosition(0);
         });
 
@@ -175,7 +215,7 @@ public abstract class SyncedListAdapter
                                        ACTION.SWAP,
                                        listData.get(listData.size() - 1)
                                                .getId());
-            onAddStep(newStep);
+            onAddStep(newStep, true);
             recyclerView.scrollToPosition(listData.size() - 1);
         });
 
@@ -186,7 +226,7 @@ public abstract class SyncedListAdapter
                         new SyncedListStep(listData.get(position).getId(),
                                            ACTION.SWAP,
                                            listData.get(position - 1).getId());
-                onAddStep(newStep);
+                onAddStep(newStep, true);
                 recyclerView.scrollToPosition(position - 4);
             }
         });
@@ -198,7 +238,7 @@ public abstract class SyncedListAdapter
                         new SyncedListStep(listData.get(position).getId(),
                                            ACTION.SWAP,
                                            listData.get(position + 1).getId());
-                onAddStep(newStep);
+                onAddStep(newStep, true);
                 recyclerView.scrollToPosition(position - 2);
             }
         });
@@ -219,7 +259,7 @@ public abstract class SyncedListAdapter
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
                                        ACTION.UPDATE, updated);
-            onAddStep(newStep);
+            onAddStep(newStep, true);
         }
     }
 
@@ -228,5 +268,6 @@ public abstract class SyncedListAdapter
      *
      * @param syncedListStep new SyncedListStep
      */
-    public abstract void onAddStep(SyncedListStep syncedListStep);
+    public abstract void onAddStep(SyncedListStep syncedListStep,
+                                   boolean notify);
 }
