@@ -14,6 +14,12 @@
     <string name="menu_about">Über</string>
 
 
+    <string name="text_about">Enstanden während des Moduls Mobile
+        Systeme an der Technischen Hochschule Ostwestfahlen Lippe.\n\n\n
+        Entwickelt von Etienne Schmidt\n\n
+        Lizensiert unter GNU GPL v3</string>
+
+
     <!-- Change before publish! -->
     <string name="preference_file_key">asdkjbIG(CTDchabscTEc89iuHC87C</string>
 

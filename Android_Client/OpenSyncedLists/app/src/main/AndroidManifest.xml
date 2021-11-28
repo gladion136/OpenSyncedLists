@@ -5,25 +5,28 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.OpenSyncedLists">
+        android:theme="@style/Theme.OpenSyncedLists"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".AboutActivity"
+            android:exported="true" />
         <activity
             android:name=".ListsActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|stateHidden">
-        </activity>
+        <activity
+            android:name=".ListActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|stateHidden"></activity>
     </application>
 
 </manifest>

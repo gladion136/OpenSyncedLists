@@ -1,11 +1,14 @@
 package eu.schmidt.systems.opensyncedlists;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -133,5 +136,15 @@ public class ListsActivity extends AppCompatActivity {
                 Log.e(Constant.LOG_TITLE_DEFAULT, "Connection is bad.. " + e);
             }
         });
+    }
+
+    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.about:
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
