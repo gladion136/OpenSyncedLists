@@ -54,7 +54,6 @@
                         android:imeOptions="actionDone"
                         android:inputType="text"
                         android:text="Titel"
-                        android:textColor="#000000"
                         android:textSize="20sp" />
 
                     <TextView
@@ -62,8 +61,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
-                        android:text="Beschreibung: asdasdasfdiasudgfiaughiudafhbadfiguhaiuegtfdfvbiua7esrtfg9irgfubidufvbpiausgfisudhfiubaydifugapw9eifghjdbfvsaidfpiuadfiubgdhfbvIEUG IUEF IUAHF IUEHFIU DSIU SDAHFIUHDSIF UHASDIUF HSDIUF SADIUHF IUSDAHF ISUADFH SDF"
-                        android:textColor="#000000" />
+                        android:text="Beschreibung: asdasdasfdiasudgfiaughiudafhbadfiguhaiuegtfdfvbiua7esrtfg9irgfubidufvbpiausgfisudhfiubaydifugapw9eifghjdbfvsaidfpiuadfiubgdhfbvIEUG IUEF IUAHF IUEHFIU DSIU SDAHFIUHDSIF UHASDIUF HSDIUF SADIUHF IUSDAHF ISUADFH SDF" />
                 </LinearLayout>
             </LinearLayout>
 

@@ -2,8 +2,11 @@ package eu.schmidt.systems.opensyncedlists;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -78,6 +81,17 @@ public class ListsActivity extends AppCompatActivity {
                                         (ArrayList<SyncedListHeader>) syncedListsHeaders
                                                 .clone());
         lVLists.setAdapter(listsAdapter);
+
+        // Read and use preferences
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        if(sharedPreferences.getString("design", "").equals(getString(R.string.pref_design_light))) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }else if(sharedPreferences.getString("design", "").equals(getString(R.string.pref_design_dark))) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
     }
 
     public void initServerConnection() {
@@ -110,9 +124,14 @@ public class ListsActivity extends AppCompatActivity {
             case R.id.new_list:
                 showCreateListDialog();
                 return true;
+            case R.id.settings:
+                Intent settingsIntent = new Intent(this,
+                                                   SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
             case R.id.about:
-                Intent intent = new Intent(this, AboutActivity.class);
-                startActivity(intent);
+                Intent aboutIntent = new Intent(this, AboutActivity.class);
+                startActivity(aboutIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

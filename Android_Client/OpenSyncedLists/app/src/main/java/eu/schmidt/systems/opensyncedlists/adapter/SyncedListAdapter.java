@@ -2,6 +2,7 @@ package eu.schmidt.systems.opensyncedlists.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,9 +43,10 @@ public abstract class SyncedListAdapter
     private RecyclerView recyclerView;
     private ArrayList<SyncedListElement> listData;
     private LayoutInflater layoutInflater;
+    private int jumpDistance = 1;
 
     /**
-     * ViewHolder for on element
+     * ViewHolder for one element
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final CheckBox checkBox;
@@ -113,6 +116,11 @@ public abstract class SyncedListAdapter
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        jumpDistance = Integer.parseInt(sharedPreferences.getString(
+                "jump_range", "1"));
     }
 
     /**
@@ -209,7 +217,7 @@ public abstract class SyncedListAdapter
         viewHolder.btnTop.setOnClickListener(vi -> {
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
-                                       ACTION.SWAP, listData.get(0).getId());
+                                       ACTION.MOVE, 0);
             onAddStep(newStep, true);
             recyclerView.scrollToPosition(0);
         });
@@ -218,34 +226,48 @@ public abstract class SyncedListAdapter
         viewHolder.btnBottom.setOnClickListener(vi -> {
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
-                                       ACTION.SWAP,
-                                       listData.get(listData.size() - 1)
-                                               .getId());
+                                       ACTION.MOVE,
+                                       listData.size() - 1);
             onAddStep(newStep, true);
             recyclerView.scrollToPosition(listData.size() - 1);
         });
 
         // on move up
         viewHolder.iVBtnUp.setOnClickListener(vi -> {
-            if (position > 0) {
+            if (position - jumpDistance >= 0) {
                 SyncedListStep newStep =
                         new SyncedListStep(listData.get(position).getId(),
-                                           ACTION.SWAP,
-                                           listData.get(position - 1).getId());
+                                           ACTION.MOVE,
+                                           position - jumpDistance);
                 onAddStep(newStep, true);
-                recyclerView.scrollToPosition(position - 4);
+                recyclerView.scrollToPosition(position - jumpDistance);
+            }else {
+                // Range to high? => move to top
+                SyncedListStep newStep =
+                        new SyncedListStep(listData.get(position).getId(),
+                                           ACTION.MOVE, 0);
+                onAddStep(newStep, true);
+                recyclerView.scrollToPosition(0);
             }
         });
 
         // on move down
         viewHolder.iVBtnDown.setOnClickListener(vi -> {
-            if (position < listData.size() - 1) {
+            if (position + jumpDistance <= listData.size() - 1) {
                 SyncedListStep newStep =
                         new SyncedListStep(listData.get(position).getId(),
-                                           ACTION.SWAP,
-                                           listData.get(position + 1).getId());
+                                           ACTION.MOVE,
+                                           position + jumpDistance);
                 onAddStep(newStep, true);
-                recyclerView.scrollToPosition(position - 2);
+                recyclerView.scrollToPosition(position + jumpDistance);
+            }else {
+                // Range to high? => move to bottom
+                SyncedListStep newStep =
+                        new SyncedListStep(listData.get(position).getId(),
+                                           ACTION.MOVE,
+                                           listData.size() - 1);
+                onAddStep(newStep, true);
+                recyclerView.scrollToPosition(listData.size() - 1);
             }
         });
     }

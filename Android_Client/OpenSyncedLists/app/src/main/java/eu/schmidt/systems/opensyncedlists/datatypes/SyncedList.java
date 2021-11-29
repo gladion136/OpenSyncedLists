@@ -111,6 +111,9 @@ public class SyncedList {
                         moveItem(srcIndex, dstIndex, result);
                     }
                     break;
+                case CLEAR:
+                    result.clear();
+                    break;
                 default:
                     Log.e(Constant.LOG_TITLE_BUILDING,
                           "Cant found step action");

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -92,6 +93,21 @@ public class ListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.list_clear:
+                SyncedListStep syncedListStep = new SyncedListStep(null,
+                                                                   ACTION.CLEAR,
+                                                                   null);
+                syncedList.addElementStep(syncedListStep);
+                if (!save()) {
+                    return false;
+                }
+                syncedListAdapter.updateItems(syncedList.getElements(), true);
+                return true;
+            case R.id.settings:
+                Intent settingsIntent = new Intent(this,
+                                                   SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

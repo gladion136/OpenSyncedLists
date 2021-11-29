@@ -18,8 +18,11 @@ public class SyncedListStep {
     Object changeValue;
 
     public SyncedListStep(JSONObject jsonObject) throws JSONException {
-        this.changeId = jsonObject.getString("changeId");
         this.changeAction = ACTION.values()[jsonObject.getInt("changeAction")];
+        if (this.changeAction == ACTION.CLEAR) {
+            return;
+        }
+        this.changeId = jsonObject.getString("changeId");
         if (jsonObject.has("changeValueElement")) {
             this.changeValue = new SyncedListElement(
                     jsonObject.getJSONObject("changeValueElement"));

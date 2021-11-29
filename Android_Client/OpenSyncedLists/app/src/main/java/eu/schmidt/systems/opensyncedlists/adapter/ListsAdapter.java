@@ -77,7 +77,7 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.txtName.setText(dataModel.getName());
-        viewHolder.txtName.setOnClickListener(v -> {
+        convertView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ListActivity.class);
             try {
                 intent.putExtra("header", dataModel.toJSON().toString());

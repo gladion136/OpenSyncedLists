@@ -30,5 +30,23 @@
 
     <!-- Change before publish!  -->
     <string name="preference_file_key">asdkjbIG(CTDchabscTEc89iuHC87C</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="general_header">General</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- General Preferences -->
+    <string name="design_mode_title">Design</string>
+    <string name="pref_design_system">System</string>
+    <string name="pref_design_light">Hell</string>
+    <string name="pref_design_dark">Dunkel</string>
+    <string name="jump_range_title">Sprung Reichweite</string>
+    <string name="jump_range_description">So weit wird das Element mit den
+        Pfeilen \"Hoch\"/\"Runter\" verschoben</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync lists periodically</string>
+    <string name="default_server_title">Default server</string>
 
 </resources>

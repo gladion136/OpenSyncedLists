@@ -14,6 +14,7 @@
             ?attr/colorPrimaryVariant
         </item>
         <!-- Customize your theme here. -->
+        <item name="android:textColorPrimary">#ffffffff</item>
         <item name="android:textColor">#ffffffff</item>
 
     </style>
