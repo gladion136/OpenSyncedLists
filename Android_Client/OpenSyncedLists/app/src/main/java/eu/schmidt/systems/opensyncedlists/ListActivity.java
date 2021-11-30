@@ -68,7 +68,11 @@ public class ListActivity extends AppCompatActivity {
         iVNewElementTop.setOnClickListener(v -> createNewElement(true));
         iVNewElementBottom.setOnClickListener(v -> createNewElement(false));
         localStorage = new LocalStorage(this);
+    }
+
+    @Override protected void onResume() {
         init();
+        super.onResume();
     }
 
     /**
@@ -95,19 +99,31 @@ public class ListActivity extends AppCompatActivity {
                 onBackPressed();
                 return true;
             case R.id.list_clear:
-                SyncedListStep syncedListStep = new SyncedListStep(null,
-                                                                   ACTION.CLEAR,
-                                                                   null);
+                SyncedListStep syncedListStep =
+                        new SyncedListStep(null, ACTION.CLEAR, null);
                 syncedList.addElementStep(syncedListStep);
                 if (!save()) {
                     return false;
                 }
                 syncedListAdapter.updateItems(syncedList.getElements(), true);
                 return true;
+            case R.id.list_settings:
+                Intent listSettingsIntent =
+                        new Intent(this, ListSettingsActivity.class);
+                try {
+                    listSettingsIntent.putExtra("id",
+                                                syncedList.getId());
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+                startActivity(listSettingsIntent);
+                finish();
+                return true;
             case R.id.settings:
-                Intent settingsIntent = new Intent(this,
-                                                   SettingsActivity.class);
+                Intent settingsIntent =
+                        new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -118,11 +134,8 @@ public class ListActivity extends AppCompatActivity {
      */
     public void init() {
         try {
-            SyncedListHeader syncedListHeader = new SyncedListHeader(
-                    new JSONObject(
-                            getIntent().getExtras().getString("header")));
-            syncedList = localStorage.getList(syncedListHeader);
-        } catch (IOException | JSONException e) {
+            syncedList = localStorage.getList(getIntent().getExtras().getString("id"));
+        } catch (Exception e) {
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
@@ -130,12 +143,14 @@ public class ListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         syncedListAdapter =
                 new SyncedListAdapter(this, syncedList.getElements(),
-                                      recyclerView) {
+                                      recyclerView,
+                                      syncedList.getHeader().isCheckOption()) {
                     @Override
                     public void onAddStep(SyncedListStep syncedListStep,
                                           boolean notify) {
                         syncedList.addElementStep(syncedListStep);
-                        syncedListAdapter.updateItems(syncedList.getElements(), notify);
+                        syncedListAdapter
+                                .updateItems(syncedList.getElements(), notify);
                         save();
                     }
                 };
@@ -174,7 +189,7 @@ public class ListActivity extends AppCompatActivity {
 
     public boolean save() {
         try {
-            localStorage.setList(syncedList);
+            localStorage.setList(syncedList, false);
         } catch (IOException | JSONException e) {
             Log.e(Constant.LOG_TITLE_DEFAULT,
                   "Local storage " + "write" + " error: " + e);
@@ -187,6 +202,4 @@ public class ListActivity extends AppCompatActivity {
     @Override public void onBackPressed() {
         finish();
     }
-
-
 }

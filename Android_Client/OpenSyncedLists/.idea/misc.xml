@@ -14,6 +14,7 @@
         <entry key="app/src/main/res/layout/settings_activity.xml" value="0.17451874366767983" />
         <entry key="app/src/main/res/menu/all_lists_menu.xml" value="0.3528205128205128" />
         <entry key="app/src/main/res/menu/one_list_menu.xml" value="0.3528205128205128" />
+        <entry key="app/src/main/res/xml/list_preferences.xml" value="0.25" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.17451874366767983" />
       </map>
     </option>

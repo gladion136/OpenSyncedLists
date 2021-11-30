@@ -79,11 +79,7 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
         viewHolder.txtName.setText(dataModel.getName());
         convertView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ListActivity.class);
-            try {
-                intent.putExtra("header", dataModel.toJSON().toString());
-            } catch (JSONException exception) {
-                exception.printStackTrace();
-            }
+            intent.putExtra("id", dataModel.getId());
             context.startActivity(intent);
         });
         return convertView;

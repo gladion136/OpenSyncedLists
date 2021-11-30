@@ -13,14 +13,18 @@
         android:theme="@style/Theme.OpenSyncedLists"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ListSettingsActivity"
+            android:exported="true"
+            android:label="@string/list_settings_title" />
+        <activity
             android:name=".SettingsActivity"
             android:exported="true"
-            android:parentActivityName=".ListsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".ListsActivity" />
         <activity
             android:name=".AboutActivity"
-            android:parentActivityName=".ListsActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:parentActivityName=".ListsActivity" />
         <activity
             android:name=".ListsActivity"
             android:exported="true">

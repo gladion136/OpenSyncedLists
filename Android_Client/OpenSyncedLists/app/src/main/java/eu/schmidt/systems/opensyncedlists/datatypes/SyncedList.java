@@ -218,7 +218,7 @@ public class SyncedList {
         return jsonObject;
     }
 
-    public SyncedListHeader getSyncedListHeader() {
+    public SyncedListHeader getHeader() {
         return syncedListHeader;
     }
 }

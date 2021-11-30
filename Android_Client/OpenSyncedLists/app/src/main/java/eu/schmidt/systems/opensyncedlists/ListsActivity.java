@@ -36,6 +36,7 @@ import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
 public class ListsActivity extends AppCompatActivity {
 
     LocalStorage localStorage;
+    SharedPreferences globalSharedPreferences;
     ArrayList<SyncedListHeader> syncedListsHeaders;
     FloatingActionButton fab;
 
@@ -48,7 +49,11 @@ public class ListsActivity extends AppCompatActivity {
         lVLists = findViewById(R.id.lVLists);
         fab = findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(v -> showCreateListDialog());
+    }
+
+    @Override protected void onResume() {
         init();
+        super.onResume();
     }
 
     public String getUniqueListId() {
@@ -83,11 +88,12 @@ public class ListsActivity extends AppCompatActivity {
         lVLists.setAdapter(listsAdapter);
 
         // Read and use preferences
-        SharedPreferences sharedPreferences =
+        globalSharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
-        if(sharedPreferences.getString("design", "").equals(getString(R.string.pref_design_light))) {
+        if(globalSharedPreferences.getString("design", "").equals(getString(R.string.pref_design_light))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }else if(sharedPreferences.getString("design", "").equals(getString(R.string.pref_design_dark))) {
+        }else if(globalSharedPreferences
+                .getString("design", "").equals(getString(R.string.pref_design_dark))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
@@ -152,16 +158,18 @@ public class ListsActivity extends AppCompatActivity {
                             return;
                         }
                         SyncedList newList = new SyncedList(
-                                new SyncedListHeader(getUniqueListId(), result,
+                                new SyncedListHeader(getUniqueListId(),
+                                                     result,
+                                                     globalSharedPreferences.getString("default_server", ""),
                                                      null, null),
                                 new ArrayList<>());
                         newList.setSecret(
                                 Cryptography.generatingRandomString(50));
                         newList.setLocalSecret(
                                 Cryptography.generatingRandomString(50));
-                        syncedListsHeaders.add(newList.getSyncedListHeader());
+                        syncedListsHeaders.add(newList.getHeader());
                         try {
-                            localStorage.setList(newList);
+                            localStorage.setList(newList, false);
                             localStorage.setListsHeaders(syncedListsHeaders);
                             listsAdapter.updateItems(syncedListsHeaders);
                         } catch (Exception e) {

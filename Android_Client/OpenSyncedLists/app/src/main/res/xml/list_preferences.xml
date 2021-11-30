@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="list_settings">
+    <PreferenceCategory android:title="@string/general_header">
+
+        <EditTextPreference
+            android:key="list_name"
+            android:title="@string/list_pref_name_title"
+            android:persistent="false" />
+
+        <SwitchPreferenceCompat
+            android:key="check_option"
+            android:title="@string/list_pref_check_option_title"
+            android:persistent="false" />
+
+        <SwitchPreferenceCompat
+            android:key="checked_list"
+            android:title="@string/list_pref_checked_list_title"
+            android:summary="@string/list_pref_checked_list_summary"
+            android:dependency="check_option"
+            android:persistent="false" />
+
+        <Preference
+            android:title="@string/list_pref_delete_btn_title"
+            android:key="delete_btn"
+            android:summary="@string/list_pref_delete_btn_summary"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            android:key="auto_sync"
+            android:title="@string/list_pref_sync_title"
+            android:summaryOn="@string/list_pref_sync_on"
+            android:summaryOff="@string/list_pref_sync_off"
+            android:persistent="false" />
+
+        <EditTextPreference
+            android:key="server_name"
+            android:title="@string/list_pref_server_name"
+            android:persistent="false" />
+
+        <Preference
+            android:title="@string/list_pref_delete_online_btn_title"
+            android:key="delete_online_btn"
+            android:summary="@string/list_pref_delete_online_btn_summary"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

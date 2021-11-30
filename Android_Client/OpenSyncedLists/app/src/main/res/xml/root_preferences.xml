@@ -1,34 +1,34 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/general_header">
-
-        <ListPreference
-            app:entries="@array/pref_design"
-            app:entryValues="@array/pref_design"
-            app:defaultValue="@string/pref_design_system"
-            app:key="design"
-            app:title="@string/design_mode_title" />
+    <PreferenceCategory android:title="@string/general_header">
 
         <ListPreference
-            app:entries="@array/pref_jump_range"
-            app:entryValues="@array/pref_jump_range"
-            app:defaultValue="1"
-            app:summary="@string/jump_range_description"
-            app:key="jump_range"
-            app:title="@string/jump_range_title" />
+            android:entries="@array/pref_design"
+            android:entryValues="@array/pref_design"
+            android:defaultValue="@string/pref_design_system"
+            android:key="design"
+            android:title="@string/design_mode_title" />
+
+        <ListPreference
+            android:entries="@array/pref_jump_range"
+            android:entryValues="@array/pref_jump_range"
+            android:defaultValue="1"
+            android:summary="@string/jump_range_description"
+            android:key="jump_range"
+            android:title="@string/jump_range_title" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+    <PreferenceCategory android:title="@string/sync_header">
 
         <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+            android:key="sync"
+            android:title="@string/sync_title" />
 
         <EditTextPreference
-            app:key="default_server"
-            app:title="@string/default_server_title"
-            app:useSimpleSummaryProvider="true" />
+            android:key="default_server"
+            android:title="@string/default_server_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>

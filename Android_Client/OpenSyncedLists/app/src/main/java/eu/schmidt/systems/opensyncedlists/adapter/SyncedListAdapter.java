@@ -41,6 +41,7 @@ public abstract class SyncedListAdapter
         implements View.OnClickListener {
     private Context context;
     private RecyclerView recyclerView;
+    private boolean checkOption;
     private ArrayList<SyncedListElement> listData;
     private LayoutInflater layoutInflater;
     private int jumpDistance = 1;
@@ -76,10 +77,12 @@ public abstract class SyncedListAdapter
      */
     public SyncedListAdapter(Context context,
                              ArrayList<SyncedListElement> listData,
-                             RecyclerView recyclerView) {
+                             RecyclerView recyclerView,
+                             boolean checkOption) {
         this.context = context;
         this.recyclerView = recyclerView;
         this.listData = listData;
+        this.checkOption = checkOption;
         layoutInflater = LayoutInflater.from(context);
 
         // Add ItemTouchHelper for drag and drop events
@@ -177,6 +180,10 @@ public abstract class SyncedListAdapter
         viewHolder.checkBox.setOnCheckedChangeListener(null);
         viewHolder.eTName.setOnFocusChangeListener(null);
         viewHolder.eTName.setOnEditorActionListener(null);
+
+        if(!checkOption) {
+            viewHolder.checkBox.setVisibility(View.GONE);
+        }
 
         // name edittext
         viewHolder.eTName.setOnFocusChangeListener((v, focused) -> {
