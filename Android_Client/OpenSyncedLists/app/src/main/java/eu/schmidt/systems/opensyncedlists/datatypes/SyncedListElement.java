@@ -68,4 +68,14 @@ public class SyncedListElement {
         jsonObject.put("description", description);
         return jsonObject;
     }
+
+    public String getAsReadableString() {
+        String result = "";
+        result += checked ? "[x]" : "[ ]";
+        result += " " + getName();
+        if (!getDescription().equals("")) {
+            result += " - " + getDescription();
+        }
+        return result;
+    }
 }

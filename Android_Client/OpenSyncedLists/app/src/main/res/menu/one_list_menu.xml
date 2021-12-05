@@ -3,10 +3,15 @@
     <item android:id="@+id/list_clear"
         android:title="@string/menu_list_clear" />
 
+    <item android:id="@+id/export_md"
+        android:title="@string/menu_export_share_md" />
+
     <item android:id="@+id/export_chat"
         android:title="@string/menu_export_share" />
+
     <item android:id="@+id/export_qr"
         android:title="@string/menu_export_qr" />
+
     <item android:id="@+id/export_more"
         android:title="@string/menu_export_more" />
 

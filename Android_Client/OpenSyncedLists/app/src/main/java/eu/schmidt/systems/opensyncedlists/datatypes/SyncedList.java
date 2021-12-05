@@ -252,4 +252,23 @@ public class SyncedList {
     public SyncedListHeader getHeader() {
         return syncedListHeader;
     }
+
+
+    public String getAsReadableString() {
+        String list = getName();
+        if(getHeader().isCheckedList()) {
+            for(SyncedListElement element : uncheckedElementsBuffer) {
+                list += "\n" + element.getAsReadableString();
+            }
+
+            for(SyncedListElement element : checkedElementsBuffer) {
+                list += "\n" + element.getAsReadableString();
+            }
+        }else {
+            for(SyncedListElement element : elementsBuffer) {
+                list += "\n" + element.getAsReadableString();
+            }
+        }
+        return list;
+    }
 }

@@ -102,6 +102,16 @@ public class ListActivity extends AppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.export_md:
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT,
+                                    syncedList.getAsReadableString());
+                sendIntent.setType("text/plain");
+                Intent shareIntent =
+                        Intent.createChooser(sendIntent, syncedList.getName());
+                startActivity(shareIntent);
+                return true;
             case R.id.list_clear:
                 SyncedListStep syncedListStep =
                         new SyncedListStep(null, ACTION.CLEAR, null);
