@@ -6,8 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,19 +18,22 @@ import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
  */
 public class SyncedList {
     SyncedListHeader syncedListHeader;
-    public ArrayList<SyncedListElement> elementsBuffer;
+    public ArrayList<SyncedListElement> elementsBuffer, checkedElementsBuffer,
+            uncheckedElementsBuffer;
     ArrayList<SyncedListStep> elementSteps;
 
     public SyncedList(SyncedListHeader syncedListHeader, JSONObject jsonObject)
             throws JSONException {
         this.syncedListHeader = syncedListHeader;
         elementSteps = new ArrayList<>();
+        checkedElementsBuffer = new ArrayList<>();
+        uncheckedElementsBuffer = new ArrayList<>();
         JSONArray jsonArraySteps = jsonObject.getJSONArray("steps");
         for (int i = 0; i < jsonArraySteps.length(); i++) {
             JSONObject step = (JSONObject) jsonArraySteps.get(i);
             elementSteps.add(new SyncedListStep(step));
         }
-        elementsBuffer = getReformatElements();
+        recalculateBuffers();
     }
 
     public SyncedList(SyncedListHeader syncedListHeader,
@@ -123,11 +124,41 @@ public class SyncedList {
         return result;
     }
 
+    public void recalculateBuffers() {
+        elementsBuffer = getReformatElements();
+        if (getHeader().isCheckedList()) {
+            checkedElementsBuffer = new ArrayList<>();
+            uncheckedElementsBuffer = new ArrayList<>();
+            for (SyncedListElement element : elementsBuffer) {
+                if (element.getChecked()) {
+                    checkedElementsBuffer.add(element);
+                } else {
+                    uncheckedElementsBuffer.add(element);
+                }
+            }
+        }
+    }
+
     public ArrayList<SyncedListElement> getElements() {
         if (elementsBuffer == null) {
-            elementsBuffer = getReformatElements();
+            recalculateBuffers();
         }
         return elementsBuffer;
+    }
+
+    public ArrayList<SyncedListElement> getCheckedElements() {
+        if (elementsBuffer == null) {
+            recalculateBuffers();
+        }
+
+        return checkedElementsBuffer;
+    }
+
+    public ArrayList<SyncedListElement> getUncheckedElements() {
+        if (elementsBuffer == null) {
+            recalculateBuffers();
+        }
+        return uncheckedElementsBuffer;
     }
 
     public String getId() {
@@ -173,12 +204,12 @@ public class SyncedList {
 
     public void setElementSteps(ArrayList<SyncedListStep> elementSteps) {
         this.elementSteps = elementSteps;
-        this.elementsBuffer = this.getReformatElements();
+        recalculateBuffers();
     }
 
     public void addElementStep(SyncedListStep elementStep) {
         this.elementSteps.add(elementStep);
-        this.elementsBuffer = this.getReformatElements();
+        recalculateBuffers();
     }
 
     public static <T> void moveItem(int sourceIndex,

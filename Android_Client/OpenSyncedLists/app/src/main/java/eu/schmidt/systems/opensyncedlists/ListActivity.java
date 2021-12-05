@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,11 +40,11 @@ public class ListActivity extends AppCompatActivity {
 
     LocalStorage localStorage;
     SyncedList syncedList;
-    RecyclerView recyclerView;
+    RecyclerView recyclerView, recyclerViewChecked;
     EditText eTNewElement;
     ImageView iVNewElementTop, iVNewElementBottom;
     protected RecyclerView.LayoutManager mLayoutManager;
-    SyncedListAdapter syncedListAdapter;
+    SyncedListAdapter syncedListAdapter, syncedListCheckedAdapter;
 
     /**
      * onCreate
@@ -53,11 +55,13 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerViewChecked = findViewById(R.id.recyclerViewChecked);
         eTNewElement = findViewById(R.id.eTNewElement);
         iVNewElementTop = findViewById(R.id.iVNewElementTop);
         iVNewElementBottom = findViewById(R.id.iVNewElementBottom);
         mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewChecked.setLayoutManager(new LinearLayoutManager(this));
         eTNewElement.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 createNewElement(false); // Need to read default from
@@ -111,8 +115,7 @@ public class ListActivity extends AppCompatActivity {
                 Intent listSettingsIntent =
                         new Intent(this, ListSettingsActivity.class);
                 try {
-                    listSettingsIntent.putExtra("id",
-                                                syncedList.getId());
+                    listSettingsIntent.putExtra("id", syncedList.getId());
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -134,27 +137,69 @@ public class ListActivity extends AppCompatActivity {
      */
     public void init() {
         try {
-            syncedList = localStorage.getList(getIntent().getExtras().getString("id"));
+            syncedList = localStorage
+                    .getList(getIntent().getExtras().getString("id"));
         } catch (Exception e) {
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
         setTitle(syncedList.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        syncedListAdapter =
-                new SyncedListAdapter(this, syncedList.getElements(),
-                                      recyclerView,
-                                      syncedList.getHeader().isCheckOption()) {
-                    @Override
-                    public void onAddStep(SyncedListStep syncedListStep,
-                                          boolean notify) {
-                        syncedList.addElementStep(syncedListStep);
-                        syncedListAdapter
-                                .updateItems(syncedList.getElements(), notify);
-                        save();
-                    }
-                };
+
+        syncedListAdapter = new SyncedListAdapter(this, syncedList.getHeader()
+                                                                .isCheckedList()
+                                                        ? syncedList
+                                                                .getUncheckedElements()
+                                                        : syncedList
+                                                                .getElements(),
+                                                  recyclerView,
+                                                  syncedList.getHeader()
+                                                          .isCheckOption(),
+                                                  syncedList.getHeader()
+                                                          .isCheckedList()) {
+            @Override public void onAddStep(SyncedListStep syncedListStep,
+                                            boolean notify) {
+                syncedList.addElementStep(syncedListStep);
+                if (syncedList.getHeader().isCheckedList()) {
+                    syncedListAdapter
+                            .updateItems(syncedList.getUncheckedElements(),
+                                         notify);
+                    syncedListCheckedAdapter
+                            .updateItems(syncedList.getCheckedElements(),
+                                         notify);
+                } else {
+                    syncedListAdapter
+                            .updateItems(syncedList.getElements(), notify);
+                }
+                save();
+            }
+        };
         recyclerView.setAdapter(syncedListAdapter);
+
+        if (syncedList.getHeader().isCheckedList()) {
+            syncedListCheckedAdapter =
+                    new SyncedListAdapter(this, syncedList.getCheckedElements(),
+                                          recyclerView, syncedList.getHeader()
+                                                  .isCheckOption(),
+                                          syncedList.getHeader()
+                                                  .isCheckedList()) {
+                        @Override
+                        public void onAddStep(SyncedListStep syncedListStep,
+                                              boolean notify) {
+                            syncedList.addElementStep(syncedListStep);
+                            syncedListAdapter.updateItems(
+                                    syncedList.getUncheckedElements(), notify);
+                            syncedListCheckedAdapter.updateItems(
+                                    syncedList.getCheckedElements(), notify);
+                            save();
+                        }
+                    };
+            recyclerViewChecked.setAdapter(syncedListCheckedAdapter);
+        } else {
+            TextView tVCheckedListTitle = findViewById(R.id.tVcheckedListTitle);
+            recyclerViewChecked.setVisibility(View.GONE);
+            tVCheckedListTitle.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -179,10 +224,18 @@ public class ListActivity extends AppCompatActivity {
         if (!save()) {
             return false;
         }
-        syncedListAdapter.updateItems(syncedList.getElements(), true);
+        if (syncedList.getHeader().isCheckedList()) {
+            syncedListAdapter
+                    .updateItems(syncedList.getUncheckedElements(), true);
+
+            syncedListCheckedAdapter
+                    .updateItems(syncedList.getCheckedElements(), true);
+        } else {
+            syncedListAdapter.updateItems(syncedList.getElements(), true);
+            recyclerView.scrollToPosition(
+                    top ? 0 : syncedList.getElements().size() - 1);
+        }
         eTNewElement.setText("");
-        recyclerView.scrollToPosition(
-                top ? 0 : syncedList.getElements().size() - 1);
         Log.d(Constant.LOG_TITLE_DEFAULT, "New element added to list");
         return true;
     }

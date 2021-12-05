@@ -42,6 +42,7 @@ public abstract class SyncedListAdapter
     private Context context;
     private RecyclerView recyclerView;
     private boolean checkOption;
+    private boolean forceNotify;
     private boolean scrollListTopBottom;
     private ArrayList<SyncedListElement> listData;
     private LayoutInflater layoutInflater;
@@ -79,11 +80,13 @@ public abstract class SyncedListAdapter
     public SyncedListAdapter(Context context,
                              ArrayList<SyncedListElement> listData,
                              RecyclerView recyclerView,
-                             boolean checkOption) {
+                             boolean checkOption,
+                             boolean forceNotify) {
         this.context = context;
         this.recyclerView = recyclerView;
         this.listData = listData;
         this.checkOption = checkOption;
+        this.forceNotify = forceNotify;
         layoutInflater = LayoutInflater.from(context);
 
         // Add ItemTouchHelper for drag and drop events
@@ -219,7 +222,7 @@ public abstract class SyncedListAdapter
             SyncedListStep newStep =
                     new SyncedListStep(listData.get(position).getId(),
                                        ACTION.UPDATE, updated);
-            onAddStep(newStep, false);
+            onAddStep(newStep, this.forceNotify);
         });
 
         // on move to top

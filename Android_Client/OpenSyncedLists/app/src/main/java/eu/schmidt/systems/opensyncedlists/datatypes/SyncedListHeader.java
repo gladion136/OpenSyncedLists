@@ -53,7 +53,7 @@ public class SyncedListHeader {
         this.secret = secret;
         this.localSecret = localSecret;
         this.checkOption = true;
-        this.checkedList = true;
+        this.checkedList = false;
         this.autoSync = true;
     }
 
