@@ -21,6 +21,7 @@
     <string name="edit_element_title">Element bearbeiten</string>
     <string name="edit_element_name">Name</string>
     <string name="edit_element_description">Beschreibung</string>
+    <string name="title_checked_list">Abgehakte Elemente:</string>
 
     <!--     About               -->
     <string name="text_about">Enstanden während des Moduls "Mobile
@@ -67,5 +68,8 @@
         online löschen</string>
     <string name="list_pref_delete_online_btn_summary">Achtung! Die Liste wird
         auf dem Server gelöscht!</string>
+    <string name="scroll_list_title">Liste scrollen</string>
+    <string name="scroll_list_summary">Liste scrollen nachdem ein
+        Element nach ganz oben/unten verschoben wurde.</string>
 
 </resources>

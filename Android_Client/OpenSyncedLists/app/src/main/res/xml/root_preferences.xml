@@ -18,12 +18,19 @@
             android:key="jump_range"
             android:title="@string/jump_range_title" />
 
+        <SwitchPreferenceCompat
+            android:key="scrollList"
+            android:defaultValue="false"
+            android:title="@string/scroll_list_title"
+            android:summary="@string/scroll_list_summary"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/sync_header">
 
         <SwitchPreferenceCompat
             android:key="sync"
+            android:defaultValue="true"
             android:title="@string/sync_title" />
 
         <EditTextPreference
