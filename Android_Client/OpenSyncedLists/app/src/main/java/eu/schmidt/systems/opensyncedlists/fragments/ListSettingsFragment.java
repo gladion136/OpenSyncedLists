@@ -23,12 +23,12 @@ import eu.schmidt.systems.opensyncedlists.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
-import eu.schmidt.systems.opensyncedlists.utils.LocalStorage;
+import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
 
 public class ListSettingsFragment extends PreferenceFragmentCompat {
 
     SyncedList syncedList;
-    LocalStorage localStorage;
+    SecureStorage secureStorage;
 
     public static void SettingsFragment() {
 
@@ -43,9 +43,9 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
                                        @Nullable ViewGroup container,
                                        @Nullable Bundle savedInstanceState) {
         // Init Storage and read current list
-        localStorage = new LocalStorage(getContext());
+        secureStorage = new SecureStorage(getContext());
         try {
-            syncedList = localStorage.getList(getArguments().getString("id"));
+            syncedList = secureStorage.getList(getArguments().getString("id"));
         } catch (Exception e) {
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
@@ -68,7 +68,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
         Preference deleteBtn = findPreference("delete_btn");
         deleteBtn.setOnPreferenceClickListener(v -> {
             try {
-                localStorage.deleteList(syncedList.getId());
+                secureStorage.deleteList(syncedList.getId());
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -136,7 +136,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
     public boolean save() {
         try {
-            localStorage.setList(syncedList, true);
+            secureStorage.setList(syncedList, true);
         } catch (IOException | JSONException e) {
             Log.e(Constant.LOG_TITLE_DEFAULT,
                   "Local storage " + "write" + " error: " + e);

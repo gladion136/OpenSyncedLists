@@ -1,8 +1,9 @@
 package eu.schmidt.systems.opensyncedlists;
 
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,26 +20,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import eu.schmidt.systems.opensyncedlists.adapter.SyncedListAdapter;
 import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
-import eu.schmidt.systems.opensyncedlists.utils.LocalStorage;
+import eu.schmidt.systems.opensyncedlists.utils.FileStorage;
+import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
 
 /**
  * ListActivity displays one list
  */
 public class ListActivity extends AppCompatActivity {
 
-    LocalStorage localStorage;
+    SecureStorage secureStorage;
     SyncedList syncedList;
     RecyclerView recyclerView, recyclerViewChecked;
     EditText eTNewElement;
@@ -71,7 +70,7 @@ public class ListActivity extends AppCompatActivity {
         });
         iVNewElementTop.setOnClickListener(v -> createNewElement(true));
         iVNewElementBottom.setOnClickListener(v -> createNewElement(false));
-        localStorage = new LocalStorage(this);
+        secureStorage = new SecureStorage(this);
     }
 
     @Override protected void onResume() {
@@ -112,6 +111,11 @@ public class ListActivity extends AppCompatActivity {
                         Intent.createChooser(sendIntent, syncedList.getName());
                 startActivity(shareIntent);
                 return true;
+            case R.id.export_list_json:
+                String absolutPath = FileStorage.exportList(this, syncedList);
+                Log.i(LOG_TITLE_STORAGE, "Exported list to: " + absolutPath);
+                FileStorage.shareFile(this, absolutPath);
+                return true;
             case R.id.list_clear:
                 SyncedListStep syncedListStep =
                         new SyncedListStep(null, ACTION.CLEAR, null);
@@ -147,7 +151,7 @@ public class ListActivity extends AppCompatActivity {
      */
     public void init() {
         try {
-            syncedList = localStorage
+            syncedList = secureStorage
                     .getList(getIntent().getExtras().getString("id"));
         } catch (Exception e) {
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
@@ -252,7 +256,7 @@ public class ListActivity extends AppCompatActivity {
 
     public boolean save() {
         try {
-            localStorage.setList(syncedList, false);
+            secureStorage.setList(syncedList, false);
         } catch (IOException | JSONException e) {
             Log.e(Constant.LOG_TITLE_DEFAULT,
                   "Local storage " + "write" + " error: " + e);

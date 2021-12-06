@@ -1,5 +1,10 @@
 package eu.schmidt.systems.opensyncedlists;
 
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -7,6 +12,7 @@ import androidx.preference.PreferenceManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,17 +23,23 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import eu.schmidt.systems.opensyncedlists.adapter.ListsAdapter;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
-import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
-import eu.schmidt.systems.opensyncedlists.utils.LocalStorage;
+import eu.schmidt.systems.opensyncedlists.utils.FileStorage;
+import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
 
 /**
@@ -35,7 +47,8 @@ import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
  */
 public class ListsActivity extends AppCompatActivity {
 
-    LocalStorage localStorage;
+    ActivityResultLauncher onImportLauncher;
+    SecureStorage secureStorage;
     SharedPreferences globalSharedPreferences;
     ArrayList<SyncedListHeader> syncedListsHeaders;
     FloatingActionButton fab;
@@ -49,11 +62,29 @@ public class ListsActivity extends AppCompatActivity {
         lVLists = findViewById(R.id.lVLists);
         fab = findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(v -> showCreateListDialog());
+
+        onImportLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Uri importFile = result.getData().getData();
+                        importFile(importFile);
+                    }
+                });
     }
 
     @Override protected void onResume() {
         init();
         super.onResume();
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
+        if (intent.getType().equals("application/json")) {
+            Uri receivedFile =
+                    (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            importFile(receivedFile);
+        }
+        super.onNewIntent(intent);
     }
 
     public String getUniqueListId() {
@@ -74,11 +105,11 @@ public class ListsActivity extends AppCompatActivity {
     }
 
     public void init() {
-        localStorage = new LocalStorage(this);
+        secureStorage = new SecureStorage(this);
         try {
-            syncedListsHeaders = localStorage.getListsHeaders();
+            syncedListsHeaders = secureStorage.getListsHeaders();
         } catch (JSONException e) {
-            Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
+            Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
         initServerConnection();
@@ -90,37 +121,41 @@ public class ListsActivity extends AppCompatActivity {
         // Read and use preferences
         globalSharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
-        if(globalSharedPreferences.getString("design", "").equals(getString(R.string.pref_design_light))) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }else if(globalSharedPreferences
-                .getString("design", "").equals(getString(R.string.pref_design_dark))) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        if (globalSharedPreferences.getString("design", "")
+                .equals(getString(R.string.pref_design_light))) {
+            AppCompatDelegate
+                    .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else if (globalSharedPreferences.getString("design", "")
+                .equals(getString(R.string.pref_design_dark))) {
+            AppCompatDelegate
+                    .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
     }
 
     public void initServerConnection() {
         ServerConnection.check_connection((jsonObject, exception) -> {
             if (jsonObject == null) {
-                Log.e(Constant.LOG_TITLE_DEFAULT,
+                Log.e(LOG_TITLE_DEFAULT,
                       "No connection to server: " + exception);
                 return;
             }
 
             try {
                 if (jsonObject.getString("status").equals("OK")) {
-                    Log.d(Constant.LOG_TITLE_DEFAULT, "Connection is good!");
+                    Log.d(LOG_TITLE_DEFAULT, "Connection is good!");
                     /**
                      * Next code here !!
                      * --------------------------------------------
                      */
                 } else {
-                    Log.e(Constant.LOG_TITLE_DEFAULT, "Connection is bad: " +
+                    Log.e(LOG_TITLE_DEFAULT, "Connection is bad: " +
                             jsonObject.getString("status"));
                 }
             } catch (JSONException e) {
-                Log.e(Constant.LOG_TITLE_DEFAULT, "Connection is bad.. " + e);
+                Log.e(LOG_TITLE_DEFAULT, "Connection is bad.. " + e);
             }
         });
     }
@@ -130,9 +165,33 @@ public class ListsActivity extends AppCompatActivity {
             case R.id.new_list:
                 showCreateListDialog();
                 return true;
+            case R.id.import_lists:
+                Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+                chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
+                chooseFile.setType("application/json");
+                Intent intent = Intent.createChooser(chooseFile,
+                                                     "Choose a file to " +
+                                                             "import");
+                onImportLauncher.launch(intent);
+                return true;
+            case R.id.export_lists:
+                ArrayList<SyncedList> syncedLists = new ArrayList<>();
+                for (SyncedListHeader header : syncedListsHeaders) {
+                    try {
+                        syncedLists.add(secureStorage.getList(header.getId()));
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+                String absolutePath =
+                        FileStorage.exportLists(this, syncedLists);
+                Log.i(LOG_TITLE_DEFAULT,
+                      "Export all files to: " + absolutePath);
+                FileStorage.shareFile(this, absolutePath);
+                return true;
             case R.id.settings:
-                Intent settingsIntent = new Intent(this,
-                                                   SettingsActivity.class);
+                Intent settingsIntent =
+                        new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
             case R.id.about:
@@ -158,26 +217,73 @@ public class ListsActivity extends AppCompatActivity {
                             return;
                         }
                         SyncedList newList = new SyncedList(
-                                new SyncedListHeader(getUniqueListId(),
-                                                     result,
-                                                     globalSharedPreferences.getString("default_server", ""),
-                                                     null, null),
-                                new ArrayList<>());
+                                new SyncedListHeader(getUniqueListId(), result,
+                                                     globalSharedPreferences
+                                                             .getString(
+                                                                     "default_server",
+                                                                     ""), null,
+                                                     null), new ArrayList<>());
                         newList.setSecret(
                                 Cryptography.generatingRandomString(50));
                         newList.setLocalSecret(
                                 Cryptography.generatingRandomString(50));
-                        syncedListsHeaders.add(newList.getHeader());
-                        try {
-                            localStorage.setList(newList, false);
-                            localStorage.setListsHeaders(syncedListsHeaders);
-                            listsAdapter.updateItems(syncedListsHeaders);
-                        } catch (Exception e) {
-                            Log.e(Constant.LOG_TITLE_DEFAULT,
-                                  "Local storage write" + " error: " + e);
-                            e.printStackTrace();
-                        }
+                        addListAndHandleCallback(newList);
                     }
                 });
+    }
+
+    public void addListAndHandleCallback(SyncedList syncedList) {
+        String result = null;
+        try {
+            result = secureStorage.addList(syncedList);
+            if (!result.equals("")) {
+                Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+            }
+            syncedListsHeaders = secureStorage.getListsHeaders();
+            listsAdapter.updateItems(syncedListsHeaders);
+        } catch (JSONException exception) {
+            exception.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * MOVE FUNCTION TO SECURESTORAGE ??
+     *
+     * @param uri
+     */
+    public void importFile(Uri uri) {
+        try {
+            InputStream in = getContentResolver().openInputStream(uri);
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            StringBuilder total = new StringBuilder();
+            for (String line; (line = r.readLine()) != null; ) {
+                total.append(line).append('\n');
+            }
+
+            String content = total.toString();
+            try {
+                JSONArray jsonArray = new JSONArray(content);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    addListAndHandleCallback(
+                            new SyncedList((JSONObject) jsonArray.get(i)));
+                }
+            } catch (JSONException e) {
+                try {
+                    JSONObject jsonObject = new JSONObject(content);
+                    SyncedList importedList = new SyncedList(jsonObject);
+                    addListAndHandleCallback(importedList);
+                } catch (JSONException exception) {
+                    Toast.makeText(this, "Cant import File!", Toast.LENGTH_LONG)
+                            .show();
+                    Log.e(LOG_TITLE_DEFAULT,
+                          "Cant import file: " + exception.toString());
+                }
+            }
+        } catch (IOException e) {
+
+        }
     }
 }

@@ -12,8 +12,8 @@
     <item android:id="@+id/export_qr"
         android:title="@string/menu_export_qr" />
 
-    <item android:id="@+id/export_more"
-        android:title="@string/menu_export_more" />
+    <item android:id="@+id/export_list_json"
+        android:title="@string/menu_export_list_json" />
 
     <item android:id="@+id/list_settings"
         android:title="@string/menu_list_settings" />

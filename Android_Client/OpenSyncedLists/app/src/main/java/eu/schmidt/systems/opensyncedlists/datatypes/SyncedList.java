@@ -22,6 +22,21 @@ public class SyncedList {
             uncheckedElementsBuffer;
     ArrayList<SyncedListStep> elementSteps;
 
+    public SyncedList(JSONObject jsonObject)
+            throws JSONException {
+        this.syncedListHeader =
+                new SyncedListHeader(jsonObject.getJSONObject("header"));
+        elementSteps = new ArrayList<>();
+        checkedElementsBuffer = new ArrayList<>();
+        uncheckedElementsBuffer = new ArrayList<>();
+        JSONArray jsonArraySteps = jsonObject.getJSONArray("steps");
+        for (int i = 0; i < jsonArraySteps.length(); i++) {
+            JSONObject step = (JSONObject) jsonArraySteps.get(i);
+            elementSteps.add(new SyncedListStep(step));
+        }
+        recalculateBuffers();
+    }
+
     public SyncedList(SyncedListHeader syncedListHeader, JSONObject jsonObject)
             throws JSONException {
         this.syncedListHeader = syncedListHeader;
@@ -236,7 +251,7 @@ public class SyncedList {
     /**
      * Convert to JSON (HEADER not included)
      *
-     * @return
+     * @return SyncedList steps
      * @throws JSONException
      */
     public JSONObject toJSON() throws JSONException {
@@ -246,6 +261,18 @@ public class SyncedList {
             jsonArraySteps.put(step.toJSON());
         }
         jsonObject.put("steps", jsonArraySteps);
+        return jsonObject;
+    }
+
+    /**
+     * Convert to JSON (Header with secrets included)
+     *
+     * @return SyncedList with secrets
+     * @throws JSONException
+     */
+    public JSONObject toJSONwithHeader() throws JSONException {
+        JSONObject jsonObject = toJSON();
+        jsonObject.put("header", getHeader().toJSON());
         return jsonObject;
     }
 
