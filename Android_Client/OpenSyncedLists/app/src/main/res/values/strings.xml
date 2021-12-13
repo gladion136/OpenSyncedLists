@@ -23,6 +23,8 @@
     <string name="edit_element_name">Name</string>
     <string name="edit_element_description">Beschreibung</string>
     <string name="title_checked_list">Abgehakte Elemente:</string>
+    <string name="eT_new_element">Neues Element</string>
+    <string name="list_element_isolator_tV">Abgehakte Elemente:</string>
 
     <!--     About               -->
     <string name="text_about">Enstanden während des Moduls "Mobile

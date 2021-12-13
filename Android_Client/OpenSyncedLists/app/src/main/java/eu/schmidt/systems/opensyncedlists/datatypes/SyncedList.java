@@ -1,5 +1,7 @@
 package eu.schmidt.systems.opensyncedlists.datatypes;
 
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
+
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -22,8 +24,7 @@ public class SyncedList {
             uncheckedElementsBuffer;
     ArrayList<SyncedListStep> elementSteps;
 
-    public SyncedList(JSONObject jsonObject)
-            throws JSONException {
+    public SyncedList(JSONObject jsonObject) throws JSONException {
         this.syncedListHeader =
                 new SyncedListHeader(jsonObject.getJSONObject("header"));
         elementSteps = new ArrayList<>();
@@ -280,22 +281,22 @@ public class SyncedList {
         return syncedListHeader;
     }
 
-
     public String getAsReadableString() {
         String list = getName();
-        if(getHeader().isCheckedList()) {
-            for(SyncedListElement element : uncheckedElementsBuffer) {
+        if (getHeader().isCheckedList()) {
+            for (SyncedListElement element : uncheckedElementsBuffer) {
                 list += "\n" + element.getAsReadableString();
             }
 
-            for(SyncedListElement element : checkedElementsBuffer) {
+            for (SyncedListElement element : checkedElementsBuffer) {
                 list += "\n" + element.getAsReadableString();
             }
-        }else {
-            for(SyncedListElement element : elementsBuffer) {
+        } else {
+            for (SyncedListElement element : elementsBuffer) {
                 list += "\n" + element.getAsReadableString();
             }
         }
         return list;
     }
+
 }

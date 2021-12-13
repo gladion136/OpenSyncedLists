@@ -79,7 +79,8 @@ public class ListsActivity extends AppCompatActivity {
     }
 
     @Override protected void onNewIntent(Intent intent) {
-        if (intent.getType().equals("application/json")) {
+        if (intent.getType() != null && intent.getType().equals("application" +
+                                                                     "/json")) {
             Uri receivedFile =
                     (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
             importFile(receivedFile);

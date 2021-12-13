@@ -1,10 +1,11 @@
 package eu.schmidt.systems.opensyncedlists.adapter;
 
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
+import eu.schmidt.systems.opensyncedlists.ListActivity;
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
+import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.fragments.ElementEditorFragment;
@@ -36,29 +38,27 @@ import eu.schmidt.systems.opensyncedlists.utils.Constant;
 /**
  * RecyclerView Adapter for ListActivity
  */
-public abstract class SyncedListAdapter
-        extends RecyclerView.Adapter<SyncedListAdapter.ViewHolder>
+public class SyncedListAdapter
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements View.OnClickListener {
-    private Context context;
+    private ListActivity listActivity;
+    private SyncedList syncedList;
     private RecyclerView recyclerView;
-    private boolean checkOption;
-    private boolean forceNotify;
     private boolean scrollListTopBottom;
-    private ArrayList<SyncedListElement> listData;
     private LayoutInflater layoutInflater;
     private int jumpDistance = 1;
 
     /**
      * ViewHolder for one element
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ElementViewHolder extends RecyclerView.ViewHolder {
         public final CheckBox checkBox;
         public final EditText eTName;
         public final TextView tVDescription;
         public final ImageView iVBtnUp, iVBtnDown;
         public final Button btnTop, btnBottom;
 
-        public ViewHolder(View view) {
+        public ElementViewHolder(View view) {
             super(view);
             checkBox = view.findViewById(R.id.checkBox);
             eTName = view.findViewById(R.id.eTTitle);
@@ -71,23 +71,22 @@ public abstract class SyncedListAdapter
     }
 
     /**
-     * Adapter constructor
-     *
-     * @param context      Context
-     * @param listData     list elements to display
-     * @param recyclerView recyclerview which is connected to this adapter
+     * ViewHolder for the isolator
      */
-    public SyncedListAdapter(Context context,
-                             ArrayList<SyncedListElement> listData,
+    public static class IsolatorViewHolder extends RecyclerView.ViewHolder {
+
+        public IsolatorViewHolder(View view) {
+            super(view);
+        }
+    }
+
+    public SyncedListAdapter(ListActivity listActivity,
                              RecyclerView recyclerView,
-                             boolean checkOption,
-                             boolean forceNotify) {
-        this.context = context;
+                             SyncedList syncedList) {
+        this.listActivity = listActivity;
         this.recyclerView = recyclerView;
-        this.listData = listData;
-        this.checkOption = checkOption;
-        this.forceNotify = forceNotify;
-        layoutInflater = LayoutInflater.from(context);
+        this.syncedList = syncedList;
+        layoutInflater = LayoutInflater.from(listActivity);
 
         // Add ItemTouchHelper for drag and drop events
         ItemTouchHelper itemTouchHelper =
@@ -95,16 +94,32 @@ public abstract class SyncedListAdapter
                     public boolean onMove(RecyclerView recyclerView,
                                           RecyclerView.ViewHolder viewHolder,
                                           RecyclerView.ViewHolder target) {
-                        SyncedListStep newStep = new SyncedListStep(
-                                listData.get(viewHolder.getAdapterPosition())
-                                        .getId(), ACTION.SWAP,
-                                listData.get(target.getAdapterPosition())
-                                        .getId());
-                        onAddStep(newStep, false);
+                        if (viewHolder instanceof ElementViewHolder &&
+                                target instanceof ElementViewHolder) {
+                            SyncedListElement selectedElement =
+                                    getElementOnPosition(
+                                            viewHolder.getAdapterPosition());
+                            SyncedListElement displacedElement =
+                                    getElementOnPosition(
+                                            target.getAdapterPosition());
+                            if (syncedList.getHeader().isCheckedList() &&
+                                    selectedElement.getChecked() !=
+                                            displacedElement.getChecked()) {
+                                return false;
+                            }
+                            int newPositionInList = syncedList.getElements()
+                                    .indexOf(displacedElement);
+                            SyncedListStep newStep =
+                                    new SyncedListStep(selectedElement.getId(),
+                                                       ACTION.MOVE,
+                                                       newPositionInList);
+                            listActivity.addElementStepAndSave(newStep, false);
 
-                        notifyItemMoved(viewHolder.getAdapterPosition(),
-                                        target.getAdapterPosition());
-                        return true;
+                            notifyItemMoved(viewHolder.getAdapterPosition(),
+                                            target.getAdapterPosition());
+                            return true;
+                        }
+                        return false;
                     }
 
                     @Override
@@ -117,34 +132,22 @@ public abstract class SyncedListAdapter
                     @Override
                     public int getMovementFlags(RecyclerView recyclerView,
                                                 RecyclerView.ViewHolder viewHolder) {
-                        return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
-                                        ItemTouchHelper.DOWN |
-                                                ItemTouchHelper.UP);
+                        if (viewHolder instanceof ElementViewHolder) {
+                            return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                                            ItemTouchHelper.DOWN |
+                                                    ItemTouchHelper.UP);
+                        } else {
+                            return 0;
+                        }
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(context);
+                PreferenceManager.getDefaultSharedPreferences(listActivity);
         jumpDistance = Integer.parseInt(
                 sharedPreferences.getString("jump_range", "1"));
         scrollListTopBottom = sharedPreferences.getBoolean("scrollList", false);
-    }
-
-    /**
-     * Update all elements
-     *
-     * @param listData new elements
-     * @param notify   notify to reload visible views
-     */
-    public void updateItems(ArrayList<SyncedListElement> listData,
-                            boolean notify) {
-        this.listData.clear();
-        this.listData.addAll(listData);
-        if (notify) {
-            this.recyclerView
-                    .post(() -> SyncedListAdapter.this.notifyDataSetChanged());
-        }
     }
 
     /**
@@ -152,9 +155,13 @@ public abstract class SyncedListAdapter
      *
      * @return size of elements
      */
-    //
     @Override public int getItemCount() {
-        return listData.size();
+        if (syncedList.getHeader().isCheckedList() &&
+                syncedList.getCheckedElements().size() > 0) {
+            return syncedList.getElements().size() + 1; // + Isolator
+        } else {
+            return syncedList.getElements().size();
+        }
     }
 
     /**
@@ -164,13 +171,38 @@ public abstract class SyncedListAdapter
      * @param viewType  viewType
      * @return viewHolder
      */
-    @Override public ViewHolder onCreateViewHolder(ViewGroup viewGroup,
-                                                   int viewType) {
-        // Create a new view, which defines the UI of the list item
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.list_element, viewGroup, false);
-        view.setOnClickListener(this);
-        return new ViewHolder(view);
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup,
+                                                      int viewType) {
+        RecyclerView.ViewHolder viewHolder;
+
+        switch (viewType) {
+            case R.layout.list_element:
+                View view = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.list_element, viewGroup, false);
+                view.setOnClickListener(this);
+                viewHolder = new ElementViewHolder(view);
+                break;
+            case R.layout.list_element_isolator:
+                View isolatorView = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.list_element_isolator, viewGroup,
+                                 false);
+                viewHolder = new IsolatorViewHolder(isolatorView);
+                break;
+            default:
+                throw new IllegalStateException(
+                        "Unexpected value: " + viewType);
+        }
+        return viewHolder;
+    }
+
+    @Override public int getItemViewType(int position) {
+        if (syncedList.getHeader().isCheckedList() &&
+                syncedList.getUncheckedElements().size() == position) {
+            return R.layout.list_element_isolator;
+        } else {
+            return R.layout.list_element;
+        }
     }
 
     /**
@@ -179,129 +211,120 @@ public abstract class SyncedListAdapter
      * @param viewHolder viewHolder
      * @param position   current position
      */
-    @Override public void onBindViewHolder(ViewHolder viewHolder,
+    @Override public void onBindViewHolder(RecyclerView.ViewHolder viewHolder,
                                            final int position) {
-        // remove old listeners (because of recycling old views)
-        viewHolder.checkBox.setOnCheckedChangeListener(null);
-        viewHolder.eTName.setOnFocusChangeListener(null);
-        viewHolder.eTName.setOnEditorActionListener(null);
+        if (viewHolder instanceof ElementViewHolder) {
+            ElementViewHolder elementViewHolder =
+                    (ElementViewHolder) viewHolder;
+            // remove old listeners (because of recycling old views)
+            elementViewHolder.checkBox.setOnCheckedChangeListener(null);
+            elementViewHolder.eTName.setOnFocusChangeListener(null);
+            elementViewHolder.eTName.setOnEditorActionListener(null);
 
-        if (!checkOption) {
-            viewHolder.checkBox.setVisibility(View.GONE);
-        }
+            SyncedListElement currentSyncedListElement =
+                    getElementOnPosition(position);
 
-        // name edittext
-        viewHolder.eTName.setOnFocusChangeListener((v, focused) -> {
-            if (!focused) {
-                checkNameChangesAndSubmit(viewHolder, position);
+            if (!syncedList.getHeader().isCheckOption()) {
+                elementViewHolder.checkBox.setVisibility(View.GONE);
             }
-        });
-        viewHolder.eTName.setText(listData.get(position).getName());
-        viewHolder.eTName.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                checkNameChangesAndSubmit(viewHolder, position);
-                InputMethodManager imm = (InputMethodManager) context
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(
-                        ((Activity) context).getCurrentFocus().getWindowToken(),
-                        0);
 
-                return true;
-            }
-            return false;
-        });
-        viewHolder.tVDescription
-                .setText(listData.get(position).getDescription());
+            // name edittext
+            elementViewHolder.eTName.setOnFocusChangeListener((v, focused) -> {
+                if (!focused) {
+                    checkNameChangesAndSubmit(elementViewHolder,
+                                              currentSyncedListElement);
+                }
+            });
+            elementViewHolder.eTName
+                    .setText(currentSyncedListElement.getName());
+            elementViewHolder.eTName
+                    .setOnEditorActionListener((v, actionId, event) -> {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            checkNameChangesAndSubmit(elementViewHolder,
+                                                      currentSyncedListElement);
+                            InputMethodManager imm =
+                                    (InputMethodManager) listActivity
+                                            .getSystemService(
+                                                    Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(
+                                    ((Activity) listActivity).getCurrentFocus()
+                                            .getWindowToken(), 0);
 
-        // Checkbox
-        viewHolder.checkBox.setChecked(listData.get(position).getChecked());
-        // on checked
-        viewHolder.checkBox.setOnCheckedChangeListener((v, checked) -> {
-            SyncedListElement updated = listData.get(position);
-            updated.setChecked(checked);
-            SyncedListStep newStep =
-                    new SyncedListStep(listData.get(position).getId(),
-                                       ACTION.UPDATE, updated);
-            onAddStep(newStep, this.forceNotify);
-        });
+                            return true;
+                        }
+                        return false;
+                    });
+            elementViewHolder.tVDescription
+                    .setText(currentSyncedListElement.getDescription());
 
-        // on move to top
-        viewHolder.btnTop.setOnClickListener(vi -> {
-            SyncedListStep newStep =
-                    new SyncedListStep(listData.get(position).getId(),
-                                       ACTION.MOVE, 0);
-            onAddStep(newStep, true);
-            if (scrollListTopBottom) {
-                recyclerView.scrollToPosition(0);
-            }
-        });
+            // Checkbox
+            elementViewHolder.checkBox
+                    .setChecked(currentSyncedListElement.getChecked());
+            // on checked
+            elementViewHolder.checkBox
+                    .setOnCheckedChangeListener((v, checked) -> {
+                        SyncedListElement updated = currentSyncedListElement;
+                        updated.setChecked(checked);
+                        SyncedListStep newStep = new SyncedListStep(
+                                currentSyncedListElement.getId(), ACTION.UPDATE,
+                                updated);
+                        listActivity.addElementStepAndSave(newStep, syncedList
+                                .getHeader().isCheckedList());
+                    });
 
-        // on move to bottom
-        viewHolder.btnBottom.setOnClickListener(vi -> {
-            SyncedListStep newStep =
-                    new SyncedListStep(listData.get(position).getId(),
-                                       ACTION.MOVE, listData.size() - 1);
-            onAddStep(newStep, true);
-            if (scrollListTopBottom) {
-                recyclerView.scrollToPosition(listData.size() - 1);
-            }
-        });
-
-        // on move up
-        viewHolder.iVBtnUp.setOnClickListener(vi -> {
-            if (position - jumpDistance >= 0) {
+            // on move to top
+            elementViewHolder.btnTop.setOnClickListener(vi -> {
                 SyncedListStep newStep =
-                        new SyncedListStep(listData.get(position).getId(),
-                                           ACTION.MOVE,
-                                           position - jumpDistance);
-                onAddStep(newStep, true);
-                recyclerView.scrollToPosition(position - jumpDistance - 1);
-            } else {
-                // Range to high? => move to top
-                SyncedListStep newStep =
-                        new SyncedListStep(listData.get(position).getId(),
+                        new SyncedListStep(currentSyncedListElement.getId(),
                                            ACTION.MOVE, 0);
-                onAddStep(newStep, true);
-                recyclerView.scrollToPosition(0);
-            }
-        });
+                listActivity.addElementStepAndSave(newStep, true);
+                if (scrollListTopBottom) {
+                    recyclerView.scrollToPosition(0);
+                }
+            });
 
-        // on move down
-        viewHolder.iVBtnDown.setOnClickListener(vi -> {
-            if (position + jumpDistance <= listData.size() - 1) {
+            // on move to bottom
+            elementViewHolder.btnBottom.setOnClickListener(vi -> {
                 SyncedListStep newStep =
-                        new SyncedListStep(listData.get(position).getId(),
+                        new SyncedListStep(currentSyncedListElement.getId(),
                                            ACTION.MOVE,
-                                           position + jumpDistance);
-                onAddStep(newStep, true);
-                recyclerView.scrollToPosition(position + jumpDistance + 1);
-            } else {
-                // Range to high? => move to bottom
-                SyncedListStep newStep =
-                        new SyncedListStep(listData.get(position).getId(),
-                                           ACTION.MOVE, listData.size() - 1);
-                onAddStep(newStep, true);
-                recyclerView.scrollToPosition(listData.size() - 1);
-            }
-        });
+                                           syncedList.getElements().size() - 1);
+                listActivity.addElementStepAndSave(newStep, true);
+                if (scrollListTopBottom) {
+                    recyclerView.scrollToPosition(
+                            getPositionOfElement(currentSyncedListElement));
+                }
+            });
+
+            // on move up
+            elementViewHolder.iVBtnUp.setOnClickListener(vi -> {
+                moveElementAndSave(currentSyncedListElement, -jumpDistance);
+            });
+
+            // on move down
+            elementViewHolder.iVBtnDown.setOnClickListener(vi -> {
+                moveElementAndSave(currentSyncedListElement, jumpDistance);
+            });
+        }
     }
 
     /**
      * Check element name changed and submit (create new SyncedListStep)
      *
-     * @param viewHolder viewHolder with EditText
-     * @param position   current position
+     * @param viewHolder
+     * @param syncedListElement
      */
-    public void checkNameChangesAndSubmit(ViewHolder viewHolder, int position) {
+    public void checkNameChangesAndSubmit(ElementViewHolder viewHolder,
+                                          SyncedListElement syncedListElement) {
         String newName = viewHolder.eTName.getText().toString();
         if (!newName.equals("") &&
-                !newName.equals(listData.get(position).getName())) {
-            SyncedListElement updated = listData.get(position);
-            updated.setName(newName);
+                !newName.equals(syncedListElement.getName())) {
+
+            syncedListElement.setName(newName);
             SyncedListStep newStep =
-                    new SyncedListStep(listData.get(position).getId(),
-                                       ACTION.UPDATE, updated);
-            onAddStep(newStep, true);
+                    new SyncedListStep(syncedListElement.getId(), ACTION.UPDATE,
+                                       syncedListElement);
+            listActivity.addElementStepAndSave(newStep, true);
         }
     }
 
@@ -312,22 +335,113 @@ public abstract class SyncedListAdapter
      */
     @Override public void onClick(View v) {
         int itemPosition = recyclerView.getChildLayoutPosition(v);
-        SyncedListElement syncedListElement = listData.get(itemPosition);
+        SyncedListElement syncedListElement =
+                getElementOnPosition(itemPosition);
         BottomSheetDialogFragment bottomSheetDialogFragment =
                 new ElementEditorFragment()
                         .newInstance(syncedListElement, syncedListStep -> {
-                            onAddStep(syncedListStep, true);
+                            listActivity.addElementStepAndSave(syncedListStep,
+                                                               true);
                         });
-        bottomSheetDialogFragment
-                .show(((AppCompatActivity) context).getSupportFragmentManager(),
-                      bottomSheetDialogFragment.getTag());
+        bottomSheetDialogFragment.show(((AppCompatActivity) listActivity)
+                                               .getSupportFragmentManager(),
+                                       bottomSheetDialogFragment.getTag());
     }
 
     /**
-     * Add step to List
+     * Get element by position inside recyclerview
      *
-     * @param syncedListStep new SyncedListStep
+     * @param position
+     * @return syncedListElement
      */
-    public abstract void onAddStep(SyncedListStep syncedListStep,
-                                   boolean notify);
+    public SyncedListElement getElementOnPosition(int position) {
+        if (syncedList.getHeader().isCheckedList()) {
+            if (position > syncedList.getUncheckedElements().size()) {
+                return syncedList.getCheckedElements().get(position - syncedList
+                        .getUncheckedElements().size() - 1);
+            } else {
+                return syncedList.getUncheckedElements().get(position);
+            }
+        } else {
+            return syncedList.getElements().get(position);
+        }
+    }
+
+    /**
+     * Get position of element inside recyclerview
+     *
+     * @param syncedListElement
+     * @return
+     */
+    public int getPositionOfElement(SyncedListElement syncedListElement) {
+        int position = 0;
+        if (syncedList.getHeader().isCheckedList()) {
+            for (int i = 0; i < syncedList.getUncheckedElements().size(); i++) {
+                if (syncedListElement.getId()
+                        .equals(syncedList.getUncheckedElements().get(i)
+                                        .getId())) {
+                    return position;
+                }
+                position++;
+            }
+            position++; // Isolator
+            for (int i = 0; i < syncedList.getCheckedElements().size(); i++) {
+                if (syncedListElement.getId()
+                        .equals(syncedList.getCheckedElements().get(i)
+                                        .getId())) {
+                    return position;
+                }
+                position++;
+            }
+        } else {
+            for (int i = 0; i < syncedList.getElements().size(); i++) {
+                if (syncedListElement.getId()
+                        .equals(syncedList.getElements().get(i).getId())) {
+                    return position;
+                }
+                position++;
+            }
+        }
+        Log.e(LOG_TITLE_DEFAULT,
+              "Error: Can't find element: " + syncedListElement);
+        return position;
+    }
+
+    /**
+     * Move element inside list (checked and unchecked list separated
+     *
+     * @param syncedListElement Element to move
+     * @param dir               direction and strength
+     */
+    public void moveElementAndSave(SyncedListElement syncedListElement,
+                                   int dir) {
+        SyncedListElement displacedElement;
+
+        // Choose list where the element should move
+        ArrayList<SyncedListElement> listOfElement;
+        if (!syncedList.getHeader().isCheckedList()) {
+            listOfElement = syncedList.getElements();
+        } else if (syncedListElement.getChecked()) {
+            listOfElement = syncedList.getCheckedElements();
+        } else {
+            listOfElement = syncedList.getUncheckedElements();
+        }
+        int targetedPosition = listOfElement.indexOf(syncedListElement) + dir;
+
+        if (targetedPosition >= listOfElement.size()) {
+            displacedElement = listOfElement.get(listOfElement.size() - 1);
+        } else if (targetedPosition < 0) {
+            displacedElement = listOfElement.get(0);
+        } else {
+            displacedElement = listOfElement.get(targetedPosition);
+        }
+
+        int newPositionInList =
+                syncedList.getElements().indexOf(displacedElement);
+        SyncedListStep newStep =
+                new SyncedListStep(syncedListElement.getId(), ACTION.MOVE,
+                                   newPositionInList);
+        listActivity.addElementStepAndSave(newStep, true);
+        recyclerView.scrollToPosition(getPositionOfElement(syncedListElement));
+    }
 }
