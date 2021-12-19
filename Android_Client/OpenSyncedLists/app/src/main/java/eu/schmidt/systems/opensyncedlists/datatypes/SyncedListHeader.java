@@ -1,8 +1,25 @@
 package eu.schmidt.systems.opensyncedlists.datatypes;
 
-import org.json.JSONArray;
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
+
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 
 /**
  * Header for a SyncedList, contains all information about a list
@@ -15,7 +32,7 @@ public class SyncedListHeader {
     private boolean autoSync;
     private String hostname;
     private byte[] secret;
-    private byte[] localSecret;
+    private SecretKey localSecret;
 
     /**
      * Called when loading a list
@@ -30,8 +47,15 @@ public class SyncedListHeader {
         checkedList = jsonObject.getBoolean("checkedList");
         autoSync = jsonObject.getBoolean("autoSync");
         hostname = jsonObject.getString("hostname");
-        secret = jsonObject.getString("secret").getBytes();
-        localSecret = jsonObject.getString("localSecret").getBytes();
+        secret = Cryptography.stringtoByteArray(jsonObject.getString(
+                "secret"));
+
+        byte[] encodedKey = Cryptography
+                .stringtoByteArray(jsonObject.getString(
+                        "localSecret"));
+        SecretKey secretKey = new SecretKeySpec(encodedKey, 0, encodedKey.length
+                , "AES");
+        localSecret = secretKey;
     }
 
     /**
@@ -46,14 +70,14 @@ public class SyncedListHeader {
                             String name,
                             String hostname,
                             byte[] secret,
-                            byte[] localSecret) {
+                            SecretKey localSecret) {
         this.id = id;
         this.name = name;
         this.hostname = hostname;
         this.secret = secret;
         this.localSecret = localSecret;
         this.checkOption = true;
-        this.checkedList = false;
+        this.checkedList = true;
         this.autoSync = true;
     }
 
@@ -113,24 +137,29 @@ public class SyncedListHeader {
         this.secret = secret;
     }
 
-    public byte[] getLocalSecret() {
+    public SecretKey getLocalSecret() {
         return localSecret;
     }
 
-    public void setLocalSecret(byte[] localSecret) {
+    public void setLocalSecret(SecretKey localSecret) {
         this.localSecret = localSecret;
     }
 
-    public JSONObject toJSON() throws JSONException {
+    public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
-        jsonObject.put("name", name);
-        jsonObject.put("hostname", hostname);
-        jsonObject.put("checkOption", checkOption);
-        jsonObject.put("checkedList", checkedList);
-        jsonObject.put("autoSync", autoSync);
-        jsonObject.put("secret", new String(secret));
-        jsonObject.put("localSecret", new String(localSecret));
+        try {
+            jsonObject.put("id", id);
+            jsonObject.put("name", name);
+            jsonObject.put("hostname", hostname);
+            jsonObject.put("checkOption", checkOption);
+            jsonObject.put("checkedList", checkedList);
+            jsonObject.put("autoSync", autoSync);
+            jsonObject.put("secret", Cryptography.byteArraytoString(secret));
+            jsonObject.put("localSecret",
+                           Cryptography.byteArraytoString(localSecret.getEncoded()));
+        }catch (JSONException exception) {
+            exception.printStackTrace();
+        }
         return jsonObject;
     }
 }

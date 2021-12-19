@@ -1,7 +1,7 @@
 package eu.schmidt.systems.opensyncedlists;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -33,9 +33,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import eu.schmidt.systems.opensyncedlists.adapter.ListsAdapter;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.exceptions.ServerException;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 import eu.schmidt.systems.opensyncedlists.utils.FileStorage;
@@ -79,13 +83,90 @@ public class ListsActivity extends AppCompatActivity {
     }
 
     @Override protected void onNewIntent(Intent intent) {
-        if (intent.getType() != null && intent.getType().equals("application" +
-                                                                     "/json")) {
+        if (intent.getType() != null &&
+                intent.getType().equals("application" + "/json")) {
             Uri receivedFile =
                     (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
             importFile(receivedFile);
+        } else if (intent.getData() != null) {
+            Log.d(LOG_TITLE_DEFAULT, "Import list via link");
+            Uri uri = intent.getData();
+            String id = uri.getQueryParameter("id");
+            String secret = uri.getQueryParameter("secret");
+            String localSecret = uri.getQueryParameter("localSecret");
+            String hostname = uri.getHost() + ":" +uri.getPort();
+            if (id != null && secret != null && localSecret != null &&
+                    hostname != null) {
+                byte[] encodedLocalSecret =
+                        Cryptography.stringtoByteArray(localSecret);
+                SecretKey
+                        secretKey = new SecretKeySpec(encodedLocalSecret, 0, encodedLocalSecret.length
+                        , "AES");
+                importListFromHost(hostname, id, secret, secretKey);
+            } else {
+                Log.e(LOG_TITLE_DEFAULT, "Wrong query parameters");
+            }
         }
         super.onNewIntent(intent);
+    }
+
+    public void importListFromHost(String hostname,
+                                   String id,
+                                   String secret,
+                                   SecretKey localSecret) {
+        ServerConnection.getList(hostname, id,
+                                 secret,
+                                 (jsonListFromServer, exceptionListFromServer) -> {
+                                     if (jsonListFromServer == null ||
+                                             exceptionListFromServer != null) {
+                                         Log.e(LOG_TITLE_NETWORK, "Error: " +
+                                                 exceptionListFromServer
+                                                         .toString());
+                                         if (exceptionListFromServer instanceof ServerException) {
+                                             if (exceptionListFromServer
+                                                     .getMessage()
+                                                     .equals("Not found")) {
+                                                 Toast.makeText(this,
+                                                                "Can't import" +
+                                                                        " " +
+                                                                        "list" +
+                                                                        ": " +
+                                                                        "Not " +
+                                                                        "found",
+                                                                Toast.LENGTH_SHORT)
+                                                         .show();
+                                             }
+                                         } else {
+                                             Toast.makeText(this,
+                                                            "Cant import " +
+                                                                    "list:" +
+                                                                    "Can't " +
+                                                                    "connect to server instance",
+                                                            Toast.LENGTH_SHORT)
+                                                     .show();
+                                         }
+                                         return;
+                                     }
+                                     try {
+                                         SyncedList receivedList =
+                                                 new SyncedList(new JSONObject(
+                                                         Cryptography
+                                                                 .decryptRSA(
+                                                                         localSecret,
+                                                                         jsonListFromServer
+                                                                                 .getJSONObject(
+                                                                                         "msg")
+                                                                                 .getString(
+                                                                                         "data"))));
+                                         addListAndHandleCallback(
+                                                 receivedList);
+                                     } catch (JSONException e) {
+                                         // Shouldn't entered if the server
+                                         // worked fine
+                                         Log.e(LOG_TITLE_NETWORK, e.toString());
+                                         e.printStackTrace();
+                                     }
+                                 });
     }
 
     public String getUniqueListId() {
@@ -113,7 +194,6 @@ public class ListsActivity extends AppCompatActivity {
             Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
-        initServerConnection();
         listsAdapter = new ListsAdapter(this, R.layout.lists_element,
                                         (ArrayList<SyncedListHeader>) syncedListsHeaders
                                                 .clone());
@@ -134,31 +214,28 @@ public class ListsActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(
                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
+        checkServerConnection();
     }
 
-    public void initServerConnection() {
-        ServerConnection.check_connection((jsonObject, exception) -> {
-            if (jsonObject == null) {
-                Log.e(LOG_TITLE_DEFAULT,
-                      "No connection to server: " + exception);
-                return;
-            }
-
-            try {
-                if (jsonObject.getString("status").equals("OK")) {
+    public void checkServerConnection() {
+        String defaultHostname =
+                globalSharedPreferences.getString("default_server", "");
+        if (defaultHostname.equals("")) {
+            return;
+        }
+        ServerConnection
+                .checkConnection(defaultHostname, (jsonResult, exception) -> {
+                    if (jsonResult == null || exception != null) {
+                        Log.e(LOG_TITLE_DEFAULT,
+                              "No connection to server: " + exception);
+                        Toast.makeText(this,
+                                       "Can't connect to default server " +
+                                               "instance", Toast.LENGTH_SHORT)
+                                .show();
+                        return;
+                    }
                     Log.d(LOG_TITLE_DEFAULT, "Connection is good!");
-                    /**
-                     * Next code here !!
-                     * --------------------------------------------
-                     */
-                } else {
-                    Log.e(LOG_TITLE_DEFAULT, "Connection is bad: " +
-                            jsonObject.getString("status"));
-                }
-            } catch (JSONException e) {
-                Log.e(LOG_TITLE_DEFAULT, "Connection is bad.. " + e);
-            }
-        });
+                });
     }
 
     @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -222,12 +299,15 @@ public class ListsActivity extends AppCompatActivity {
                                                      globalSharedPreferences
                                                              .getString(
                                                                      "default_server",
-                                                                     ""), null,
-                                                     null), new ArrayList<>());
-                        newList.setSecret(
-                                Cryptography.generatingRandomString(50));
-                        newList.setLocalSecret(
-                                Cryptography.generatingRandomString(50));
+                                                                     ""),
+                                                     Cryptography
+                                                             .stringtoByteArray(
+                                                                     Cryptography
+                                                                             .generatingRandomString(
+                                                                                     50)),
+                                                     Cryptography
+                                                             .generateAESKey()),
+                                new ArrayList<>());
                         addListAndHandleCallback(newList);
                     }
                 });

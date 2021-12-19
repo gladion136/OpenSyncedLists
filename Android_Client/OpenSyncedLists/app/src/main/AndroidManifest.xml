@@ -39,10 +39,26 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/json" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:path="/list/share"
+                    android:scheme="https" />
+                <data
+                    android:host="*"
+                    android:path="/list/share"
+                    android:scheme="http" />
+            </intent-filter>
+
         </activity>
         <activity
             android:name=".ListActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|stateHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden|stateHidden" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

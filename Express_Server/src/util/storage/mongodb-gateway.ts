@@ -46,15 +46,17 @@ export class MongoDBGateway implements IDBGateway {
         if (this.client === undefined) {
             return this.errorPromise;
         }
+        // tslint:disable-next-line:no-console
+        console.log("Add:" + list.id);
         const dbo = this.client.db("mydb");
-        const query = { id: list.id };
+        const query = { id: list.id, secret: list.secret };
         return new Promise(async (resolve, reject) => {
             dbo.collection("lists")
                 .find(query)
                 .toArray((error, result) => {
                     if (error || result.length <= 0) {
                         // tslint:disable-next-line:no-console
-                        console.log("List: " + list.name);
+                        console.log("List: " + list.id);
                         dbo.collection("lists").insertOne(list, (err, res) => {
                             if (err) {
                                 reject(
@@ -71,17 +73,17 @@ export class MongoDBGateway implements IDBGateway {
         });
     }
 
-    public async set_list(list: IList) {
+    public async set_list(list: IList, oldHash: string) {
         if (this.client === undefined) {
             return this.errorPromise;
         }
         const dbo = this.client.db("mydb");
-        const query = { id: list.id, secret: list.secret };
+        const query = { id: list.id, secret: list.secret, hash: oldHash };
         return new Promise(async (resolve, reject) => {
             await dbo
                 .collection("lists")
                 .updateOne(query, { $set: list }, (err, result) => {
-                    if (err || result.length <= 0) {
+                    if (err || !result) {
                         reject("Error while update");
                     } else {
                         resolve("Success");
@@ -101,9 +103,13 @@ export class MongoDBGateway implements IDBGateway {
             const collection = await dbo.collection("lists");
             collection.findOne(
                 query,
-                { projection: { id: 1, name: 1, secret: 1, elements: 1 } },
+                { projection: { id: 1, secret: 1, data: 1 } },
                 (err, result) => {
-                    err ? reject(err) : resolve(result);
+                    if (err || !result) {
+                        err ? reject(err) : reject("Not found");
+                    } else {
+                        resolve(result);
+                    }
                 }
             );
         });

@@ -6,7 +6,7 @@
     <item android:id="@+id/export_md"
         android:title="@string/menu_export_share_md" />
 
-    <item android:id="@+id/export_chat"
+    <item android:id="@+id/export_link"
         android:title="@string/menu_export_share" />
 
     <item android:id="@+id/export_qr"
@@ -14,6 +14,9 @@
 
     <item android:id="@+id/export_list_json"
         android:title="@string/menu_export_list_json" />
+
+    <item android:id="@+id/manual_sync"
+        android:title="@string/menu_manual_sync" />
 
     <item android:id="@+id/list_settings"
         android:title="@string/menu_list_settings" />

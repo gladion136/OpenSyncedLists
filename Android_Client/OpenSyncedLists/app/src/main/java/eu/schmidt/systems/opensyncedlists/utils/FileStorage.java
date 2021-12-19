@@ -39,7 +39,7 @@ public class FileStorage {
             e.printStackTrace();
             Log.e(LOG_TITLE_STORAGE, "File not found. Did you" +
                     " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
             e.printStackTrace();
         }
@@ -61,7 +61,7 @@ public class FileStorage {
             e.printStackTrace();
             Log.e(LOG_TITLE_STORAGE, "File not found. Did you" +
                     " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
             e.printStackTrace();
         }

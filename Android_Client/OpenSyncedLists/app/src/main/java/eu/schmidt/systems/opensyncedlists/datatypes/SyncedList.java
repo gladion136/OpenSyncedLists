@@ -8,9 +8,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.crypto.SecretKey;
 
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
@@ -193,8 +196,8 @@ public class SyncedList {
         syncedListHeader.setName(name);
     }
 
-    public byte[] getSecret() {
-        return syncedListHeader.getSecret();
+    public String getSecret() {
+        return Cryptography.byteArraytoString(syncedListHeader.getSecret());
     }
 
     public boolean compareSecret(byte[] target) {
@@ -210,8 +213,8 @@ public class SyncedList {
         this.syncedListHeader.setSecret(Cryptography.getSHA(secret));
     }
 
-    public void setLocalSecret(String secret) {
-        this.syncedListHeader.setLocalSecret(Cryptography.getSHA(secret));
+    public void setLocalSecret(SecretKey keypair) {
+        this.syncedListHeader.setLocalSecret(keypair);
     }
 
     public ArrayList<SyncedListStep> getElementSteps() {
@@ -224,6 +227,9 @@ public class SyncedList {
     }
 
     public void addElementStep(SyncedListStep elementStep) {
+        if(elementStep.changeAction == ACTION.CLEAR) {
+            this.elementSteps.clear();
+        }
         this.elementSteps.add(elementStep);
         recalculateBuffers();
     }
@@ -255,13 +261,17 @@ public class SyncedList {
      * @return SyncedList steps
      * @throws JSONException
      */
-    public JSONObject toJSON() throws JSONException {
+    public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        JSONArray jsonArraySteps = new JSONArray();
-        for (SyncedListStep step : elementSteps) {
-            jsonArraySteps.put(step.toJSON());
+        try {
+            JSONArray jsonArraySteps = new JSONArray();
+            for (SyncedListStep step : elementSteps) {
+                jsonArraySteps.put(step.toJSON());
+            }
+            jsonObject.put("steps", jsonArraySteps);
+        }catch (JSONException exception) {
+            exception.printStackTrace();
         }
-        jsonObject.put("steps", jsonArraySteps);
         return jsonObject;
     }
 
@@ -271,9 +281,13 @@ public class SyncedList {
      * @return SyncedList with secrets
      * @throws JSONException
      */
-    public JSONObject toJSONwithHeader() throws JSONException {
+    public JSONObject toJSONwithHeader() {
         JSONObject jsonObject = toJSON();
-        jsonObject.put("header", getHeader().toJSON());
+        try {
+            jsonObject.put("header", getHeader().toJSON());
+        } catch (JSONException exception) {
+            exception.printStackTrace();
+        }
         return jsonObject;
     }
 
@@ -297,6 +311,63 @@ public class SyncedList {
             }
         }
         return list;
+    }
+
+    /**
+     * Sync lists and return solution
+     *
+     * @param syncedList1
+     * @param syncedList2
+     * @return synchronized List
+     */
+    public static SyncedList sync(SyncedList syncedList1,
+                                  SyncedList syncedList2) {
+        ArrayList<SyncedListStep> result =
+                (ArrayList<SyncedListStep>) syncedList1.getElementSteps().clone();
+        ArrayList<SyncedListStep> syncWith = syncedList2.getElementSteps();
+
+        for(int i=0; i<syncWith.size(); i++) {
+            SyncedListStep currentStep = syncWith.get(i);
+            // Still in result?
+            boolean stillInResult = false;
+
+            for (SyncedListStep s: result
+            ) {
+                if(s.equals(currentStep)) {
+                    stillInResult = true;
+                    break;
+                }
+            }
+
+            if(stillInResult) continue;
+            // Add between correct time
+            boolean added = false;
+            for(int x=result.size()-1; x>=0; x--) {
+                if(result.get(x).timestamp < currentStep.timestamp) {
+                    result.add(x+1, currentStep);
+                    added = true;
+                    break;
+                }
+            }
+            if (!added) {
+                result.add(0, currentStep);
+            }
+        }
+        syncedList1.setElementSteps(result);
+        return syncedList1;
+    }
+
+    public void sync(SyncedList syncedList) {
+        SyncedList newList = SyncedList.sync(this, syncedList);
+        syncedListHeader = newList.getHeader();
+        setElementSteps(newList.getElementSteps());
+    }
+
+    public String getFullListEncrypted() {
+        String data = toJSONwithHeader().toString();
+        String encrypted =
+                Cryptography.encryptRSA(getHeader().getLocalSecret(), data);
+        return encrypted;
     }
 
 }

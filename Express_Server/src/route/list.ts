@@ -2,6 +2,7 @@
  * API für die Settings
  */
 import * as express from "express";
+import path from "path";
 import { db } from "../app";
 import { IList } from "../util/structures/list";
 
@@ -17,57 +18,98 @@ listRouter.get("/get", async (req, res) => {
         req.query.id === undefined ||
         req.query.secret === undefined
     ) {
-        res.send("Error wrong paramenters");
+        res.send('{"status":"ERROR", "msg":"Wrong parameters"}');
         return;
     } else {
         res.send(
             await db
-                .get_list(String(req.query.id), String(req.query.secret))
+                .get_list(req.query.id as string, req.query.secret as string)
                 .then((resp) => {
-                    res.send(resp);
+                    res.send({
+                        msg: resp,
+                        status: "OK",
+                    });
                 })
                 .catch((err) => {
-                    res.send(err);
+                    res.send({
+                        msg: err,
+                        status: "ERROR",
+                    });
                 })
         );
     }
 });
 
-listRouter.get("/set", async (req, res) => {
-    if (req.query == null || req.query.list == null) {
-        res.send("Error wrong paramenters");
+listRouter.post("/set", async (req, res) => {
+    if (
+        req.query == null ||
+        req.query.id === undefined ||
+        req.query.secret === undefined ||
+        req.body === undefined ||
+        req.body.data === undefined ||
+        req.body.basedOnHash === undefined ||
+        req.body.hash === undefined
+    ) {
+        res.send('{"status":"ERROR", "msg":"Wrong parameters"}');
         return;
     }
 
-    const list = req.query.list as unknown as IList;
+    const list: IList = {
+        data: req.body.data,
+        hash: req.body.hash,
+        id: req.query.id as string,
+        secret: req.query.secret as string,
+    };
     if (list.id && list.secret) {
         await db
-            .set_list(list)
+            .set_list(list, req.body.basedOnHash as string)
             .then((resp) => {
-                res.send(resp);
+                res.send({
+                    msg: resp,
+                    status: "OK",
+                });
             })
             .catch((err) => {
-                res.send(err);
+                res.send({
+                    msg: err,
+                    status: "ERROR",
+                });
             });
     }
-
-    res.send("Wrong list");
 });
 
-listRouter.get("/add", async (req, res) => {
-    if (req.query == null || req.query.list === undefined) {
-        res.send("Error wrong paramenters");
+listRouter.post("/add", async (req, res) => {
+    if (
+        req.query == null ||
+        req.query.id === undefined ||
+        req.query.secret === undefined ||
+        req.body === undefined ||
+        req.body.data === undefined ||
+        req.body.hash === undefined
+    ) {
+        res.send('{"status":"ERROR", "msg":"Wrong parameters"}');
         return;
     } else {
-        const list = req.query.list as unknown as IList;
+        const list: IList = {
+            data: req.body.data,
+            hash: req.body.hash,
+            id: req.query.id as string,
+            secret: req.query.secret as string,
+        };
         if (list.id && list.secret) {
             await db
                 .add_list(list)
                 .then((resp) => {
-                    res.send(resp);
+                    res.send({
+                        msg: resp,
+                        status: "OK",
+                    });
                 })
                 .catch((err) => {
-                    res.send(err);
+                    res.send({
+                        msg: err,
+                        status: "ERROR",
+                    });
                 });
         }
     }
@@ -79,18 +121,28 @@ listRouter.get("/remove", async (req, res) => {
         req.query.id === undefined ||
         req.query.secret === undefined
     ) {
-        res.send("Error wrong paramenters");
+        res.send('{"status":"ERROR", "msg":"Wrong parameters"}');
         return;
     } else {
         res.send(
             await db
                 .delete_list(String(req.query.id), String(req.query.secret))
                 .then((resp) => {
-                    res.send(resp);
+                    res.send({
+                        msg: resp,
+                        status: "OK",
+                    });
                 })
                 .catch((err) => {
-                    res.send(err);
+                    res.send({
+                        msg: err,
+                        status: "ERROR",
+                    });
                 })
         );
     }
+});
+
+listRouter.get("/share", (req, res) => {
+    res.sendFile(path.join(__dirname, "../html/share.html"));
 });

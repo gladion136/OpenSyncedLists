@@ -1,8 +1,10 @@
 /**
  * Sensorverwaltung Backend
  */
+
 import cors from "cors";
 import express from "express";
+import path from "path";
 import { listRouter } from "./route/list";
 import { MongoDBGateway } from "./util/storage/mongodb-gateway";
 
@@ -11,6 +13,8 @@ const DEBUG = true;
 const app = express();
 const port = 3000;
 app.use(cors());
+app.use(express.json());
+
 /**
  * Initilize DB
  */
@@ -34,8 +38,8 @@ app.get("/test", (req, res) => {
 
 app.use("/list", listRouter);
 
-app.use("/", (req, res) => {
-    res.send("Please use the OpenSyncedLists App!");
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "/html/index.html"));
 });
 
 app.listen(port, () => {

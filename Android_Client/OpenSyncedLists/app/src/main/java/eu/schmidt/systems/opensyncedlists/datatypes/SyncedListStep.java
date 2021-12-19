@@ -11,18 +11,17 @@ import java.util.concurrent.ThreadLocalRandom;
  * One changes Step for a SyncedList
  */
 public class SyncedListStep {
-    Long timestamp;
-
-    String changeId;
-    ACTION changeAction;
-    Object changeValue;
+    long timestamp = 0;
+    String changeId = "";
+    ACTION changeAction = ACTION.CLEAR;
+    Object changeValue = "";
 
     public SyncedListStep(JSONObject jsonObject) throws JSONException {
         this.changeAction = ACTION.values()[jsonObject.getInt("changeAction")];
-        if (this.changeAction == ACTION.CLEAR) {
-            return;
+        this.timestamp = jsonObject.getLong("timestamp");
+        if (jsonObject.has("changeId")) {
+            this.changeId = jsonObject.getString("changeId");
         }
-        this.changeId = jsonObject.getString("changeId");
         if (jsonObject.has("changeValueElement")) {
             this.changeValue = new SyncedListElement(
                     jsonObject.getJSONObject("changeValueElement"));
@@ -34,10 +33,10 @@ public class SyncedListStep {
     public SyncedListStep(String changeId,
                           ACTION changeAction,
                           Object changeValue) {
+        this.timestamp = System.currentTimeMillis();
         this.changeId = changeId;
         this.changeAction = changeAction;
         this.changeValue = changeValue;
-        this.timestamp = System.nanoTime();
     }
 
     public String getChangeId() {
@@ -64,20 +63,51 @@ public class SyncedListStep {
         this.changeValue = changeValue;
     }
 
-    public Long getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("changeId", this.changeId);
+        jsonObject.put("timestamp", this.timestamp);
         jsonObject.put("changeAction", this.changeAction.ordinal());
-        if (this.changeValue instanceof SyncedListElement) {
-            jsonObject.put("changeValueElement",
-                           ((SyncedListElement) this.changeValue).toJSON());
-        } else {
-            jsonObject.put("changeValue", this.changeValue);
+        if (this.changeId != null) {
+            jsonObject.put("changeId", this.changeId);
+        }
+        if (this.changeValue != null) {
+            if (this.changeValue instanceof SyncedListElement) {
+                jsonObject.put("changeValueElement",
+                               ((SyncedListElement) this.changeValue).toJSON());
+            } else {
+                jsonObject.put("changeValue", this.changeValue);
+            }
         }
         return jsonObject;
+    }
+
+    /**
+     * Test if step is equal
+     *
+     * @param step equal to this step?
+     * @return equal?
+     */
+    public boolean equals(SyncedListStep step) {
+        if (getChangeId() == null && step.getChangeId() != null) {
+            return false;
+        }
+        if (getChangeId() != null && step.getChangeId() == null) {
+            return false;
+        }
+        if (getChangeId() != null && step.getChangeId() != null &&
+                !getChangeId().equals(step.getChangeId())) {
+            return false;
+        }
+        if (!getChangeAction().equals(step.getChangeAction())) {
+            return false;
+        }
+        if (timestamp != step.getTimestamp()) {
+            return false;
+        }
+        return true;
     }
 }

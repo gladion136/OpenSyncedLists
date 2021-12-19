@@ -16,6 +16,7 @@
     <string name="menu_export_share_md">Als Markdown/Text teilen</string>
     <string name="menu_export_qr">Als QR-Code teilen</string>
     <string name="menu_export_list_json">Liste exportieren</string>
+    <string name="menu_manual_sync">Synchronisieren</string>
     <string name="menu_about">Über</string>
 
     <!--     SyncedList          -->
