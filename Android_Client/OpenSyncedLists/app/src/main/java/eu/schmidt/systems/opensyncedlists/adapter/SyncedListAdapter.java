@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,8 +54,7 @@ public class SyncedListAdapter
         public final CheckBox checkBox;
         public final EditText eTName;
         public final TextView tVDescription;
-        public final ImageView iVBtnUp, iVBtnDown;
-        public final Button btnTop, btnBottom;
+        public final ImageView iVBtnUp, iVBtnDown, iVTop, iVBottom;
 
         public ElementViewHolder(View view) {
             super(view);
@@ -65,8 +63,8 @@ public class SyncedListAdapter
             tVDescription = view.findViewById(R.id.tVDescription);
             iVBtnUp = view.findViewById(R.id.btnJumpUp);
             iVBtnDown = view.findViewById(R.id.btnJumpDown);
-            btnTop = view.findViewById(R.id.btnJumpTop);
-            btnBottom = view.findViewById(R.id.btnJumpBottom);
+            iVTop = view.findViewById(R.id.btnJumpTop);
+            iVBottom = view.findViewById(R.id.btnJumpBottom);
         }
     }
 
@@ -177,15 +175,16 @@ public class SyncedListAdapter
         RecyclerView.ViewHolder viewHolder;
 
         switch (viewType) {
+            case R.layout.list_element_invert:
             case R.layout.list_element:
                 View view = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.list_element, viewGroup, false);
+                        .inflate(viewType, viewGroup, false);
                 view.setOnClickListener(this);
                 viewHolder = new ElementViewHolder(view);
                 break;
             case R.layout.list_element_isolator:
                 View isolatorView = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.list_element_isolator, viewGroup,
+                        .inflate(viewType, viewGroup,
                                  false);
                 viewHolder = new IsolatorViewHolder(isolatorView);
                 break;
@@ -201,7 +200,9 @@ public class SyncedListAdapter
                 syncedList.getUncheckedElements().size() == position) {
             return R.layout.list_element_isolator;
         } else {
-            return R.layout.list_element;
+
+            return syncedList.getHeader().isInvertElement() ?
+                   R.layout.list_element_invert : R.layout.list_element;
         }
     }
 
@@ -273,7 +274,7 @@ public class SyncedListAdapter
                     });
 
             // on move to top
-            elementViewHolder.btnTop.setOnClickListener(vi -> {
+            elementViewHolder.iVTop.setOnClickListener(vi -> {
                 SyncedListStep newStep =
                         new SyncedListStep(currentSyncedListElement.getId(),
                                            ACTION.MOVE, 0);
@@ -284,7 +285,7 @@ public class SyncedListAdapter
             });
 
             // on move to bottom
-            elementViewHolder.btnBottom.setOnClickListener(vi -> {
+            elementViewHolder.iVBottom.setOnClickListener(vi -> {
                 SyncedListStep newStep =
                         new SyncedListStep(currentSyncedListElement.getId(),
                                            ACTION.MOVE,

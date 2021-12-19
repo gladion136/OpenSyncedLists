@@ -122,7 +122,7 @@ export class MongoDBGateway implements IDBGateway {
         const dbo = this.client.db("mydb");
         const query = { id, secret };
         return new Promise(async (resolve, reject) => {
-            await dbo.collection("sensors").deleteOne(query, (err, result) => {
+            await dbo.collection("lists").deleteOne(query, (err, result) => {
                 if (err) {
                     reject("Error while removing");
                 } else {

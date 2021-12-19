@@ -22,8 +22,10 @@ import java.io.IOException;
 import eu.schmidt.systems.opensyncedlists.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
+import eu.schmidt.systems.opensyncedlists.exceptions.ServerException;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
 
 public class ListSettingsFragment extends PreferenceFragmentCompat {
 
@@ -101,6 +103,18 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
             return true;
         }));
 
+        SwitchPreferenceCompat invertElementPref = findPreference(
+                "invert_element");
+        invertElementPref.setChecked(syncedList.getHeader().isInvertElement());
+        invertElementPref.setOnPreferenceChangeListener(((preference, newValue) -> {
+            boolean newVal = (boolean) newValue;
+            if (newVal != syncedList.getHeader().isInvertElement()) {
+                syncedList.getHeader().setInvertElement(newVal);
+                save();
+            }
+            return true;
+        }));
+
         SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
         autoSyncPref.setChecked(syncedList.getHeader().isAutoSync());
         autoSyncPref.setOnPreferenceChangeListener(((preference, newValue) -> {
@@ -126,8 +140,31 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
         deleteOnlineBtn.setOnPreferenceClickListener(v -> {
-            Toast.makeText(getContext(), "Not implemented yet!",
-                           Toast.LENGTH_LONG).show();
+            ServerConnection.removeList(syncedList.getHeader().getHostname(),
+                                        syncedList.getId(),
+                                        syncedList.getSecret(), (jsonResult,
+                                                                 exceptionFromServer) -> {
+                        if(jsonResult == null || exceptionFromServer != null) {
+                            if(exceptionFromServer instanceof ServerException) {
+                                Toast.makeText(getContext(), "Something wrent " +
+                                                       "wrong!",
+                                               Toast.LENGTH_LONG).show();
+                            }else {
+                                Toast.makeText(getContext(), "No connection " +
+                                                       "to server",
+                                               Toast.LENGTH_LONG).show();
+                            }
+                        }else {
+                            try {
+                                secureStorage.deleteList(syncedList.getId());
+                            } catch (Exception exception) {
+                                exception.printStackTrace();
+                            }
+                            Intent intent = new Intent(getContext(), ListsActivity.class);
+                            startActivity(intent);
+                            getActivity().finish();
+                        }
+                    });
             return true;
         });
 

@@ -56,6 +56,8 @@
 
     <!-- Listen Einstellungen  -->
     <string name="list_settings_title">Listen Einstellungen</string>
+    <string name="list_pref_sync_summary">Listen Einstellungen werden nicht
+        synchronisiert!</string>
     <string name="list_pref_check_option_title">Haken für jedes Element</string>
     <string name="list_pref_name_title">Listen Name</string>
     <string name="list_pref_server_name">Server Hostname</string>
@@ -65,13 +67,19 @@
     <string name="list_pref_checked_list_title">Liste für abgehakte Elemente</string>
     <string name="list_pref_checked_list_summary">Extra Liste für abgehakte
         Elemente am Ende der Liste</string>
+    <string name="list_pref_invert_element_title">Checkbox rechts</string>
+    <string name="list_pref_invert_element_summary">Checkbox rechts und
+    Buttons links abbilden.</string>
+
     <string name="list_pref_delete_btn_title">Liste löschen</string>
     <string name="list_pref_delete_btn_summary">Achtung! Die Liste wird nur
         lokal gelöscht!</string>
     <string name="list_pref_delete_online_btn_title">Liste
-        online löschen</string>
+        online und lokal löschen</string>
     <string name="list_pref_delete_online_btn_summary">Achtung! Die Liste wird
-        auf dem Server gelöscht!</string>
+        auf dem Server und lokal gelöscht! Sollte die Liste noch auf
+        einem anderem Gerät existieren, könnte sie wieder auf den
+        Server hochgeladen werden.</string>
     <string name="scroll_list_title">Liste scrollen</string>
     <string name="scroll_list_summary">Liste scrollen nachdem ein
         Element nach ganz oben/unten verschoben wurde.</string>

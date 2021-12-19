@@ -1,14 +1,11 @@
 package eu.schmidt.systems.opensyncedlists.datatypes;
 
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
-
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

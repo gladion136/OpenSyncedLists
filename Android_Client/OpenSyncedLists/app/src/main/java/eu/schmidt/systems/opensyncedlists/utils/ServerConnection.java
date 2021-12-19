@@ -89,8 +89,21 @@ public abstract class ServerConnection {
         }).execute(info, query, data);
     }
 
-    public static void removeList(String id, String secret, Callback callback) {
+    public static void removeList(String hostname, String id, String secret,
+                                  Callback callback) {
+        Log.d(LOG_TITLE_NETWORK, "Send Request: removeList");
+        HashMap<String, String> info = new HashMap<>();
+        info.put("hostname", hostname);
+        info.put("path", "/list/remove");
+        info.put("type", "GET");
 
+        HashMap<String, String> query = new HashMap<>();
+        query.put("id", id);
+        query.put("secret", secret);
+
+        new HandleRequestTask((jsonObject, exception) -> {
+            callback.callback(jsonObject, exception);
+        }).execute(info, query);
     }
 
     public static void addList(SyncedList syncedList, Callback callback) {

@@ -20,6 +20,13 @@
             android:dependency="check_option"
             android:persistent="false" />
 
+        <SwitchPreferenceCompat
+            android:key="invert_element"
+            android:title="@string/list_pref_invert_element_title"
+            android:summary="@string/list_pref_invert_element_summary"
+            android:dependency="check_option"
+            android:persistent="false" />
+
         <Preference
             android:title="@string/list_pref_delete_btn_title"
             android:key="delete_btn"
@@ -28,7 +35,8 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/sync_header">
+    <PreferenceCategory android:title="@string/sync_header"
+        android:summary="@string/list_pref_sync_summary">
 
         <SwitchPreferenceCompat
             android:key="auto_sync"

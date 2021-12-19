@@ -30,6 +30,7 @@ public class SyncedListHeader {
     private boolean checkOption;
     private boolean checkedList;
     private boolean autoSync;
+    private boolean invertElement;
     private String hostname;
     private byte[] secret;
     private SecretKey localSecret;
@@ -46,6 +47,7 @@ public class SyncedListHeader {
         checkOption = jsonObject.getBoolean("checkOption");
         checkedList = jsonObject.getBoolean("checkedList");
         autoSync = jsonObject.getBoolean("autoSync");
+        invertElement = jsonObject.getBoolean("invertElement");
         hostname = jsonObject.getString("hostname");
         secret = Cryptography.stringtoByteArray(jsonObject.getString(
                 "secret"));
@@ -78,6 +80,7 @@ public class SyncedListHeader {
         this.localSecret = localSecret;
         this.checkOption = true;
         this.checkedList = true;
+        this.invertElement = false;
         this.autoSync = true;
     }
 
@@ -145,6 +148,14 @@ public class SyncedListHeader {
         this.localSecret = localSecret;
     }
 
+    public boolean isInvertElement() {
+        return invertElement;
+    }
+
+    public void setInvertElement(boolean invertElement) {
+        this.invertElement = invertElement;
+    }
+
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -154,6 +165,7 @@ public class SyncedListHeader {
             jsonObject.put("checkOption", checkOption);
             jsonObject.put("checkedList", checkedList);
             jsonObject.put("autoSync", autoSync);
+            jsonObject.put("invertElement", invertElement);
             jsonObject.put("secret", Cryptography.byteArraytoString(secret));
             jsonObject.put("localSecret",
                            Cryptography.byteArraytoString(localSecret.getEncoded()));

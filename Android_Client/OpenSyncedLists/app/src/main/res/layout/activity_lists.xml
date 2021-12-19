@@ -13,10 +13,10 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:clickable="true"
-        app:backgroundTint="@color/green"
+        app:backgroundTint="?attr/colorSecondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_add"
+        app:srcCompat="@drawable/add"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <ListView

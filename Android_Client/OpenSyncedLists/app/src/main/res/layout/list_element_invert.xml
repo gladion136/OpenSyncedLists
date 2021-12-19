@@ -22,54 +22,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:orientation="horizontal"
-                android:id="@+id/hLayoutMain">
-
-                <CheckBox
-                    android:id="@+id/checkBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="1"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:minWidth="48dp"
-                    tools:ignore="TouchTargetSizeCheck" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="4"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/eTTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:imeOptions="actionDone"
-                        android:inputType="text"
-                        android:text="Titel"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/tVDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:text="Beschreibung: asdasdasfdiasudgfiaughiudafhbadfiguhaiuegtfdfvbiua7esrtfg9irgfubidufvbpiausgfisudhfiubaydifugapw9eifghjdbfvsaidfpiuadfiubgdhfbvIEUG IUEF IUAHF IUEHFIU DSIU SDAHFIUHDSIF UHASDIUF HSDIUF SADIUHF IUSDAHF ISUADFH SDF" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
                 android:layout_weight="5"
                 android:orientation="horizontal"
                 android:weightSum="4">
@@ -101,7 +54,7 @@
                         android:paddingTop="0dp"
                         android:paddingRight="0dp"
                         android:paddingBottom="0dp"
-                        android:src="@drawable/down_arrow"/>
+                        android:src="@drawable/down_arrow" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -119,7 +72,7 @@
                         android:paddingTop="0dp"
                         android:paddingRight="0dp"
                         android:paddingBottom="0dp"
-                        android:src="@drawable/top_arrow"/>
+                        android:src="@drawable/top_arrow" />
 
                     <ImageView
                         android:id="@+id/btnJumpBottom"
@@ -130,8 +83,56 @@
                         android:paddingTop="0dp"
                         android:paddingRight="0dp"
                         android:paddingBottom="0dp"
-                        android:src="@drawable/bottom_arrow"/>
+                        android:src="@drawable/bottom_arrow" />
                 </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/hLayoutMain"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/eTTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:text="Titel"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tVDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:text="Beschreibung: asdasdasfdiasudgfiaughiudafhbadfiguhaiuegtfdfvbiua7esrtfg9irgfubidufvbpiausgfisudhfiubaydifugapw9eifghjdbfvsaidfpiuadfiubgdhfbvIEUG IUEF IUAHF IUEHFIU DSIU SDAHFIUHDSIF UHASDIUF HSDIUF SADIUHF IUSDAHF ISUADFH SDF" />
+                </LinearLayout>
+
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:minWidth="48dp"
+                    tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
 
         </LinearLayout>
