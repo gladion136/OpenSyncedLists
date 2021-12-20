@@ -94,14 +94,14 @@ public class ListsActivity extends AppCompatActivity {
             String id = uri.getQueryParameter("id");
             String secret = uri.getQueryParameter("secret");
             String localSecret = uri.getQueryParameter("localSecret");
-            String hostname = uri.getHost() + ":" +uri.getPort();
+            String hostname = uri.getHost() + ":" + uri.getPort();
             if (id != null && secret != null && localSecret != null &&
                     hostname != null) {
                 byte[] encodedLocalSecret =
                         Cryptography.stringtoByteArray(localSecret);
-                SecretKey
-                        secretKey = new SecretKeySpec(encodedLocalSecret, 0, encodedLocalSecret.length
-                        , "AES");
+                SecretKey secretKey = new SecretKeySpec(encodedLocalSecret, 0,
+                                                        encodedLocalSecret.length,
+                                                        "AES");
                 importListFromHost(hostname, id, secret, secretKey);
             } else {
                 Log.e(LOG_TITLE_DEFAULT, "Wrong query parameters");
@@ -114,8 +114,7 @@ public class ListsActivity extends AppCompatActivity {
                                    String id,
                                    String secret,
                                    SecretKey localSecret) {
-        ServerConnection.getList(hostname, id,
-                                 secret,
+        ServerConnection.getList(hostname, id, secret,
                                  (jsonListFromServer, exceptionListFromServer) -> {
                                      if (jsonListFromServer == null ||
                                              exceptionListFromServer != null) {
@@ -126,22 +125,18 @@ public class ListsActivity extends AppCompatActivity {
                                              if (exceptionListFromServer
                                                      .getMessage()
                                                      .equals("Not found")) {
-                                                 Toast.makeText(this,
-                                                                "Can't import" +
-                                                                        " " +
-                                                                        "list" +
-                                                                        ": " +
-                                                                        "Not " +
-                                                                        "found",
+                                                 Toast.makeText(this, getString(
+                                                         R.string.cant_import_list) +
+                                                                        " " + getString(
+                                                         R.string.not_found),
                                                                 Toast.LENGTH_SHORT)
                                                          .show();
                                              }
                                          } else {
-                                             Toast.makeText(this,
-                                                            "Cant import " +
-                                                                    "list:" +
-                                                                    "Can't " +
-                                                                    "connect to server instance",
+                                             Toast.makeText(this, getString(
+                                                     R.string.cant_import_list) +
+                                                                    " " + getString(
+                                                     R.string.no_connection),
                                                             Toast.LENGTH_SHORT)
                                                      .show();
                                          }
@@ -158,8 +153,7 @@ public class ListsActivity extends AppCompatActivity {
                                                                                          "msg")
                                                                                  .getString(
                                                                                          "data"))));
-                                         addListAndHandleCallback(
-                                                 receivedList);
+                                         addListAndHandleCallback(receivedList);
                                      } catch (JSONException e) {
                                          // Shouldn't entered if the server
                                          // worked fine
@@ -228,10 +222,8 @@ public class ListsActivity extends AppCompatActivity {
                     if (jsonResult == null || exception != null) {
                         Log.e(LOG_TITLE_DEFAULT,
                               "No connection to server: " + exception);
-                        Toast.makeText(this,
-                                       "Can't connect to default server " +
-                                               "instance", Toast.LENGTH_SHORT)
-                                .show();
+                        Toast.makeText(this, getString(R.string.no_connection),
+                                       Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Log.d(LOG_TITLE_DEFAULT, "Connection is good!");
@@ -247,9 +239,8 @@ public class ListsActivity extends AppCompatActivity {
                 Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                 chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
                 chooseFile.setType("application/json");
-                Intent intent = Intent.createChooser(chooseFile,
-                                                     "Choose a file to " +
-                                                             "import");
+                Intent intent = Intent.createChooser(chooseFile, getString(
+                        R.string.choose_file_to_import));
                 onImportLauncher.launch(intent);
                 return true;
             case R.id.export_lists:
@@ -284,33 +275,39 @@ public class ListsActivity extends AppCompatActivity {
      * Show and handle create list dialog
      */
     public void showCreateListDialog() {
-        DialogBuilder.editTextDialog(this, "Create new " + "list",
-                                     "Enter list name:", "Create list",
-                                     "Cancel", result -> {
-                    if (result != null) {
-                        if (result.equals("")) {
-                            Toast.makeText(this,
-                                           "Please enter a name " + "first",
-                                           Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        SyncedList newList = new SyncedList(
-                                new SyncedListHeader(getUniqueListId(), result,
-                                                     globalSharedPreferences
-                                                             .getString(
-                                                                     "default_server",
-                                                                     ""),
-                                                     Cryptography
-                                                             .stringtoByteArray(
-                                                                     Cryptography
-                                                                             .generatingRandomString(
-                                                                                     50)),
-                                                     Cryptography
-                                                             .generateAESKey()),
-                                new ArrayList<>());
-                        addListAndHandleCallback(newList);
-                    }
-                });
+        DialogBuilder
+                .editTextDialog(this, getString(R.string.create_list_title),
+                                getString(R.string.create_list_msg),
+                                getString(R.string.create_list_yes),
+                                getString(R.string.create_list_cancel),
+                                result -> {
+                                    if (result != null) {
+                                        if (result.equals("")) {
+                                            Toast.makeText(this, getString(
+                                                    R.string.no_name_entered),
+                                                           Toast.LENGTH_SHORT)
+                                                    .show();
+                                            return;
+                                        }
+                                        SyncedList newList = new SyncedList(
+                                                new SyncedListHeader(
+                                                        getUniqueListId(),
+                                                        result,
+                                                        globalSharedPreferences
+                                                                .getString(
+                                                                        "default_server",
+                                                                        ""),
+                                                        Cryptography
+                                                                .stringtoByteArray(
+                                                                        Cryptography
+                                                                                .generatingRandomString(
+                                                                                        50)),
+                                                        Cryptography
+                                                                .generateAESKey()),
+                                                new ArrayList<>());
+                                        addListAndHandleCallback(newList);
+                                    }
+                                });
     }
 
     public void addListAndHandleCallback(SyncedList syncedList) {
@@ -357,8 +354,8 @@ public class ListsActivity extends AppCompatActivity {
                     SyncedList importedList = new SyncedList(jsonObject);
                     addListAndHandleCallback(importedList);
                 } catch (JSONException exception) {
-                    Toast.makeText(this, "Cant import File!", Toast.LENGTH_LONG)
-                            .show();
+                    Toast.makeText(this, getString(R.string.cant_import_file),
+                                   Toast.LENGTH_LONG).show();
                     Log.e(LOG_TITLE_DEFAULT,
                           "Cant import file: " + exception.toString());
                 }

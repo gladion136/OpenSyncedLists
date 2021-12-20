@@ -154,9 +154,9 @@ public abstract class ServerConnection {
                 String hostname = info.get("hostname");
                 String path = info.get("path");
                 String type = info.get("type");
-                String[] splitProtocoll = hostname.split("://");
-                String protocoll = splitProtocoll[0];
-                hostname = splitProtocoll[1];
+                String[] splitHost = hostname.split("://");
+                String protocoll = splitHost[0];
+                hostname = splitHost[1];
 
                 HttpURLConnection urlConnection = null;
                 Uri.Builder uriBuilder = new Uri.Builder().scheme(protocoll)

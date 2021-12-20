@@ -71,25 +71,10 @@ public class Cryptography {
     }
 
     public static byte[] stringtoByteArray(String s) {
-        /* From Hex String
-
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }*/
         return Base64.decode(s, Base64.DEFAULT);
     }
 
     public static String byteArraytoString(byte[] bytes) {
-        /* To Hex String
-
-        StringBuilder res = new StringBuilder();
-        for (byte b : bytes) {
-            res.append(String.format("%02X-",b));
-        }
-        return res.toString().replaceAll("-", "");*/
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 

@@ -80,8 +80,8 @@ public class ElementEditorFragment extends BottomSheetDialogFragment {
 
         btnDelete.setOnClickListener(v -> {
             SyncedListStep newStep =
-                    new SyncedListStep(syncedListElement.getId(),
-                                       ACTION.REMOVE, null);
+                    new SyncedListStep(syncedListElement.getId(), ACTION.REMOVE,
+                                       null);
             callback.addNewStep(newStep);
             dismiss();
         });

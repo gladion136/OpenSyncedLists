@@ -103,17 +103,18 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
             return true;
         }));
 
-        SwitchPreferenceCompat invertElementPref = findPreference(
-                "invert_element");
+        SwitchPreferenceCompat invertElementPref =
+                findPreference("invert_element");
         invertElementPref.setChecked(syncedList.getHeader().isInvertElement());
-        invertElementPref.setOnPreferenceChangeListener(((preference, newValue) -> {
-            boolean newVal = (boolean) newValue;
-            if (newVal != syncedList.getHeader().isInvertElement()) {
-                syncedList.getHeader().setInvertElement(newVal);
-                save();
-            }
-            return true;
-        }));
+        invertElementPref
+                .setOnPreferenceChangeListener(((preference, newValue) -> {
+                    boolean newVal = (boolean) newValue;
+                    if (newVal != syncedList.getHeader().isInvertElement()) {
+                        syncedList.getHeader().setInvertElement(newVal);
+                        save();
+                    }
+                    return true;
+                }));
 
         SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
         autoSyncPref.setChecked(syncedList.getHeader().isAutoSync());
@@ -142,29 +143,38 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
         deleteOnlineBtn.setOnPreferenceClickListener(v -> {
             ServerConnection.removeList(syncedList.getHeader().getHostname(),
                                         syncedList.getId(),
-                                        syncedList.getSecret(), (jsonResult,
-                                                                 exceptionFromServer) -> {
-                        if(jsonResult == null || exceptionFromServer != null) {
-                            if(exceptionFromServer instanceof ServerException) {
-                                Toast.makeText(getContext(), "Something wrent " +
-                                                       "wrong!",
-                                               Toast.LENGTH_LONG).show();
-                            }else {
-                                Toast.makeText(getContext(), "No connection " +
-                                                       "to server",
-                                               Toast.LENGTH_LONG).show();
-                            }
-                        }else {
-                            try {
-                                secureStorage.deleteList(syncedList.getId());
-                            } catch (Exception exception) {
-                                exception.printStackTrace();
-                            }
-                            Intent intent = new Intent(getContext(), ListsActivity.class);
-                            startActivity(intent);
-                            getActivity().finish();
-                        }
-                    });
+                                        syncedList.getSecret(),
+                                        (jsonResult, exceptionFromServer) -> {
+                                            if (jsonResult == null ||
+                                                    exceptionFromServer !=
+                                                            null) {
+                                                if (exceptionFromServer instanceof ServerException) {
+                                                    Toast.makeText(getContext(),
+                                                                   getString(
+                                                                           R.string.unexpected_error),
+                                                                   Toast.LENGTH_LONG)
+                                                            .show();
+                                                } else {
+                                                    Toast.makeText(getContext(),
+                                                                   getString(
+                                                                           R.string.no_connection),
+                                                                   Toast.LENGTH_LONG)
+                                                            .show();
+                                                }
+                                            } else {
+                                                try {
+                                                    secureStorage.deleteList(
+                                                            syncedList.getId());
+                                                } catch (Exception exception) {
+                                                    exception.printStackTrace();
+                                                }
+                                                Intent intent =
+                                                        new Intent(getContext(),
+                                                                   ListsActivity.class);
+                                                startActivity(intent);
+                                                getActivity().finish();
+                                            }
+                                        });
             return true;
         });
 

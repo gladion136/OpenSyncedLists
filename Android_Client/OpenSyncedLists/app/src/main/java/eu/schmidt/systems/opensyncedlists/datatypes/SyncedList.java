@@ -224,7 +224,7 @@ public class SyncedList {
     }
 
     public void addElementStep(SyncedListStep elementStep) {
-        if(elementStep.changeAction == ACTION.CLEAR) {
+        if (elementStep.changeAction == ACTION.CLEAR) {
             this.elementSteps.clear();
         }
         this.elementSteps.add(elementStep);
@@ -266,7 +266,7 @@ public class SyncedList {
                 jsonArraySteps.put(step.toJSON());
             }
             jsonObject.put("steps", jsonArraySteps);
-        }catch (JSONException exception) {
+        } catch (JSONException exception) {
             exception.printStackTrace();
         }
         return jsonObject;
@@ -320,28 +320,30 @@ public class SyncedList {
     public static SyncedList sync(SyncedList syncedList1,
                                   SyncedList syncedList2) {
         ArrayList<SyncedListStep> result =
-                (ArrayList<SyncedListStep>) syncedList1.getElementSteps().clone();
+                (ArrayList<SyncedListStep>) syncedList1.getElementSteps()
+                        .clone();
         ArrayList<SyncedListStep> syncWith = syncedList2.getElementSteps();
 
-        for(int i=0; i<syncWith.size(); i++) {
+        for (int i = 0; i < syncWith.size(); i++) {
             SyncedListStep currentStep = syncWith.get(i);
             // Still in result?
             boolean stillInResult = false;
 
-            for (SyncedListStep s: result
-            ) {
-                if(s.equals(currentStep)) {
+            for (SyncedListStep s : result) {
+                if (s.equals(currentStep)) {
                     stillInResult = true;
                     break;
                 }
             }
 
-            if(stillInResult) continue;
+            if (stillInResult) {
+                continue;
+            }
             // Add between correct time
             boolean added = false;
-            for(int x=result.size()-1; x>=0; x--) {
-                if(result.get(x).timestamp < currentStep.timestamp) {
-                    result.add(x+1, currentStep);
+            for (int x = result.size() - 1; x >= 0; x--) {
+                if (result.get(x).timestamp < currentStep.timestamp) {
+                    result.add(x + 1, currentStep);
                     added = true;
                     break;
                 }
@@ -366,5 +368,4 @@ public class SyncedList {
                 Cryptography.encryptRSA(getHeader().getLocalSecret(), data);
         return encrypted;
     }
-
 }

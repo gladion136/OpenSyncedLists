@@ -35,7 +35,7 @@
 
         <EditTextPreference
             android:key="default_server"
-            android:title="@string/default_server_title" />
+            android:title="@string/default_server_title"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

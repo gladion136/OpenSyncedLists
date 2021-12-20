@@ -184,8 +184,7 @@ public class SyncedListAdapter
                 break;
             case R.layout.list_element_isolator:
                 View isolatorView = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(viewType, viewGroup,
-                                 false);
+                        .inflate(viewType, viewGroup, false);
                 viewHolder = new IsolatorViewHolder(isolatorView);
                 break;
             default:
@@ -201,8 +200,8 @@ public class SyncedListAdapter
             return R.layout.list_element_isolator;
         } else {
 
-            return syncedList.getHeader().isInvertElement() ?
-                   R.layout.list_element_invert : R.layout.list_element;
+            return syncedList.getHeader().isInvertElement()
+                   ? R.layout.list_element_invert : R.layout.list_element;
         }
     }
 

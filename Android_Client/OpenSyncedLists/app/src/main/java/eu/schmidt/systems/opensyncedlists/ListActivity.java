@@ -72,7 +72,7 @@ public class ListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         eTNewElement.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                createNewElement(false); // Need to read default from
+                createNewElement(false);
                 return true;
             }
             return false;
@@ -145,17 +145,16 @@ public class ListActivity extends AppCompatActivity {
                 syncWithHost();
                 return true;
             case R.id.export_link:
-                if(!syncedList.getHeader().getHostname().equals("")) {
+                if (!syncedList.getHeader().getHostname().equals("")) {
                     String hostname = syncedList.getHeader().getHostname();
-                    String[] splitProtocoll = hostname.split("://");
-                    String protocoll = splitProtocoll[0];
-                    hostname = splitProtocoll[1];
+                    String[] splitHost = hostname.split("://");
+                    String protocoll = splitHost[0];
+                    hostname = splitHost[1];
                     Uri.Builder uriBuilder = new Uri.Builder().scheme(protocoll)
-                            .encodedAuthority(hostname)
-                            .path("/list/share");
+                            .encodedAuthority(hostname).path("/list/share");
                     uriBuilder.appendQueryParameter("id", syncedList.getId());
-                    uriBuilder
-                            .appendQueryParameter("secret", syncedList.getSecret());
+                    uriBuilder.appendQueryParameter("secret",
+                                                    syncedList.getSecret());
                     uriBuilder.appendQueryParameter("localSecret", Cryptography
                             .byteArraytoString(
                                     syncedList.getHeader().getLocalSecret()
@@ -163,19 +162,20 @@ public class ListActivity extends AppCompatActivity {
                     Uri uri = uriBuilder.build();
                     Intent sendUriIntent = new Intent();
                     sendUriIntent.setAction(Intent.ACTION_SEND);
-                    sendUriIntent.putExtra(Intent.EXTRA_TEXT, "Import the list '" +
-                            syncedList.getName() +
-                            "' to OpenSyncedLists with the following link:\n\n" +
-                            uri.toString() +
-                            "\n\nDon't open the link with your browser! After this the server owner is able to decrypt the List!");
+                    sendUriIntent.putExtra(Intent.EXTRA_TEXT,
+                                           getString(R.string.share_before_name) +
+                                                   syncedList.getName() +
+                                                   getString(R.string.share_after_name) +
+                                                   uri.toString() +
+                                                   getString(R.string.share_after_link));
                     sendUriIntent.setType("text/plain");
                     Intent shareUriIntent = Intent.createChooser(sendUriIntent,
                                                                  syncedList
                                                                          .getName());
                     startActivity(shareUriIntent);
-                }else {
-                    Toast.makeText(this, "No server selected!"
-                            , Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, getString(R.string.no_server_selected),
+                                   Toast.LENGTH_LONG).show();
                 }
 
                 return true;
@@ -225,19 +225,16 @@ public class ListActivity extends AppCompatActivity {
         if (hostname.equals("")) {
             return;
         }
-        ServerConnection
-                .checkConnection(hostname, (jsonResult, exception) -> {
-                    if (jsonResult == null || exception != null) {
-                        Log.e(LOG_TITLE_DEFAULT,
-                              "No connection to server: " + exception);
-                        Toast.makeText(this,
-                                       "Can't connect to server " +
-                                               "instance", Toast.LENGTH_SHORT)
-                                .show();
-                        return;
-                    }
-                    Log.d(LOG_TITLE_DEFAULT, "Connection is good!");
-                });
+        ServerConnection.checkConnection(hostname, (jsonResult, exception) -> {
+            if (jsonResult == null || exception != null) {
+                Log.e(LOG_TITLE_DEFAULT,
+                      "No connection to server: " + exception);
+                Toast.makeText(this, getString(R.string.no_connection),
+                               Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Log.d(LOG_TITLE_DEFAULT, "Connection is good!");
+        });
     }
 
     @Override protected void onDestroy() {
@@ -253,10 +250,8 @@ public class ListActivity extends AppCompatActivity {
      * Returns: success(true)
      */
     public boolean createNewElement(boolean top) {
-        String elementName = eTNewElement
-                .getText()
-                .toString();
-        if(!elementName.equals("")) {
+        String elementName = eTNewElement.getText().toString();
+        if (!elementName.equals("")) {
             String id = syncedList.generateUniqueElementId();
             SyncedListStep syncedListStep = new SyncedListStep(id, ACTION.ADD,
                                                                new SyncedListElement(
@@ -267,7 +262,8 @@ public class ListActivity extends AppCompatActivity {
                                                                        ""));
             addElementStepAndSave(syncedListStep, true);
             if (top) {
-                SyncedListStep syncedListStepMove = new SyncedListStep(id, ACTION.MOVE, 0);
+                SyncedListStep syncedListStepMove =
+                        new SyncedListStep(id, ACTION.MOVE, 0);
                 addElementStepAndSave(syncedListStepMove, true);
             }
             if (!syncedList.getHeader().isCheckedList()) {
@@ -343,8 +339,8 @@ public class ListActivity extends AppCompatActivity {
                 if (exception instanceof ServerException) {
                     Log.e(LOG_TITLE_NETWORK,
                           "Unexpected Error: " + exception.toString());
-                    Toast.makeText(this, "Can't add list to server! " +
-                            "Unexpected Error!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.unexpected_error),
+                                   Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Log.e(LOG_TITLE_NETWORK, "Error: " + exception.toString());
@@ -374,9 +370,11 @@ public class ListActivity extends AppCompatActivity {
                                      Log.d(LOG_TITLE_NETWORK, "Finish sync");
                                      syncedList.sync(synchronizedList);
                                      this.recyclerView
-                                             .post(() -> syncedListAdapter.notifyDataSetChanged());
+                                             .post(() -> syncedListAdapter
+                                                     .notifyDataSetChanged());
                                      try {
-                                         secureStorage.setList(syncedList, false);
+                                         secureStorage
+                                                 .setList(syncedList, false);
                                      } catch (IOException e) {
                                          e.printStackTrace();
                                      } catch (JSONException e) {

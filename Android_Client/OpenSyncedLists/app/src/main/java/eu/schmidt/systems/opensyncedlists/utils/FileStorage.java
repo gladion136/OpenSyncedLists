@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
 
 public class FileStorage {
@@ -37,8 +38,7 @@ public class FileStorage {
             fileWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.e(LOG_TITLE_STORAGE, "File not found. Did you" +
-                    " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
+            Log.e(LOG_TITLE_STORAGE, "File not found.");
         } catch (IOException e) {
             Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
             e.printStackTrace();
@@ -59,8 +59,7 @@ public class FileStorage {
             fileWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.e(LOG_TITLE_STORAGE, "File not found. Did you" +
-                    " add a WRITE_EXTERNAL_STORAGE permission to the   manifest?");
+            Log.e(LOG_TITLE_STORAGE, "File not found.");
         } catch (IOException e) {
             Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
             e.printStackTrace();
@@ -80,7 +79,7 @@ public class FileStorage {
         } catch (ActivityNotFoundException exception) {
             Log.e(LOG_TITLE_DEFAULT,
                   "No activity found to receive " + "file: " + exception);
-            Toast.makeText(context, "You have no app to handle files!",
+            Toast.makeText(context, context.getString(R.string.no_app_for_intent_installed),
                            Toast.LENGTH_SHORT).show();
         }
     }

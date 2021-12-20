@@ -158,8 +158,8 @@ public class SecureStorage {
             if (header.getId().equals(syncedList.getId())) {
                 syncedListsHeaders.set(i, syncedList.getHeader());
                 newList = false;
-                result = "A list with the same id already exists " +
-                        "and got overridden!";
+                result =
+                        context.getString(R.string.list_with_id_got_overridden);
                 break;
             }
         }
