@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +14,9 @@ import android.widget.EditText;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 
 public class ElementEditorFragment extends BottomSheetDialogFragment {
     EditText eTName, eTDescription;

@@ -1,11 +1,7 @@
-package eu.schmidt.systems.opensyncedlists.datatypes;
+package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.Serializable;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * One changes Step for a SyncedList

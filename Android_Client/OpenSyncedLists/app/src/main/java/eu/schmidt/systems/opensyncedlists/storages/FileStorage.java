@@ -1,6 +1,5 @@
-package eu.schmidt.systems.opensyncedlists.utils;
+package eu.schmidt.systems.opensyncedlists.storages;
 
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.FILE_PROVIDER_AUTHORITY;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
@@ -14,20 +13,20 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import eu.schmidt.systems.opensyncedlists.BuildConfig;
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 
 public class FileStorage {
+    public final static String FILE_PROVIDER_AUTHORITY =
+            BuildConfig.APPLICATION_ID + ".fileprovider";
 
     public static String exportList(Context context, SyncedList syncedList) {
         File file =

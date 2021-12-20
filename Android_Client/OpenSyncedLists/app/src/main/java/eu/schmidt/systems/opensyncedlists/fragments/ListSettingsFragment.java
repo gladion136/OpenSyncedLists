@@ -19,13 +19,13 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-import eu.schmidt.systems.opensyncedlists.ListsActivity;
+import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
-import eu.schmidt.systems.opensyncedlists.exceptions.ServerException;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
-import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
-import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
+import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 
 public class ListSettingsFragment extends PreferenceFragmentCompat {
 
@@ -38,7 +38,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.list_preferences, rootKey);
+        setPreferencesFromResource(R.xml.preferences_list, rootKey);
     }
 
     @Override public View onCreateView(@NonNull LayoutInflater inflater,
@@ -141,10 +141,10 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
         deleteOnlineBtn.setOnPreferenceClickListener(v -> {
-            ServerConnection.removeList(syncedList.getHeader().getHostname(),
-                                        syncedList.getId(),
-                                        syncedList.getSecret(),
-                                        (jsonResult, exceptionFromServer) -> {
+            ServerWrapper.removeList(syncedList.getHeader().getHostname(),
+                                     syncedList.getId(),
+                                     syncedList.getSecret(),
+                                     (jsonResult, exceptionFromServer) -> {
                                             if (jsonResult == null ||
                                                     exceptionFromServer !=
                                                             null) {

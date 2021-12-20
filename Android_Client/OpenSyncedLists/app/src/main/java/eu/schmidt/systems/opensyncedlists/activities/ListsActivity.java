@@ -1,4 +1,4 @@
-package eu.schmidt.systems.opensyncedlists;
+package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
@@ -36,15 +36,16 @@ import java.util.ArrayList;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import eu.schmidt.systems.opensyncedlists.adapter.ListsAdapter;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
-import eu.schmidt.systems.opensyncedlists.exceptions.ServerException;
+import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.adapters.ListsAdapter;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
-import eu.schmidt.systems.opensyncedlists.utils.FileStorage;
-import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
-import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
+import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
+import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 
 /**
  * ListsActivity displays all lists on device
@@ -115,8 +116,8 @@ public class ListsActivity extends AppCompatActivity {
                                    String id,
                                    String secret,
                                    SecretKey localSecret) {
-        ServerConnection.getList(hostname, id, secret,
-                                 (jsonListFromServer, exceptionListFromServer) -> {
+        ServerWrapper.getList(hostname, id, secret,
+                              (jsonListFromServer, exceptionListFromServer) -> {
                                      if (jsonListFromServer == null ||
                                              exceptionListFromServer != null) {
                                          Log.e(LOG_TITLE_NETWORK, "Error: " +
@@ -189,7 +190,7 @@ public class ListsActivity extends AppCompatActivity {
             Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
-        listsAdapter = new ListsAdapter(this, R.layout.lists_element,
+        listsAdapter = new ListsAdapter(this, R.layout.element_lists,
                                         (ArrayList<SyncedListHeader>) syncedListsHeaders
                                                 .clone());
         lVLists.setAdapter(listsAdapter);
@@ -218,7 +219,7 @@ public class ListsActivity extends AppCompatActivity {
         if (defaultHostname.equals("")) {
             return;
         }
-        ServerConnection
+        ServerWrapper
                 .checkConnection(defaultHostname, (jsonResult, exception) -> {
                     if (jsonResult == null || exception != null) {
                         Log.e(LOG_TITLE_DEFAULT,

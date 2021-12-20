@@ -1,4 +1,4 @@
-package eu.schmidt.systems.opensyncedlists.datatypes;
+package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 /**
  * Action of SyncedListStep

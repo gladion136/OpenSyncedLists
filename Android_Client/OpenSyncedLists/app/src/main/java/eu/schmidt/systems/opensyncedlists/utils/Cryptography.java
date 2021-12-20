@@ -1,9 +1,6 @@
 package eu.schmidt.systems.opensyncedlists.utils;
 
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_SYNC;
-
 import android.util.Base64;
-import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

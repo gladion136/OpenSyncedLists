@@ -3,21 +3,10 @@ package eu.schmidt.systems.opensyncedlists.utils;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.InputType;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
-
-import org.json.JSONException;
-
-import java.io.IOException;
-
-import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
 
 /**
  * DialogBuilder to easily create simple dialogs
@@ -39,7 +28,7 @@ public class DialogBuilder {
                                       String message,
                                       String yesOption,
                                       String noOption,
-                                      DialogCallback callback) {
+                                      Callback callback) {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
         final EditText editText = new EditText(context);
 
@@ -68,9 +57,9 @@ public class DialogBuilder {
     }
 
     /**
-     * DialogCallback
+     * Callback
      */
-    public interface DialogCallback {
+    public interface Callback {
         void callback(String result);
     }
 

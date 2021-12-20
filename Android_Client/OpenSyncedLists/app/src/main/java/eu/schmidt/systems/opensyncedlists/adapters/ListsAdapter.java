@@ -1,27 +1,20 @@
-package eu.schmidt.systems.opensyncedlists.adapter;
+package eu.schmidt.systems.opensyncedlists.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 
-import eu.schmidt.systems.opensyncedlists.ListActivity;
+import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 
 /**
  * ListView Adapter for ListsActivity
@@ -71,7 +64,7 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView =
-                    inflater.inflate(R.layout.lists_element, parent, false);
+                    inflater.inflate(R.layout.element_lists, parent, false);
             viewHolder.txtName = convertView.findViewById(R.id.textView);
             convertView.setTag(viewHolder);
         } else {

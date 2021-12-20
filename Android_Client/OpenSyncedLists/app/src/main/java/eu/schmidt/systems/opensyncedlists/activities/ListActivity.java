@@ -1,9 +1,8 @@
-package eu.schmidt.systems.opensyncedlists;
+package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_SYNC;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,19 +26,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import eu.schmidt.systems.opensyncedlists.adapter.SyncedListAdapter;
-import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
-import eu.schmidt.systems.opensyncedlists.exceptions.ServerException;
+import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
+import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
-import eu.schmidt.systems.opensyncedlists.utils.FileStorage;
-import eu.schmidt.systems.opensyncedlists.utils.SecureStorage;
-import eu.schmidt.systems.opensyncedlists.utils.ServerConnection;
+import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
+import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 
 /**
  * ListActivity displays one list
@@ -229,7 +228,7 @@ public class ListActivity extends AppCompatActivity {
         if (hostname.equals("")) {
             return;
         }
-        ServerConnection.checkConnection(hostname, (jsonResult, exception) -> {
+        ServerWrapper.checkConnection(hostname, (jsonResult, exception) -> {
             if (jsonResult == null || exception != null) {
                 Log.e(LOG_TITLE_DEFAULT,
                       "No connection to server: " + exception);
@@ -292,9 +291,9 @@ public class ListActivity extends AppCompatActivity {
         }
         Log.d(LOG_TITLE_NETWORK, "Start synchronize list");
         // Start sync
-        ServerConnection.getList(hostname, syncedList.getHeader().getId(),
-                                 syncedList.getSecret(),
-                                 (jsonListFromServer, exceptionListFromServer) -> {
+        ServerWrapper.getList(hostname, syncedList.getHeader().getId(),
+                              syncedList.getSecret(),
+                              (jsonListFromServer, exceptionListFromServer) -> {
                                      if (jsonListFromServer == null ||
                                              exceptionListFromServer != null) {
                                          Log.e(LOG_TITLE_NETWORK, "Error: " +
@@ -340,7 +339,7 @@ public class ListActivity extends AppCompatActivity {
      * Get called from syncWithHost
      */
     private void addListToServer() {
-        ServerConnection.addList(syncedList, (jsonResult, exception) -> {
+        ServerWrapper.addList(syncedList, (jsonResult, exception) -> {
             if (jsonResult == null || exception != null) {
                 if (exception instanceof ServerException) {
                     Log.e(LOG_TITLE_NETWORK,
@@ -363,8 +362,8 @@ public class ListActivity extends AppCompatActivity {
                 .equals(syncedList.toJSON().toString())) {
             SyncedList synchronizedList =
                     SyncedList.sync(syncedList, receivedList);
-            ServerConnection.setList(synchronizedList, receivedListHash,
-                                     (jsonResult, exception) -> {
+            ServerWrapper.setList(synchronizedList, receivedListHash,
+                                  (jsonResult, exception) -> {
                                          if (jsonResult == null ||
                                                  exception != null) {
                                              Log.e(LOG_TITLE_NETWORK,

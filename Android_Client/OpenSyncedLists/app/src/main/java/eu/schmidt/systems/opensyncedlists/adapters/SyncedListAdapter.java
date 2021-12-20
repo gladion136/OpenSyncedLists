@@ -1,4 +1,4 @@
-package eu.schmidt.systems.opensyncedlists.adapter;
+package eu.schmidt.systems.opensyncedlists.adapters;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 
@@ -25,12 +25,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 
-import eu.schmidt.systems.opensyncedlists.ListActivity;
+import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.datatypes.ACTION;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListStep;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.fragments.ElementEditorFragment;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
@@ -175,14 +175,14 @@ public class SyncedListAdapter
         RecyclerView.ViewHolder viewHolder;
 
         switch (viewType) {
-            case R.layout.list_element_invert:
-            case R.layout.list_element:
+            case R.layout.element_list_invert:
+            case R.layout.element_list:
                 View view = LayoutInflater.from(viewGroup.getContext())
                         .inflate(viewType, viewGroup, false);
                 view.setOnClickListener(this);
                 viewHolder = new ElementViewHolder(view);
                 break;
-            case R.layout.list_element_isolator:
+            case R.layout.element_list_isolator:
                 View isolatorView = LayoutInflater.from(viewGroup.getContext())
                         .inflate(viewType, viewGroup, false);
                 viewHolder = new IsolatorViewHolder(isolatorView);
@@ -197,11 +197,11 @@ public class SyncedListAdapter
     @Override public int getItemViewType(int position) {
         if (syncedList.getHeader().isCheckedList() &&
                 syncedList.getUncheckedElements().size() == position) {
-            return R.layout.list_element_isolator;
+            return R.layout.element_list_isolator;
         } else {
 
             return syncedList.getHeader().isInvertElement()
-                   ? R.layout.list_element_invert : R.layout.list_element;
+                   ? R.layout.element_list_invert : R.layout.element_list;
         }
     }
 

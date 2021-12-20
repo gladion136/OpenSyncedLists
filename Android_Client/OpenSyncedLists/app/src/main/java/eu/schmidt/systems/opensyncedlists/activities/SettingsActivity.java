@@ -1,4 +1,4 @@
-package eu.schmidt.systems.opensyncedlists;
+package eu.schmidt.systems.opensyncedlists.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -6,15 +6,17 @@ import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+
+import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.fragments.SettingsFragment;
 
 public class SettingsActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.activity_settings);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.settings, new SettingsFragment()).commit();
@@ -49,13 +51,4 @@ public class SettingsActivity extends AppCompatActivity implements
                 break;
         }
     }
-
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.root_preferences, rootKey);
-        }
-    }
-
-
 }

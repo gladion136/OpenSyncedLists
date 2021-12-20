@@ -1,11 +1,8 @@
-package eu.schmidt.systems.opensyncedlists.utils;
-
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
+package eu.schmidt.systems.opensyncedlists.storages;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,8 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedList;
-import eu.schmidt.systems.opensyncedlists.datatypes.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 public class SecureStorage {
     Context context;
@@ -46,14 +44,14 @@ public class SecureStorage {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("LIST_" + list.getId(), list.toJSON().toString());
         editor.apply();
-        Log.d(Constant.LOG_TITLE_DEFAULT, "Save List: " + list.getName());
+        Log.d(Constant.LOG_TITLE_STORAGE, "Save List");
         if (headerChanged) {
             ArrayList<SyncedListHeader> headers = getListsHeaders();
             for (int i = 0; i < headers.size(); i++) {
                 if (headers.get(i).getId().equals(list.getId())) {
                     headers.set(i, list.getHeader());
-                    Log.d(Constant.LOG_TITLE_DEFAULT,
-                          "Header of list " + "changed to: " + list.getName());
+                    Log.d(Constant.LOG_TITLE_STORAGE,
+                          "Header of list changed");
                     break;
                 }
             }
@@ -77,8 +75,6 @@ public class SecureStorage {
 
         SyncedList result =
                 new SyncedList(getListHeader(id), new JSONObject(data));
-        Log.d(Constant.LOG_TITLE_DEFAULT,
-              "Load Lists Headers: " + result.toString());
         return result;
     }
 
@@ -99,8 +95,7 @@ public class SecureStorage {
             result.add(
                     new SyncedListHeader((JSONObject) jsonArrayLists.get(i)));
         }
-        Log.d(Constant.LOG_TITLE_DEFAULT,
-              "Load Lists Headers: " + result.toString());
+        Log.d(Constant.LOG_TITLE_STORAGE, "Load Lists Headers");
         return result;
     }
 
@@ -108,8 +103,6 @@ public class SecureStorage {
         ArrayList<SyncedListHeader> headers = getListsHeaders();
         for (int i = 0; i < headers.size(); i++) {
             if (headers.get(i).getId().equals(id)) {
-                Log.d(Constant.LOG_TITLE_DEFAULT,
-                      "Found header: " + headers.get(i).getName());
                 return headers.get(i);
             }
         }
@@ -131,8 +124,7 @@ public class SecureStorage {
         }
         editor.putString("LISTS_HEADERS", jsonArray.toString());
         editor.apply();
-        Log.d(Constant.LOG_TITLE_DEFAULT,
-              "Save Lists Headers: " + jsonArray.toString());
+        Log.d(Constant.LOG_TITLE_STORAGE, "Save Lists Headers");
     }
 
     public void deleteList(String id) throws Exception {

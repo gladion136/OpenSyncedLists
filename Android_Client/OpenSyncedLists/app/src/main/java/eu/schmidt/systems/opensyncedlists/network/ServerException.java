@@ -1,4 +1,4 @@
-package eu.schmidt.systems.opensyncedlists.exceptions;
+package eu.schmidt.systems.opensyncedlists.network;
 
 public class ServerException extends Exception {
     public ServerException(String message) {

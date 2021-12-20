@@ -1,6 +1,4 @@
-package eu.schmidt.systems.opensyncedlists.datatypes;
-
-import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_SYNC;
+package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 import android.util.Log;
 

@@ -1,9 +1,7 @@
-package eu.schmidt.systems.opensyncedlists.datatypes;
+package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 
 /**
  * An Element of a SyncedList

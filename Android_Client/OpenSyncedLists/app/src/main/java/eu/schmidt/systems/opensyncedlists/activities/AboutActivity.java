@@ -1,9 +1,11 @@
-package eu.schmidt.systems.opensyncedlists;
+package eu.schmidt.systems.opensyncedlists.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+
+import eu.schmidt.systems.opensyncedlists.R;
 
 public class AboutActivity extends AppCompatActivity {
 

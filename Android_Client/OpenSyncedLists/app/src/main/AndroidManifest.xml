@@ -13,20 +13,20 @@
         android:theme="@style/Theme.OpenSyncedLists"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ListSettingsActivity"
+            android:name=".activities.ListSettingsActivity"
             android:exported="true"
             android:label="@string/list_settings_title" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ListsActivity" />
+            android:parentActivityName=".activities.ListsActivity" />
         <activity
-            android:name=".AboutActivity"
+            android:name=".activities.AboutActivity"
             android:exported="true"
-            android:parentActivityName=".ListsActivity" />
+            android:parentActivityName=".activities.ListsActivity" />
         <activity
-            android:name=".ListsActivity"
+            android:name=".activities.ListsActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -57,7 +57,7 @@
 
         </activity>
         <activity
-            android:name=".ListActivity"
+            android:name=".activities.ListActivity"
             android:windowSoftInputMode="stateAlwaysHidden|stateHidden" />
 
         <provider
