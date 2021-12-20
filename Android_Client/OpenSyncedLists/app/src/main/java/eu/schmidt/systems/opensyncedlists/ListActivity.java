@@ -3,6 +3,7 @@ package eu.schmidt.systems.opensyncedlists;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_SYNC;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -142,7 +143,12 @@ public class ListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.manual_sync:
-                syncWithHost();
+                if (!syncedList.getHeader().getHostname().equals("")) {
+                    syncWithHost();
+                } else {
+                    Toast.makeText(this, getString(R.string.no_server_selected),
+                                   Toast.LENGTH_LONG).show();
+                }
                 return true;
             case R.id.export_link:
                 if (!syncedList.getHeader().getHostname().equals("")) {
@@ -162,12 +168,11 @@ public class ListActivity extends AppCompatActivity {
                     Uri uri = uriBuilder.build();
                     Intent sendUriIntent = new Intent();
                     sendUriIntent.setAction(Intent.ACTION_SEND);
-                    sendUriIntent.putExtra(Intent.EXTRA_TEXT,
-                                           getString(R.string.share_before_name) +
-                                                   syncedList.getName() +
-                                                   getString(R.string.share_after_name) +
-                                                   uri.toString() +
-                                                   getString(R.string.share_after_link));
+                    sendUriIntent.putExtra(Intent.EXTRA_TEXT, getString(
+                            R.string.share_before_name) + syncedList.getName() +
+                            getString(R.string.share_after_name) +
+                            uri.toString() +
+                            getString(R.string.share_after_link));
                     sendUriIntent.setType("text/plain");
                     Intent shareUriIntent = Intent.createChooser(sendUriIntent,
                                                                  syncedList
@@ -177,7 +182,6 @@ public class ListActivity extends AppCompatActivity {
                     Toast.makeText(this, getString(R.string.no_server_selected),
                                    Toast.LENGTH_LONG).show();
                 }
-
                 return true;
             case R.id.settings:
                 Intent settingsIntent =
@@ -307,6 +311,10 @@ public class ListActivity extends AppCompatActivity {
                                          return;
                                      }
                                      try {
+                                         String encryptedData =
+                                                 jsonListFromServer
+                                                         .getJSONObject("msg")
+                                                         .getString("data");
                                          SyncedList receivedList =
                                                  new SyncedList(new JSONObject(
                                                          Cryptography
@@ -314,13 +322,11 @@ public class ListActivity extends AppCompatActivity {
                                                                          syncedList
                                                                                  .getHeader()
                                                                                  .getLocalSecret(),
-                                                                         jsonListFromServer
-                                                                                 .getJSONObject(
-                                                                                         "msg")
-                                                                                 .getString(
-                                                                                         "data"))));
-                                         syncAndUpdateListOnServer(
-                                                 receivedList);
+                                                                         encryptedData)));
+                                         syncAndUpdateListOnServer(receivedList,
+                                                                   Cryptography
+                                                                           .getSHAasString(
+                                                                                   encryptedData));
                                      } catch (JSONException e) {
                                          // Shouldn't entered if the server
                                          // worked fine
@@ -350,37 +356,44 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    private void syncAndUpdateListOnServer(SyncedList receivedList) {
-        SyncedList synchronizedList = SyncedList.sync(syncedList, receivedList);
-        ServerConnection.setList(synchronizedList, Cryptography
-                                         .getSHAasString(receivedList.getFullListEncrypted()),
-                                 (jsonResult, exception) -> {
-                                     if (jsonResult == null ||
-                                             exception != null) {
-                                         Log.e(LOG_TITLE_NETWORK, "Error: " +
-                                                 exception.toString());
-                                         if (exception instanceof ServerException) {
-                                             // Something went wrong for
-                                             // example wrong hash => Resync
-                                             syncWithHost();
+    private void syncAndUpdateListOnServer(SyncedList receivedList,
+                                           String receivedListHash) {
+        // Sync if changes happened
+        if (!receivedList.toJSON().toString()
+                .equals(syncedList.toJSON().toString())) {
+            SyncedList synchronizedList =
+                    SyncedList.sync(syncedList, receivedList);
+            ServerConnection.setList(synchronizedList, receivedListHash,
+                                     (jsonResult, exception) -> {
+                                         if (jsonResult == null ||
+                                                 exception != null) {
+                                             Log.e(LOG_TITLE_NETWORK,
+                                                   "Error: " + exception
+                                                           .toString());
+                                             if (exception instanceof ServerException) {
+                                                 // Something went wrong for
+                                                 // example wrong hash => Resync
+                                                 syncWithHost();
+                                                 return;
+                                             }
                                              return;
                                          }
-                                         return;
-                                     }
-                                     Log.d(LOG_TITLE_NETWORK, "Finish sync");
-                                     syncedList.sync(synchronizedList);
-                                     this.recyclerView
-                                             .post(() -> syncedListAdapter
-                                                     .notifyDataSetChanged());
-                                     try {
-                                         secureStorage
-                                                 .setList(syncedList, false);
-                                     } catch (IOException e) {
-                                         e.printStackTrace();
-                                     } catch (JSONException e) {
-                                         e.printStackTrace();
-                                     }
-                                 });
+                                         Log.d(LOG_TITLE_NETWORK,
+                                               "Finish sync!");
+                                         syncedList.sync(synchronizedList);
+                                         this.recyclerView
+                                                 .post(() -> syncedListAdapter
+                                                         .notifyDataSetChanged());
+                                         try {
+                                             secureStorage.setList(syncedList,
+                                                                   false);
+                                         } catch (IOException e) {
+                                             e.printStackTrace();
+                                         } catch (JSONException e) {
+                                             e.printStackTrace();
+                                         }
+                                     });
+        }
     }
 
     /**

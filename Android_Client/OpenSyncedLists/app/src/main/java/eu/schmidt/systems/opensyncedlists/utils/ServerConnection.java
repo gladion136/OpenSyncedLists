@@ -34,7 +34,6 @@ public abstract class ServerConnection {
      * @param callback Callback
      */
     public static void checkConnection(String hostname, Callback callback) {
-        Log.d(LOG_TITLE_NETWORK, "Send Request: checkConnection");
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", hostname);
         info.put("path", "/test");
@@ -51,7 +50,6 @@ public abstract class ServerConnection {
                                String id,
                                String secret,
                                Callback callback) {
-        Log.d(LOG_TITLE_NETWORK, "Send Request: getList");
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", hostname);
         info.put("path", "/list/get");
@@ -71,7 +69,6 @@ public abstract class ServerConnection {
     public static void setList(SyncedList syncedList,
                                String basedOnHash,
                                Callback callback) {
-        Log.d(LOG_TITLE_NETWORK, "Send Request: setList");
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", syncedList.getHeader().getHostname());
         info.put("path", "/list/set");

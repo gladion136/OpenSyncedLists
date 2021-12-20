@@ -89,12 +89,13 @@ public class ListsActivity extends AppCompatActivity {
                     (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
             importFile(receivedFile);
         } else if (intent.getData() != null) {
-            Log.d(LOG_TITLE_DEFAULT, "Import list via link");
             Uri uri = intent.getData();
             String id = uri.getQueryParameter("id");
             String secret = uri.getQueryParameter("secret");
             String localSecret = uri.getQueryParameter("localSecret");
-            String hostname = uri.getHost() + ":" + uri.getPort();
+            String hostname =
+                    uri.getScheme() + "://" + uri.getAuthority();
+            Log.d(LOG_TITLE_DEFAULT, "Import list via link from host: " + hostname);
             if (id != null && secret != null && localSecret != null &&
                     hostname != null) {
                 byte[] encodedLocalSecret =

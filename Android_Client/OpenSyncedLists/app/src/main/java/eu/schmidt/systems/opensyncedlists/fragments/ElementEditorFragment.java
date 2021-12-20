@@ -68,11 +68,12 @@ public class ElementEditorFragment extends BottomSheetDialogFragment {
                     (!newName.equals(syncedListElement.getName()) ||
                             !newDescription.equals(syncedListElement
                                                            .getDescription()))) {
-                syncedListElement.setName(newName);
-                syncedListElement.setDescription(newDescription);
+                SyncedListElement updated = syncedListElement.clone();
+                updated.setName(newName);
+                updated.setDescription(newDescription);
                 SyncedListStep newStep =
-                        new SyncedListStep(syncedListElement.getId(),
-                                           ACTION.UPDATE, syncedListElement);
+                        new SyncedListStep(updated.getId(),
+                                           ACTION.UPDATE, updated);
                 callback.addNewStep(newStep);
                 dismiss();
             }
@@ -80,8 +81,7 @@ public class ElementEditorFragment extends BottomSheetDialogFragment {
 
         btnDelete.setOnClickListener(v -> {
             SyncedListStep newStep =
-                    new SyncedListStep(syncedListElement.getId(), ACTION.REMOVE,
-                                       null);
+                    new SyncedListStep(syncedListElement.getId(), ACTION.REMOVE);
             callback.addNewStep(newStep);
             dismiss();
         });

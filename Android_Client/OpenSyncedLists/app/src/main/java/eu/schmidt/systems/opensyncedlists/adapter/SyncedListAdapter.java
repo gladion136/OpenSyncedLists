@@ -263,7 +263,8 @@ public class SyncedListAdapter
             // on checked
             elementViewHolder.checkBox
                     .setOnCheckedChangeListener((v, checked) -> {
-                        SyncedListElement updated = currentSyncedListElement;
+                        SyncedListElement updated =
+                                currentSyncedListElement.clone();
                         updated.setChecked(checked);
                         SyncedListStep newStep = new SyncedListStep(
                                 currentSyncedListElement.getId(), ACTION.UPDATE,
@@ -316,14 +317,15 @@ public class SyncedListAdapter
      */
     public void checkNameChangesAndSubmit(ElementViewHolder viewHolder,
                                           SyncedListElement syncedListElement) {
+
         String newName = viewHolder.eTName.getText().toString();
         if (!newName.equals("") &&
                 !newName.equals(syncedListElement.getName())) {
-
-            syncedListElement.setName(newName);
+            SyncedListElement updated = syncedListElement.clone();
+            updated.setName(newName);
             SyncedListStep newStep =
-                    new SyncedListStep(syncedListElement.getId(), ACTION.UPDATE,
-                                       syncedListElement);
+                    new SyncedListStep(updated.getId(), ACTION.UPDATE,
+                                       updated);
             listActivity.addElementStepAndSave(newStep, true);
         }
     }

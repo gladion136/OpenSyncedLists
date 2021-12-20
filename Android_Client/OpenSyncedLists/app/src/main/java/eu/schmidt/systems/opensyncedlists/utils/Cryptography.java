@@ -1,6 +1,9 @@
 package eu.schmidt.systems.opensyncedlists.utils;
 
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_SYNC;
+
 import android.util.Base64;
+import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -105,7 +108,8 @@ public class Cryptography {
             System.arraycopy(iv, 0, encrypted, 0, iv.length);
             System.arraycopy(ciphertext, 0, encrypted, iv.length,
                              ciphertext.length);
-            return Base64.encodeToString(encrypted, Base64.DEFAULT);
+
+            result = Base64.encodeToString(encrypted, Base64.DEFAULT);
         } catch (Exception e) {
             e.printStackTrace();
         }

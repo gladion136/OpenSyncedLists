@@ -60,12 +60,17 @@ public class SyncedListElement {
         this.description = description;
     }
 
-    public JSONObject toJSON() throws JSONException {
+    public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
-        jsonObject.put("checked", checked);
-        jsonObject.put("name", name);
-        jsonObject.put("description", description);
+        try {
+            jsonObject.put("id", id);
+            jsonObject.put("checked", checked);
+            jsonObject.put("name", name);
+            jsonObject.put("description", description);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         return jsonObject;
     }
 
@@ -77,5 +82,14 @@ public class SyncedListElement {
             result += " - " + getDescription();
         }
         return result;
+    }
+
+    public SyncedListElement clone() {
+        try {
+            return new SyncedListElement(toJSON());
+        } catch (JSONException exception) {
+            exception.printStackTrace();
+        }
+        return null;
     }
 }

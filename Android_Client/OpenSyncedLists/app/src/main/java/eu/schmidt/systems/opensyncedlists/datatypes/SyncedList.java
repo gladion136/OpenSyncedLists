@@ -1,5 +1,7 @@
 package eu.schmidt.systems.opensyncedlists.datatypes;
 
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_SYNC;
+
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -67,12 +69,11 @@ public class SyncedList {
             SyncedListStep currentStep = this.elementSteps.get(i);
             switch (currentStep.getChangeAction()) {
                 case ADD:
-                    result.add(
-                            (SyncedListElement) currentStep.getChangeValue());
+                    result.add(currentStep.getChangeValueElement());
                     break;
                 case UPDATE:
                     SyncedListElement changeElement =
-                            (SyncedListElement) currentStep.getChangeValue();
+                            currentStep.getChangeValueElement();
                     for (int x = 0; x < result.size(); x++) {
                         if (result.get(x).getId()
                                 .equals(currentStep.getChangeId())) {
@@ -87,8 +88,8 @@ public class SyncedList {
                                 .equals(currentStep.getChangeId())) {
                             int swap = 0;
                             for (swap = 0; swap < result.size(); swap++) {
-                                if (result.get(swap).getId()
-                                        .equals(currentStep.getChangeValue())) {
+                                if (result.get(swap).getId().equals(currentStep
+                                                                            .getChangeValueString())) {
                                     break;
                                 }
                             }
@@ -124,7 +125,7 @@ public class SyncedList {
                         }
                     }
                     if (srcIndex != -1) {
-                        dstIndex = (int) currentStep.getChangeValue();
+                        dstIndex = (int) currentStep.getChangeValueInt();
                         moveItem(srcIndex, dstIndex, result);
                     }
                     break;
@@ -350,6 +351,13 @@ public class SyncedList {
             }
             if (!added) {
                 result.add(0, currentStep);
+            }
+        }
+        // Optimize
+        for(int x = result.size()-1; x > 0; x--) {
+            if(result.get(x).getChangeAction()==ACTION.CLEAR) {
+                result.removeAll(result.subList(0, x));
+                break;
             }
         }
         syncedList1.setElementSteps(result);
