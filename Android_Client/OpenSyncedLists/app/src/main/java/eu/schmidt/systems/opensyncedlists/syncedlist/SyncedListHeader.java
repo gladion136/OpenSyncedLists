@@ -36,13 +36,12 @@ public class SyncedListHeader {
         autoSync = jsonObject.getBoolean("autoSync");
         invertElement = jsonObject.getBoolean("invertElement");
         hostname = jsonObject.getString("hostname");
-        secret = Cryptography.stringtoByteArray(jsonObject.getString("secret"));
+        secret = Cryptography.stringToByteArray(jsonObject.getString("secret"));
 
         byte[] encodedKey = Cryptography
-                .stringtoByteArray(jsonObject.getString("localSecret"));
-        SecretKey secretKey =
+                .stringToByteArray(jsonObject.getString("localSecret"));
+        localSecret =
                 new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
-        localSecret = secretKey;
     }
 
     /**
@@ -151,9 +150,9 @@ public class SyncedListHeader {
             jsonObject.put("checkedList", checkedList);
             jsonObject.put("autoSync", autoSync);
             jsonObject.put("invertElement", invertElement);
-            jsonObject.put("secret", Cryptography.byteArraytoString(secret));
+            jsonObject.put("secret", Cryptography.byteArrayToString(secret));
             jsonObject.put("localSecret", Cryptography
-                    .byteArraytoString(localSecret.getEncoded()));
+                    .byteArrayToString(localSecret.getEncoded()));
         } catch (JSONException exception) {
             exception.printStackTrace();
         }

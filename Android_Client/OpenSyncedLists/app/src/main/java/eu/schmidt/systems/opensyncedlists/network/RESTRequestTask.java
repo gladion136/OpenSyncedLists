@@ -22,24 +22,25 @@ class RESTRequestTask
         extends AsyncTask<HashMap<String, String>, Void, JSONObject> {
 
     private Exception exception;
-    private Callback callback;
+    private final Callback callback;
 
     public RESTRequestTask(Callback callback) {
         this.callback = callback;
     }
 
-    protected JSONObject doInBackground(HashMap<String, String>... param) {
+    @SafeVarargs
+    protected final JSONObject doInBackground(HashMap<String, String>... param) {
         try {
             HashMap<String, String> info = param[0];
             String hostname = info.get("hostname");
             String path = info.get("path");
             String type = info.get("type");
             String[] splitHost = hostname.split("://");
-            String protocoll = splitHost[0];
+            String protocol = splitHost[0];
             hostname = splitHost[1];
 
-            HttpURLConnection urlConnection = null;
-            Uri.Builder uriBuilder = new Uri.Builder().scheme(protocoll)
+            HttpURLConnection urlConnection;
+            Uri.Builder uriBuilder = new Uri.Builder().scheme(protocol)
                     .encodedAuthority(hostname).path(path);
             if (param.length > 1) {
                 HashMap<String, String> query = param[1];
@@ -71,9 +72,9 @@ class RESTRequestTask
 
             try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(urlConnection.getInputStream(),
-                                          "utf-8"))) {
+                                          StandardCharsets.UTF_8))) {
                 StringBuilder response = new StringBuilder();
-                String responseLine = null;
+                String responseLine;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }

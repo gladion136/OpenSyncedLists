@@ -19,22 +19,18 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.R;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.network.ServerException;
-import eu.schmidt.systems.opensyncedlists.utils.Constant;
-import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
+import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 public class ListSettingsFragment extends PreferenceFragmentCompat {
 
     SyncedList syncedList;
     SecureStorage secureStorage;
-
-    public static void SettingsFragment() {
-
-    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -181,15 +177,13 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    public boolean save() {
+    public void save() {
         try {
             secureStorage.setList(syncedList, true);
         } catch (IOException | JSONException e) {
             Log.e(Constant.LOG_TITLE_DEFAULT,
                   "Local storage " + "write" + " error: " + e);
             e.printStackTrace();
-            return false;
         }
-        return true;
     }
 }

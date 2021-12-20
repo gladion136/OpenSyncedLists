@@ -39,16 +39,19 @@ public class SettingsActivity extends AppCompatActivity implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
-        switch(key) {
-            case "design":
-                if(sharedPreferences.getString("design", "").equals(getString(R.string.pref_design_light))) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                }else if(sharedPreferences.getString("design", "").equals(getString(R.string.pref_design_dark))) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                }else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                }
-                break;
+        if ("design".equals(key)) {
+            if (sharedPreferences.getString("design", "")
+                    .equals(getString(R.string.pref_design_light))) {
+                AppCompatDelegate
+                        .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            } else if (sharedPreferences.getString("design", "")
+                    .equals(getString(R.string.pref_design_dark))) {
+                AppCompatDelegate
+                        .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            }
         }
     }
 }

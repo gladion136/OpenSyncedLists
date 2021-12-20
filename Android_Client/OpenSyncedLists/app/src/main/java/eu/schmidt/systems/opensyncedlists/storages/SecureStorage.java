@@ -17,8 +17,8 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 public class SecureStorage {
-    Context context;
-    SharedPreferences sharedPref;
+    final Context context;
+    final SharedPreferences sharedPref;
 
     /**
      * Open private local shared preferences storage
@@ -73,9 +73,7 @@ public class SecureStorage {
             return null;
         }
 
-        SyncedList result =
-                new SyncedList(getListHeader(id), new JSONObject(data));
-        return result;
+        return new SyncedList(getListHeader(id), new JSONObject(data));
     }
 
     /**
@@ -113,10 +111,8 @@ public class SecureStorage {
      * Override all lists headers
      *
      * @param headers all Headers
-     * @throws JSONException
      */
-    public void setListsHeaders(ArrayList<SyncedListHeader> headers)
-            throws JSONException {
+    public void setListsHeaders(ArrayList<SyncedListHeader> headers) {
         SharedPreferences.Editor editor = sharedPref.edit();
         JSONArray jsonArray = new JSONArray();
         for (SyncedListHeader header : headers) {
@@ -132,6 +128,7 @@ public class SecureStorage {
         for (int i = 0; i < headers.size(); i++) {
             if (headers.get(i).getId().equals(id)) {
                 headers.remove(i);
+                break;
             }
         }
         setListsHeaders(headers);

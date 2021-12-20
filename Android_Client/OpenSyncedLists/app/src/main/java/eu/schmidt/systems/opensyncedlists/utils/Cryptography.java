@@ -25,7 +25,7 @@ public class Cryptography {
     private final static String CHARSET = "UTF-8";
 
     public static String getSHAasString(String input) {
-        return byteArraytoString(getSHA(input));
+        return byteArrayToString(getSHA(input));
     }
 
     /**
@@ -70,11 +70,11 @@ public class Cryptography {
         return buffer.toString();
     }
 
-    public static byte[] stringtoByteArray(String s) {
+    public static byte[] stringToByteArray(String s) {
         return Base64.decode(s, Base64.DEFAULT);
     }
 
-    public static String byteArraytoString(byte[] bytes) {
+    public static String byteArrayToString(byte[] bytes) {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 

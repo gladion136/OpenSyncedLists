@@ -84,7 +84,7 @@ public class SyncedList {
                     for (int x = 0; x < result.size(); x++) {
                         if (result.get(x).getId()
                                 .equals(currentStep.getChangeId())) {
-                            int swap = 0;
+                            int swap;
                             for (swap = 0; swap < result.size(); swap++) {
                                 if (result.get(swap).getId().equals(currentStep
                                                                             .getChangeValueString())) {
@@ -123,7 +123,7 @@ public class SyncedList {
                         }
                     }
                     if (srcIndex != -1) {
-                        dstIndex = (int) currentStep.getChangeValueInt();
+                        dstIndex = currentStep.getChangeValueInt();
                         moveItem(srcIndex, dstIndex, result);
                     }
                     break;
@@ -193,7 +193,7 @@ public class SyncedList {
     }
 
     public String getSecret() {
-        return Cryptography.byteArraytoString(syncedListHeader.getSecret());
+        return Cryptography.byteArrayToString(syncedListHeader.getSecret());
     }
 
     public boolean compareSecret(byte[] target) {
@@ -277,7 +277,7 @@ public class SyncedList {
      * @return SyncedList with secrets
      * @throws JSONException
      */
-    public JSONObject toJSONwithHeader() {
+    public JSONObject toJsonWithHeader() {
         JSONObject jsonObject = toJSON();
         try {
             jsonObject.put("header", getHeader().toJSON());
@@ -292,21 +292,21 @@ public class SyncedList {
     }
 
     public String getAsReadableString() {
-        String list = getName();
+        StringBuilder list = new StringBuilder(getName());
         if (getHeader().isCheckedList()) {
             for (SyncedListElement element : uncheckedElementsBuffer) {
-                list += "\n" + element.getAsReadableString();
+                list.append("\n").append(element.getAsReadableString());
             }
 
             for (SyncedListElement element : checkedElementsBuffer) {
-                list += "\n" + element.getAsReadableString();
+                list.append("\n").append(element.getAsReadableString());
             }
         } else {
             for (SyncedListElement element : elementsBuffer) {
-                list += "\n" + element.getAsReadableString();
+                list.append("\n").append(element.getAsReadableString());
             }
         }
-        return list;
+        return list.toString();
     }
 
     /**
@@ -369,9 +369,7 @@ public class SyncedList {
     }
 
     public String getFullListEncrypted() {
-        String data = toJSONwithHeader().toString();
-        String encrypted =
-                Cryptography.encryptRSA(getHeader().getLocalSecret(), data);
-        return encrypted;
+        String data = toJsonWithHeader().toString();
+        return Cryptography.encryptRSA(getHeader().getLocalSecret(), data);
     }
 }

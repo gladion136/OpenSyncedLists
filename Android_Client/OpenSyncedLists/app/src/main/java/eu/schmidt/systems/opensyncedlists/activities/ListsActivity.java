@@ -3,13 +3,6 @@ package eu.schmidt.systems.opensyncedlists.activities;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.preference.PreferenceManager;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -20,6 +13,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -38,14 +38,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.adapters.ListsAdapter;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.network.ServerException;
-import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
-import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
+import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
-import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
+import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 
 /**
  * ListsActivity displays all lists on device
@@ -86,8 +86,7 @@ public class ListsActivity extends AppCompatActivity {
     @Override protected void onNewIntent(Intent intent) {
         if (intent.getType() != null &&
                 intent.getType().equals("application" + "/json")) {
-            Uri receivedFile =
-                    (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            Uri receivedFile = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             importFile(receivedFile);
         } else if (intent.getData() != null) {
             Uri uri = intent.getData();
@@ -100,7 +99,7 @@ public class ListsActivity extends AppCompatActivity {
             if (id != null && secret != null && localSecret != null &&
                     hostname != null) {
                 byte[] encodedLocalSecret =
-                        Cryptography.stringtoByteArray(localSecret);
+                        Cryptography.stringToByteArray(localSecret);
                 SecretKey secretKey = new SecretKeySpec(encodedLocalSecret, 0,
                                                         encodedLocalSecret.length,
                                                         "AES");
@@ -300,7 +299,7 @@ public class ListsActivity extends AppCompatActivity {
                                                                         "default_server",
                                                                         ""),
                                                         Cryptography
-                                                                .stringtoByteArray(
+                                                                .stringToByteArray(
                                                                         Cryptography
                                                                                 .generatingRandomString(
                                                                                         50)),
@@ -313,7 +312,7 @@ public class ListsActivity extends AppCompatActivity {
     }
 
     public void addListAndHandleCallback(SyncedList syncedList) {
-        String result = null;
+        String result;
         try {
             result = secureStorage.addList(syncedList);
             if (!result.equals("")) {
@@ -321,10 +320,8 @@ public class ListsActivity extends AppCompatActivity {
             }
             syncedListsHeaders = secureStorage.getListsHeaders();
             listsAdapter.updateItems(syncedListsHeaders);
-        } catch (JSONException exception) {
+        } catch (JSONException | IOException exception) {
             exception.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -362,7 +359,7 @@ public class ListsActivity extends AppCompatActivity {
                           "Cant import file: " + exception.toString());
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
 
         }
     }

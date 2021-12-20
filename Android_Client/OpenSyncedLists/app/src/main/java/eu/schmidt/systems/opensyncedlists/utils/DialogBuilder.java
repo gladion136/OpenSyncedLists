@@ -20,7 +20,7 @@ public class DialogBuilder {
      * @param title     title of the dialog
      * @param message   message of the dialog
      * @param yesOption text of the yes option
-     * @param noOption  text of the no/cancle option
+     * @param noOption  text of the no/cancel option
      * @param callback  handle callback
      */
     public static void editTextDialog(Context context,
@@ -61,16 +61,6 @@ public class DialogBuilder {
      */
     public interface Callback {
         void callback(String result);
-    }
-
-    /**
-     * Convert density pixel to pixel
-     *
-     * @param dp density pixels
-     * @return pixels
-     */
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 }
 

@@ -1,9 +1,8 @@
 package eu.schmidt.systems.opensyncedlists.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import eu.schmidt.systems.opensyncedlists.R;
 

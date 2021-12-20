@@ -3,13 +3,15 @@ package eu.schmidt.systems.opensyncedlists.syncedlist;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 /**
  * One changes Step for a SyncedList
  */
 public class SyncedListStep {
-    long timestamp = 0;
+    long timestamp;
     String changeId = "";
-    ACTION changeAction = ACTION.CLEAR;
+    ACTION changeAction;
     Integer changeValueInt;
     String changeValueString = null;
     SyncedListElement changeValueElement = null;
@@ -133,7 +135,7 @@ public class SyncedListStep {
         if (timestamp != step.getTimestamp()) {
             return false;
         }
-        if (this.changeValueInt != step.changeValueInt) {
+        if (!Objects.equals(this.changeValueInt, step.changeValueInt)) {
             return false;
         }
         if (this.changeValueString != null) {
@@ -147,9 +149,8 @@ public class SyncedListStep {
         }
         if (this.changeValueElement != null) {
             if (step.changeValueElement != null) {
-                if (!this.changeValueElement.toJSON().toString().equals(step.changeValueElement.toJSON().toString())) {
-                    return false;
-                }
+                return this.changeValueElement.toJSON().toString()
+                        .equals(step.changeValueElement.toJSON().toString());
             } else {
                 return false;
             }

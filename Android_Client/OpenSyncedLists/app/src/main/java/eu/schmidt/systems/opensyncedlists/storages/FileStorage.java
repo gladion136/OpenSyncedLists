@@ -33,7 +33,7 @@ public class FileStorage {
                 new File(context.getFilesDir(), syncedList.getName() + ".json");
         try {
             FileWriter fileWriter = new FileWriter(file, false);
-            fileWriter.write(syncedList.toJSONwithHeader().toString());
+            fileWriter.write(syncedList.toJsonWithHeader().toString());
             fileWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -51,7 +51,7 @@ public class FileStorage {
         try {
             JSONArray jsonArray = new JSONArray();
             for (SyncedList list : syncedLists) {
-                jsonArray.put(list.toJSONwithHeader());
+                jsonArray.put(list.toJsonWithHeader());
             }
             FileWriter fileWriter = new FileWriter(file, false);
             fileWriter.write(jsonArray.toString());

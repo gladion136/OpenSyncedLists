@@ -4,11 +4,6 @@ import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAUL
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +17,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,16 +29,16 @@ import java.io.IOException;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter;
+import eu.schmidt.systems.opensyncedlists.network.ServerException;
+import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
+import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
+import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
-import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
-import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
-import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
-import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 
 /**
  * ListActivity displays one list
@@ -153,15 +153,15 @@ public class ListActivity extends AppCompatActivity {
                 if (!syncedList.getHeader().getHostname().equals("")) {
                     String hostname = syncedList.getHeader().getHostname();
                     String[] splitHost = hostname.split("://");
-                    String protocoll = splitHost[0];
+                    String protocol = splitHost[0];
                     hostname = splitHost[1];
-                    Uri.Builder uriBuilder = new Uri.Builder().scheme(protocoll)
+                    Uri.Builder uriBuilder = new Uri.Builder().scheme(protocol)
                             .encodedAuthority(hostname).path("/list/share");
                     uriBuilder.appendQueryParameter("id", syncedList.getId());
                     uriBuilder.appendQueryParameter("secret",
                                                     syncedList.getSecret());
                     uriBuilder.appendQueryParameter("localSecret", Cryptography
-                            .byteArraytoString(
+                            .byteArrayToString(
                                     syncedList.getHeader().getLocalSecret()
                                             .getEncoded()));
                     Uri uri = uriBuilder.build();
@@ -243,7 +243,7 @@ public class ListActivity extends AppCompatActivity {
     @Override protected void onDestroy() {
         try {
             handler.removeCallbacks(runnableCode);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         } // Exception not important
         super.onDestroy();
     }
@@ -252,7 +252,7 @@ public class ListActivity extends AppCompatActivity {
      * Read name from edittext on bottom and create new element inside list
      * Returns: success(true)
      */
-    public boolean createNewElement(boolean top) {
+    public void createNewElement(boolean top) {
         String elementName = eTNewElement.getText().toString();
         if (!elementName.equals("")) {
             String id = syncedList.generateUniqueElementId();
@@ -275,9 +275,7 @@ public class ListActivity extends AppCompatActivity {
             }
             eTNewElement.setText("");
             Log.d(Constant.LOG_TITLE_DEFAULT, "New element added to list");
-            return true;
         }
-        return false;
     }
 
     @Override public void onBackPressed() {
@@ -371,7 +369,7 @@ public class ListActivity extends AppCompatActivity {
                                                            .toString());
                                              if (exception instanceof ServerException) {
                                                  // Something went wrong for
-                                                 // example wrong hash => Resync
+                                                 // example wrong hash => ReSync
                                                  syncWithHost();
                                                  return;
                                              }
@@ -386,12 +384,10 @@ public class ListActivity extends AppCompatActivity {
                                          try {
                                              secureStorage.setList(syncedList,
                                                                    false);
-                                         } catch (IOException e) {
-                                             e.printStackTrace();
-                                         } catch (JSONException e) {
+                                         } catch (IOException | JSONException e) {
                                              e.printStackTrace();
                                          }
-                                     });
+                                  });
         }
     }
 

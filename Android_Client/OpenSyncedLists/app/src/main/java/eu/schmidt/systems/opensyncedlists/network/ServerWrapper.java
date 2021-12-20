@@ -27,9 +27,7 @@ public abstract class ServerWrapper {
 
         Log.d(LOG_TITLE_NETWORK, "Send Request: checkConnection to " + info.get(
                 "hostname"));
-        new RESTRequestTask((jsonObject, exception) -> {
-            callback.callback(jsonObject, exception);
-        }).execute(info);
+        new RESTRequestTask(callback).execute(info);
     }
 
     public static void getList(String hostname,
@@ -47,9 +45,7 @@ public abstract class ServerWrapper {
 
         Log.d(LOG_TITLE_NETWORK, "Send Request: getList to " + info.get(
                 "hostname"));
-        new RESTRequestTask((jsonObject, exception) -> {
-            callback.callback(jsonObject, exception);
-        }).execute(info, query);
+        new RESTRequestTask(callback).execute(info, query);
     }
 
     public static void setList(SyncedList syncedList,
@@ -62,7 +58,7 @@ public abstract class ServerWrapper {
 
         HashMap<String, String> query = new HashMap<>();
         query.put("id", syncedList.getId());
-        query.put("secret", syncedList.getSecret().toString());
+        query.put("secret", syncedList.getSecret());
 
         HashMap<String, String> data = new HashMap<>();
         String fullListEncrypted = syncedList.getFullListEncrypted();
@@ -73,9 +69,7 @@ public abstract class ServerWrapper {
 
         Log.d(LOG_TITLE_NETWORK, "Send Request: setList to " + info.get(
                 "hostname"));
-        new RESTRequestTask((jsonObject, exception) -> {
-            callback.callback(jsonObject, exception);
-        }).execute(info, query, data);
+        new RESTRequestTask(callback).execute(info, query, data);
     }
 
     public static void removeList(String hostname, String id, String secret,
@@ -91,9 +85,7 @@ public abstract class ServerWrapper {
 
         Log.d(LOG_TITLE_NETWORK, "Send Request: removeList to " + info.get(
                 "hostname"));
-        new RESTRequestTask((jsonObject, exception) -> {
-            callback.callback(jsonObject, exception);
-        }).execute(info, query);
+        new RESTRequestTask(callback).execute(info, query);
     }
 
     public static void addList(SyncedList syncedList, RESTRequestTask.Callback callback) {
@@ -104,7 +96,7 @@ public abstract class ServerWrapper {
 
         HashMap<String, String> query = new HashMap<>();
         query.put("id", syncedList.getId());
-        query.put("secret", syncedList.getSecret().toString());
+        query.put("secret", syncedList.getSecret());
 
         HashMap<String, String> data = new HashMap<>();
         String fullListEncrypted = syncedList.getFullListEncrypted();
@@ -113,9 +105,7 @@ public abstract class ServerWrapper {
 
         Log.d(LOG_TITLE_NETWORK, "Send Request: addList to " + info.get(
                 "hostname"));
-        new RESTRequestTask((jsonObject, exception) -> {
-            callback.callback(jsonObject, exception);
-        }).execute(info, query, data);
+        new RESTRequestTask(callback).execute(info, query, data);
     }
 
 }

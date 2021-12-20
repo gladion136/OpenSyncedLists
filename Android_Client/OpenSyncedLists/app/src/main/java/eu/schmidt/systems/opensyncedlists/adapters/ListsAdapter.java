@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
-import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
 import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 
 /**
@@ -21,8 +21,8 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
  */
 public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
 
-    ArrayList<SyncedListHeader> syncedListsHeaders;
-    Context context;
+    final ArrayList<SyncedListHeader> syncedListsHeaders;
+    final Context context;
 
     /**
      * Adapter constructor

@@ -1,7 +1,5 @@
 package eu.schmidt.systems.opensyncedlists.utils;
 
-import eu.schmidt.systems.opensyncedlists.BuildConfig;
-
 /**
  * Constant that can used without context.
  */

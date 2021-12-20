@@ -25,13 +25,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 
-import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
 import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
+import eu.schmidt.systems.opensyncedlists.fragments.ElementEditorFragment;
 import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
-import eu.schmidt.systems.opensyncedlists.fragments.ElementEditorFragment;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 /**
@@ -40,12 +40,11 @@ import eu.schmidt.systems.opensyncedlists.utils.Constant;
 public class SyncedListAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements View.OnClickListener {
-    private ListActivity listActivity;
-    private SyncedList syncedList;
-    private RecyclerView recyclerView;
-    private boolean scrollListTopBottom;
-    private LayoutInflater layoutInflater;
-    private int jumpDistance = 1;
+    private final ListActivity listActivity;
+    private final SyncedList syncedList;
+    private final RecyclerView recyclerView;
+    private final boolean scrollListTopBottom;
+    private int jumpDistance;
 
     /**
      * ViewHolder for one element
@@ -84,7 +83,7 @@ public class SyncedListAdapter
         this.listActivity = listActivity;
         this.recyclerView = recyclerView;
         this.syncedList = syncedList;
-        layoutInflater = LayoutInflater.from(listActivity);
+        LayoutInflater.from(listActivity);
 
         // Add ItemTouchHelper for drag and drop events
         ItemTouchHelper itemTouchHelper =
@@ -247,7 +246,7 @@ public class SyncedListAdapter
                                             .getSystemService(
                                                     Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(
-                                    ((Activity) listActivity).getCurrentFocus()
+                                    listActivity.getCurrentFocus()
                                             .getWindowToken(), 0);
 
                             return true;
@@ -298,14 +297,10 @@ public class SyncedListAdapter
             });
 
             // on move up
-            elementViewHolder.iVBtnUp.setOnClickListener(vi -> {
-                moveElementAndSave(currentSyncedListElement, -jumpDistance);
-            });
+            elementViewHolder.iVBtnUp.setOnClickListener(vi -> moveElementAndSave(currentSyncedListElement, -jumpDistance));
 
             // on move down
-            elementViewHolder.iVBtnDown.setOnClickListener(vi -> {
-                moveElementAndSave(currentSyncedListElement, jumpDistance);
-            });
+            elementViewHolder.iVBtnDown.setOnClickListener(vi -> moveElementAndSave(currentSyncedListElement, jumpDistance));
         }
     }
 
@@ -341,11 +336,9 @@ public class SyncedListAdapter
                 getElementOnPosition(itemPosition);
         BottomSheetDialogFragment bottomSheetDialogFragment =
                 new ElementEditorFragment()
-                        .newInstance(syncedListElement, syncedListStep -> {
-                            listActivity.addElementStepAndSave(syncedListStep,
-                                                               true);
-                        });
-        bottomSheetDialogFragment.show(((AppCompatActivity) listActivity)
+                        .newInstance(syncedListElement, syncedListStep -> listActivity.addElementStepAndSave(syncedListStep,
+                                                                                                         true));
+        bottomSheetDialogFragment.show(listActivity
                                                .getSupportFragmentManager(),
                                        bottomSheetDialogFragment.getTag());
     }
