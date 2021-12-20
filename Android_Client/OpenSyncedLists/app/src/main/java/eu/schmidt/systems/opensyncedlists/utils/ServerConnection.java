@@ -40,6 +40,8 @@ public abstract class ServerConnection {
         info.put("path", "/test");
         info.put("type", "GET");
 
+        Log.d(LOG_TITLE_NETWORK, "Send Request: checkConnection to " + info.get(
+                "hostname"));
         new HandleRequestTask((jsonObject, exception) -> {
             callback.callback(jsonObject, exception);
         }).execute(info);
@@ -59,6 +61,8 @@ public abstract class ServerConnection {
         query.put("id", id);
         query.put("secret", secret);
 
+        Log.d(LOG_TITLE_NETWORK, "Send Request: getList to " + info.get(
+                "hostname"));
         new HandleRequestTask((jsonObject, exception) -> {
             callback.callback(jsonObject, exception);
         }).execute(info, query);
@@ -84,6 +88,8 @@ public abstract class ServerConnection {
         // Only success if basedOnHash equals hash inside database
         data.put("basedOnHash", basedOnHash);
 
+        Log.d(LOG_TITLE_NETWORK, "Send Request: setList to " + info.get(
+                "hostname"));
         new HandleRequestTask((jsonObject, exception) -> {
             callback.callback(jsonObject, exception);
         }).execute(info, query, data);
@@ -91,7 +97,6 @@ public abstract class ServerConnection {
 
     public static void removeList(String hostname, String id, String secret,
                                   Callback callback) {
-        Log.d(LOG_TITLE_NETWORK, "Send Request: removeList");
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", hostname);
         info.put("path", "/list/remove");
@@ -101,13 +106,14 @@ public abstract class ServerConnection {
         query.put("id", id);
         query.put("secret", secret);
 
+        Log.d(LOG_TITLE_NETWORK, "Send Request: removeList to " + info.get(
+                "hostname"));
         new HandleRequestTask((jsonObject, exception) -> {
             callback.callback(jsonObject, exception);
         }).execute(info, query);
     }
 
     public static void addList(SyncedList syncedList, Callback callback) {
-        Log.d(LOG_TITLE_NETWORK, "Send Request: addList");
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", syncedList.getHeader().getHostname());
         info.put("path", "/list/add");
@@ -122,6 +128,8 @@ public abstract class ServerConnection {
         data.put("data", fullListEncrypted);
         data.put("hash", Cryptography.getSHAasString(fullListEncrypted));
 
+        Log.d(LOG_TITLE_NETWORK, "Send Request: addList to " + info.get(
+                "hostname"));
         new HandleRequestTask((jsonObject, exception) -> {
             callback.callback(jsonObject, exception);
         }).execute(info, query, data);
@@ -146,9 +154,12 @@ public abstract class ServerConnection {
                 String hostname = info.get("hostname");
                 String path = info.get("path");
                 String type = info.get("type");
+                String[] splitProtocoll = hostname.split("://");
+                String protocoll = splitProtocoll[0];
+                hostname = splitProtocoll[1];
 
                 HttpURLConnection urlConnection = null;
-                Uri.Builder uriBuilder = new Uri.Builder().scheme("http")
+                Uri.Builder uriBuilder = new Uri.Builder().scheme(protocoll)
                         .encodedAuthority(hostname).path(path);
                 if (param.length > 1) {
                     HashMap<String, String> query = param[1];

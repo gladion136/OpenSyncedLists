@@ -5,16 +5,24 @@ import android.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * Some preconfigured cryptography tools
  */
 public class Cryptography {
+
+    private final static int GCM_IV_LENGTH = 12;
+    private final static int GCM_TAG_LENGTH = 16;
+
+    private final static String CHARSET = "UTF-8";
 
     public static String getSHAasString(String input) {
         return byteArraytoString(getSHA(input));
@@ -85,9 +93,7 @@ public class Cryptography {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 
-
-    public static SecretKey generateAESKey()
-    {
+    public static SecretKey generateAESKey() {
         try {
             KeyGenerator generator = KeyGenerator.getInstance("AES");
             generator.init(256);
@@ -98,17 +104,23 @@ public class Cryptography {
         return null;
     }
 
-
     public static String encryptRSA(SecretKey secretKey, String data) {
         String result = "";
         try {
-            // Breakable by known-plaintext attacks
-            Cipher cipher
-                    = Cipher.getInstance("AES");
-            cipher.init(
-                    Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.encodeToString(cipher.doFinal(
-                            data.getBytes("UTF-8")), Base64.DEFAULT);
+            byte[] iv = new byte[GCM_IV_LENGTH];
+            (new SecureRandom()).nextBytes(iv);
+            GCMParameterSpec ivSpec =
+                    new GCMParameterSpec(GCM_TAG_LENGTH * Byte.SIZE, iv);
+
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+            // Encrypt and add iv
+            byte[] ciphertext = cipher.doFinal(data.getBytes(CHARSET));
+            byte[] encrypted = new byte[iv.length + ciphertext.length];
+            System.arraycopy(iv, 0, encrypted, 0, iv.length);
+            System.arraycopy(ciphertext, 0, encrypted, iv.length,
+                             ciphertext.length);
+            return Base64.encodeToString(encrypted, Base64.DEFAULT);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,13 +130,19 @@ public class Cryptography {
     public static String decryptRSA(SecretKey secretKey, String data) {
         String result = "";
         try {
-            Cipher cipher
-                    = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE,
-                        secretKey);
-            byte[] resultBytes
-                    = cipher.doFinal(Base64.decode(data, Base64.DEFAULT));
-            result =  new String(resultBytes, "UTF-8");
+            byte[] decoded = Base64.decode(data, Base64.DEFAULT);
+
+            // get iv
+            byte[] iv = Arrays.copyOfRange(decoded, 0, GCM_IV_LENGTH);
+            GCMParameterSpec ivSpec =
+                    new GCMParameterSpec(GCM_TAG_LENGTH * Byte.SIZE, iv);
+
+            // decrypt
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
+            byte[] resultBytes = cipher.doFinal(decoded, GCM_IV_LENGTH,
+                                                decoded.length - GCM_IV_LENGTH);
+            result = new String(resultBytes, CHARSET);
         } catch (Exception e) {
             e.printStackTrace();
         }
