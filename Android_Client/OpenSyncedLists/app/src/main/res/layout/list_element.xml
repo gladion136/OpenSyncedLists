@@ -53,7 +53,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:imeOptions="actionDone"
-                        android:inputType="text"
+                        android:inputType="textNoSuggestions"
                         android:text="Titel"
                         android:textSize="20sp" />
 

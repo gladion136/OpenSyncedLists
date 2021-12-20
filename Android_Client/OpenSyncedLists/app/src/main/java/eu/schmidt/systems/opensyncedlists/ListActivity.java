@@ -146,8 +146,12 @@ public class ListActivity extends AppCompatActivity {
                 return true;
             case R.id.export_link:
                 if(!syncedList.getHeader().getHostname().equals("")) {
-                    Uri.Builder uriBuilder = new Uri.Builder().scheme("http")
-                            .encodedAuthority(syncedList.getHeader().getHostname())
+                    String hostname = syncedList.getHeader().getHostname();
+                    String[] splitProtocoll = hostname.split("://");
+                    String protocoll = splitProtocoll[0];
+                    hostname = splitProtocoll[1];
+                    Uri.Builder uriBuilder = new Uri.Builder().scheme(protocoll)
+                            .encodedAuthority(hostname)
                             .path("/list/share");
                     uriBuilder.appendQueryParameter("id", syncedList.getId());
                     uriBuilder
