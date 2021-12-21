@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package eu.schmidt.systems.opensyncedlists.fragments;
 
 import android.content.Intent;
@@ -27,16 +43,34 @@ import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
+/**
+ * Fragment to handle the view of one list settings
+ */
 public class ListSettingsFragment extends PreferenceFragmentCompat {
 
     SyncedList syncedList;
     SecureStorage secureStorage;
 
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+    /**
+     * Pass the preference list to show.
+     *
+     * @param savedInstanceState not used
+     * @param rootKey            RootKey
+     */
+    @Override public void onCreatePreferences(Bundle savedInstanceState,
+                                              String rootKey) {
         setPreferencesFromResource(R.xml.preferences_list, rootKey);
     }
 
+    /**
+     * Initialize the fragment, add listeners, fill preferences with current
+     * data.
+     *
+     * @param inflater           Just used for super call.
+     * @param container          Just used for super call.
+     * @param savedInstanceState Just used for super call.
+     * @return the View with content and listeners
+     */
     @Override public View onCreateView(@NonNull LayoutInflater inflater,
                                        @Nullable ViewGroup container,
                                        @Nullable Bundle savedInstanceState) {
@@ -54,7 +88,8 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
         Preference deleteBtn = findPreference("delete_btn");
         SwitchPreferenceCompat checkOptionPref = findPreference("check_option");
         SwitchPreferenceCompat checkListPref = findPreference("checked_list");
-        SwitchPreferenceCompat invertElementPref = findPreference("invert_element");
+        SwitchPreferenceCompat invertElementPref =
+                findPreference("invert_element");
         SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
         EditTextPreference serverNamePref = findPreference("server_name");
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
@@ -90,7 +125,8 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
                     if (newVal != syncedList.getHeader().isCheckOption()) {
                         syncedList.getHeader().setCheckOption(newVal);
                         syncedList.getHeader().setCheckedList(newVal);
-                        checkListPref.setChecked(syncedList.getHeader().isCheckedList());
+                        checkListPref.setChecked(
+                                syncedList.getHeader().isCheckedList());
                         syncedList.recalculateBuffers();
                         save();
                     }
@@ -142,46 +178,47 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
         deleteOnlineBtn.setOnPreferenceClickListener(v -> {
             ServerWrapper.removeList(syncedList.getHeader().getHostname(),
-                                     syncedList.getId(),
-                                     syncedList.getSecret(),
+                                     syncedList.getId(), syncedList.getSecret(),
                                      (jsonResult, exceptionFromServer) -> {
-                                            if (jsonResult == null ||
-                                                    exceptionFromServer !=
-                                                            null) {
-                                                if (exceptionFromServer instanceof ServerException) {
-                                                    Toast.makeText(getContext(),
-                                                                   getString(
-                                                                           R.string.unexpected_error),
-                                                                   Toast.LENGTH_LONG)
-                                                            .show();
-                                                } else {
-                                                    Toast.makeText(getContext(),
-                                                                   getString(
-                                                                           R.string.no_connection),
-                                                                   Toast.LENGTH_LONG)
-                                                            .show();
-                                                }
-                                            } else {
-                                                try {
-                                                    secureStorage.deleteList(
-                                                            syncedList.getId());
-                                                } catch (Exception exception) {
-                                                    exception.printStackTrace();
-                                                }
-                                                Intent intent =
-                                                        new Intent(getContext(),
-                                                                   ListsActivity.class);
-                                                startActivity(intent);
-                                                getActivity().finish();
-                                            }
-                                        });
+                                         if (jsonResult == null ||
+                                                 exceptionFromServer != null) {
+                                             if (exceptionFromServer instanceof ServerException) {
+                                                 Toast.makeText(getContext(),
+                                                                getString(
+                                                                        R.string.unexpected_error),
+                                                                Toast.LENGTH_LONG)
+                                                         .show();
+                                             } else {
+                                                 Toast.makeText(getContext(),
+                                                                getString(
+                                                                        R.string.no_connection),
+                                                                Toast.LENGTH_LONG)
+                                                         .show();
+                                             }
+                                         } else {
+                                             try {
+                                                 secureStorage.deleteList(
+                                                         syncedList.getId());
+                                             } catch (Exception exception) {
+                                                 exception.printStackTrace();
+                                             }
+                                             Intent intent =
+                                                     new Intent(getContext(),
+                                                                ListsActivity.class);
+                                             startActivity(intent);
+                                             getActivity().finish();
+                                         }
+                                     });
             return true;
         });
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    public void save() {
+    /**
+     * Save the list to storage and handle exceptions.
+     */
+    private void save() {
         try {
             secureStorage.setList(syncedList);
         } catch (IOException | JSONException e) {

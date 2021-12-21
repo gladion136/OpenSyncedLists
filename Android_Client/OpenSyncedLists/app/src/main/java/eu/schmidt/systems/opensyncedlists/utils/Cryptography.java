@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package eu.schmidt.systems.opensyncedlists.utils;
 
 import android.util.Base64;
@@ -22,17 +38,26 @@ public class Cryptography {
     private final static int GCM_IV_LENGTH = 12;
     private final static int GCM_TAG_LENGTH = 16;
 
+    /**
+     * Used Charset for all methods
+     */
     private final static String CHARSET = "UTF-8";
 
+    /**
+     * Get the SHA-256 Hash as String.
+     *
+     * @param input String to hash
+     * @return SHA-256 Hash as String
+     */
     public static String getSHAasString(String input) {
         return byteArrayToString(getSHA(input));
     }
 
     /**
-     * Get SHA-256 Hash of a String
+     * Get the SHA-256 Hash of a String.
      *
-     * @param input InputString
-     * @return SHA-256 Hash
+     * @param input String to hash
+     * @return SHA-256 Hash as bytes
      */
     public static byte[] getSHA(String input) {
         MessageDigest md = null;
@@ -45,7 +70,7 @@ public class Cryptography {
     }
 
     /**
-     * Generate a random string with letters A-Z and a-z
+     * Generate a random string with letters A-Z and a-z.
      *
      * @param length Length of String
      * @return random string
@@ -70,14 +95,31 @@ public class Cryptography {
         return buffer.toString();
     }
 
+    /**
+     * Convert a string to bytes with Base64 Encoder
+     *
+     * @param s String to convert
+     * @return bytes as Base64
+     */
     public static byte[] stringToByteArray(String s) {
         return Base64.decode(s, Base64.DEFAULT);
     }
 
+    /**
+     * Convert bytes to String with Base64 Encoder
+     *
+     * @param bytes Bytes
+     * @return String from Base64 Encoder
+     */
     public static String byteArrayToString(byte[] bytes) {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 
+    /**
+     * Generate a symmetric AES key
+     *
+     * @return symmetric AES key
+     */
     public static SecretKey generateAESKey() {
         try {
             KeyGenerator generator = KeyGenerator.getInstance("AES");
@@ -89,6 +131,13 @@ public class Cryptography {
         return null;
     }
 
+    /**
+     * Encrypt data via AES/GCM/NoPadding.
+     *
+     * @param secretKey symmetric key
+     * @param data      data to encrypt
+     * @return encrypted data
+     */
     public static String encryptRSA(SecretKey secretKey, String data) {
         String result = "";
         try {
@@ -113,6 +162,13 @@ public class Cryptography {
         return result;
     }
 
+    /**
+     * Decrypt encrypted data via AES/GCM/NoPadding.
+     *
+     * @param secretKey symmetric key
+     * @param data      data to decrypt
+     * @return readable data
+     */
     public static String decryptRSA(SecretKey secretKey, String data) {
         String result = "";
         try {

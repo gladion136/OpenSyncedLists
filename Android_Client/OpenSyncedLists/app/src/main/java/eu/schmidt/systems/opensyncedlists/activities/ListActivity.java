@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
@@ -41,25 +57,24 @@ import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 
 /**
- * ListActivity displays one list
+ * Activity for displaying one syncedList.
  */
 public class ListActivity extends AppCompatActivity {
 
-    SecureStorage secureStorage;
-    SyncedList syncedList;
-    RecyclerView recyclerView;
-    EditText eTNewElement;
-    ImageView iVNewElementTop, iVNewElementBottom;
-    protected RecyclerView.LayoutManager mLayoutManager;
-    SyncedListAdapter syncedListAdapter;
-
-    Handler handler;
-    Runnable runnableCode;
+    private SecureStorage secureStorage;
+    private SyncedList syncedList;
+    private SyncedListAdapter syncedListAdapter;
+    private Handler autoSyncHandler;
+    private Runnable autoSyncRunnable;
+    private RecyclerView recyclerView;
+    private EditText eTNewElement;
+    private ImageView iVNewElementTop, iVNewElementBottom;
 
     /**
-     * onCreate
+     * In onCreate the layout is set and the global Variables are
+     * initialised.
      *
-     * @param savedInstanceState
+     * @param savedInstanceState In this case just used for the super call.
      */
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +83,6 @@ public class ListActivity extends AppCompatActivity {
         eTNewElement = findViewById(R.id.eTNewElement);
         iVNewElementTop = findViewById(R.id.iVNewElementTop);
         iVNewElementBottom = findViewById(R.id.iVNewElementBottom);
-        mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         eTNewElement.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -82,15 +96,29 @@ public class ListActivity extends AppCompatActivity {
         secureStorage = new SecureStorage(this);
     }
 
+    /**
+     * In onResume the init function is called.
+     */
     @Override protected void onResume() {
         init();
         super.onResume();
     }
 
     /**
-     * onCreateOptionsMenu
+     * onDestroy clears all handlers.
+     */
+    @Override protected void onDestroy() {
+        try {
+            autoSyncHandler.removeCallbacks(autoSyncRunnable);
+        } catch (Exception ignored) {
+        }
+        super.onDestroy();
+    }
+
+    /**
+     * In onCreateOptionsMenu the menu from the ActionBar is inflated.
      *
-     * @param menu Menu
+     * @param menu Menu to inflate
      * @return true
      */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,7 +128,7 @@ public class ListActivity extends AppCompatActivity {
     }
 
     /**
-     * onOptionsItemSelected (events for actionbar)
+     * onOptionsItemSelected handles the events from the ActionBar.
      *
      * @param item selected item
      * @return action handled?
@@ -108,40 +136,42 @@ public class ListActivity extends AppCompatActivity {
     @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                // Back to ListsActivity
                 onBackPressed();
                 return true;
             case R.id.export_md:
+                // Export the list as markdown/text and send it to another app.
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT,
-                                    syncedList.getAsReadableString());
+                                    syncedList.getAsMarkdown());
                 sendIntent.setType("text/plain");
                 Intent shareIntent =
                         Intent.createChooser(sendIntent, syncedList.getName());
                 startActivity(shareIntent);
                 return true;
             case R.id.export_list_json:
+                // Export the list as json and share the file.
                 String absolutPath = FileStorage.exportList(this, syncedList);
                 Log.i(LOG_TITLE_STORAGE, "Exported list to: " + absolutPath);
                 FileStorage.shareFile(this, absolutPath);
                 return true;
             case R.id.list_clear:
+                // Remove the list elements
                 SyncedListStep syncedListStep =
                         new SyncedListStep("", ACTION.CLEAR, "");
                 addElementStepAndSave(syncedListStep, true);
                 return true;
             case R.id.list_settings:
+                // Open the list settings
                 Intent listSettingsIntent =
                         new Intent(this, ListSettingsActivity.class);
-                try {
-                    listSettingsIntent.putExtra("id", syncedList.getId());
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
+                listSettingsIntent.putExtra("id", syncedList.getId());
                 startActivity(listSettingsIntent);
                 finish();
                 return true;
             case R.id.manual_sync:
+                // Synchronize the app
                 if (!syncedList.getHeader().getHostname().equals("")) {
                     syncWithHost();
                 } else {
@@ -150,7 +180,9 @@ public class ListActivity extends AppCompatActivity {
                 }
                 return true;
             case R.id.export_link:
+                // Share the list as link (via server)
                 if (!syncedList.getHeader().getHostname().equals("")) {
+                    // Build link/uri
                     String hostname = syncedList.getHeader().getHostname();
                     String[] splitHost = hostname.split("://");
                     String protocol = splitHost[0];
@@ -165,6 +197,7 @@ public class ListActivity extends AppCompatActivity {
                                     syncedList.getHeader().getLocalSecret()
                                             .getEncoded()));
                     Uri uri = uriBuilder.build();
+                    // Share the link to another app
                     Intent sendUriIntent = new Intent();
                     sendUriIntent.setAction(Intent.ACTION_SEND);
                     sendUriIntent.putExtra(Intent.EXTRA_TEXT, getString(
@@ -183,19 +216,22 @@ public class ListActivity extends AppCompatActivity {
                 }
                 return true;
             case R.id.settings:
+                // Open global settings
                 Intent settingsIntent =
                         new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 finish();
                 return true;
         }
+        // Item not handled.. pass to super
         return super.onOptionsItemSelected(item);
     }
 
     /**
-     * Initialize
+     * Initialize fills the activity with content. (Fill list, start sync, ..)
      */
-    public void init() {
+    private void init() {
+        // Read the list with passed id
         try {
             syncedList = secureStorage
                     .getList(getIntent().getExtras().getString("id"));
@@ -203,27 +239,33 @@ public class ListActivity extends AppCompatActivity {
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
+        // Update ActionBar
         setTitle(syncedList.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Update Adapter
         syncedListAdapter =
                 new SyncedListAdapter(this, recyclerView, syncedList);
         recyclerView.setAdapter(syncedListAdapter);
 
+        // Should autoSync?
         if (syncedList.getHeader().isAutoSync() &&
                 !syncedList.getHeader().getHostname().equals("")) {
             // Auto synchronize every 10 seconds
-            handler = new Handler();
-            runnableCode = () -> {
+            autoSyncHandler = new Handler();
+            autoSyncRunnable = () -> {
                 syncWithHost();
-                handler.postDelayed(runnableCode, 10000);
+                autoSyncHandler.postDelayed(autoSyncRunnable, 10000);
             };
-            handler.post(runnableCode);
+            autoSyncHandler.post(autoSyncRunnable);
         }
         checkServerConnection();
     }
 
-    public void checkServerConnection() {
+    /**
+     * Checks the connection to the server and shows an Toast on error.
+     */
+    protected void checkServerConnection() {
         String hostname = syncedList.getHeader().getHostname();
         if (hostname.equals("")) {
             return;
@@ -240,21 +282,15 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    @Override protected void onDestroy() {
-        try {
-            handler.removeCallbacks(runnableCode);
-        } catch (Exception ignored) {
-        } // Exception not important
-        super.onDestroy();
-    }
-
     /**
-     * Read name from edittext on bottom and create new element inside list
-     * Returns: success(true)
+     * Read name from editText on bottom and create new element inside list.
+     *
+     * @param top Should the element added on top?
      */
-    public void createNewElement(boolean top) {
+    protected void createNewElement(boolean top) {
         String elementName = eTNewElement.getText().toString();
         if (!elementName.equals("")) {
+            // Create SyncedListStep for new the element
             String id = syncedList.generateUniqueElementId();
             SyncedListStep syncedListStep = new SyncedListStep(id, ACTION.ADD,
                                                                new SyncedListElement(
@@ -265,11 +301,16 @@ public class ListActivity extends AppCompatActivity {
                                                                        ""));
             addElementStepAndSave(syncedListStep, true);
             if (top) {
+                // Create SyncedListStep for moving the element
                 SyncedListStep syncedListStepMove =
                         new SyncedListStep(id, ACTION.MOVE, 0);
                 addElementStepAndSave(syncedListStepMove, true);
             }
-            if (!syncedList.getHeader().isCheckedList()) {
+            // Scroll to the element
+            if (syncedList.getHeader().isCheckedList()) {
+                recyclerView.scrollToPosition(
+                        top ? 0 : syncedList.getUncheckedElements().size() - 1);
+            } else {
                 recyclerView.scrollToPosition(
                         top ? 0 : syncedList.getElements().size() - 1);
             }
@@ -278,10 +319,16 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * onBackPressed finish the activity.
+     */
     @Override public void onBackPressed() {
         finish();
     }
 
+    /**
+     * Start synchronizing with the connected server of the list.
+     */
     public void syncWithHost() {
         String hostname = syncedList.getHeader().getHostname();
         if (hostname.equals("")) {
@@ -292,49 +339,51 @@ public class ListActivity extends AppCompatActivity {
         ServerWrapper.getList(hostname, syncedList.getHeader().getId(),
                               syncedList.getSecret(),
                               (jsonListFromServer, exceptionListFromServer) -> {
-                                     if (jsonListFromServer == null ||
-                                             exceptionListFromServer != null) {
-                                         Log.e(LOG_TITLE_NETWORK, "Error: " +
-                                                 exceptionListFromServer
-                                                         .toString());
+                                  if (jsonListFromServer == null ||
+                                          exceptionListFromServer != null) {
+                                      Log.e(LOG_TITLE_NETWORK, "Error: " +
+                                              exceptionListFromServer
+                                                      .toString());
 
-                                         if (exceptionListFromServer instanceof ServerException) {
-                                             if (exceptionListFromServer
-                                                     .getMessage()
-                                                     .equals("Not found")) {
-                                                 addListToServer();
-                                             }
-                                         }
-                                         return;
-                                     }
-                                     try {
-                                         String encryptedData =
-                                                 jsonListFromServer
-                                                         .getJSONObject("msg")
-                                                         .getString("data");
-                                         SyncedList receivedList =
-                                                 new SyncedList(new JSONObject(
-                                                         Cryptography
-                                                                 .decryptRSA(
-                                                                         syncedList
-                                                                                 .getHeader()
-                                                                                 .getLocalSecret(),
-                                                                         encryptedData)));
-                                         syncAndUpdateListOnServer(receivedList,
-                                                                   Cryptography
-                                                                           .getSHAasString(
-                                                                                   encryptedData));
-                                     } catch (JSONException e) {
-                                         // Shouldn't entered if the server
-                                         // worked fine
-                                         Log.e(LOG_TITLE_NETWORK, e.toString());
-                                         e.printStackTrace();
-                                     }
-                                 });
+                                      if (exceptionListFromServer instanceof ServerException) {
+                                          if (exceptionListFromServer
+                                                  .getMessage()
+                                                  .equals("Not found")) {
+                                              // List not on server, so
+                                              // add it
+                                              addListToServer();
+                                          }
+                                      }
+                                      return;
+                                  }
+                                  try {
+                                      // Wrap result Data
+                                      String encryptedData = jsonListFromServer
+                                              .getJSONObject("msg")
+                                              .getString("data");
+                                      SyncedList receivedList = new SyncedList(
+                                              new JSONObject(Cryptography
+                                                                     .decryptRSA(
+                                                                             syncedList
+                                                                                     .getHeader()
+                                                                                     .getLocalSecret(),
+                                                                             encryptedData)));
+                                      // Start sync
+                                      syncAndUpdateListOnServer(receivedList,
+                                                                Cryptography
+                                                                        .getSHAasString(
+                                                                                encryptedData));
+                                  } catch (JSONException e) {
+                                      // Shouldn't entered if the server
+                                      // worked fine
+                                      Log.e(LOG_TITLE_NETWORK, e.toString());
+                                      e.printStackTrace();
+                                  }
+                              });
     }
 
     /**
-     * Get called from syncWithHost
+     * Add a new list to the server. Get called from syncWithHost.
      */
     private void addListToServer() {
         ServerWrapper.addList(syncedList, (jsonResult, exception) -> {
@@ -353,6 +402,12 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Synchronize with the receivedList and push result.
+     *
+     * @param receivedList     List from server
+     * @param receivedListHash hash from encrypted list on server
+     */
     private void syncAndUpdateListOnServer(SyncedList receivedList,
                                            String receivedListHash) {
         // Sync if changes happened
@@ -362,38 +417,40 @@ public class ListActivity extends AppCompatActivity {
                     SyncedList.sync(syncedList, receivedList);
             ServerWrapper.setList(synchronizedList, receivedListHash,
                                   (jsonResult, exception) -> {
-                                         if (jsonResult == null ||
-                                                 exception != null) {
-                                             Log.e(LOG_TITLE_NETWORK,
-                                                   "Error: " + exception
-                                                           .toString());
-                                             if (exception instanceof ServerException) {
-                                                 // Something went wrong for
-                                                 // example wrong hash => ReSync
-                                                 syncWithHost();
-                                                 return;
-                                             }
-                                             return;
-                                         }
-                                         Log.d(LOG_TITLE_NETWORK,
-                                               "Finish sync!");
-                                         syncedList.sync(synchronizedList);
-                                         this.recyclerView
-                                                 .post(() -> syncedListAdapter
-                                                         .notifyDataSetChanged());
-                                         try {
-                                             secureStorage.setList(syncedList);
-                                         } catch (IOException | JSONException e) {
-                                             e.printStackTrace();
-                                         }
+                                      if (jsonResult == null ||
+                                              exception != null) {
+                                          Log.e(LOG_TITLE_NETWORK, "Error: " +
+                                                  exception.toString());
+                                          if (exception instanceof ServerException) {
+                                              // Something went wrong for
+                                              // example wrong hash => Retry
+                                              // Sync
+                                              syncWithHost();
+                                              return;
+                                          }
+                                          return;
+                                      }
+                                      Log.d(LOG_TITLE_NETWORK, "Finish sync!");
+                                      // Sync successfull written to server,
+                                      // so sync again and apply changes.
+                                      syncedList.sync(synchronizedList);
+                                      this.recyclerView
+                                              .post(() -> syncedListAdapter
+                                                      .notifyDataSetChanged());
+                                      try {
+                                          secureStorage.setList(syncedList);
+                                      } catch (IOException | JSONException e) {
+                                          e.printStackTrace();
+                                      }
                                   });
         }
     }
 
     /**
-     * Add step to List
+     * Add step to list and save it
      *
      * @param syncedListStep new SyncedListStep
+     * @param notify         should visible view refreshed?
      */
     public void addElementStepAndSave(SyncedListStep syncedListStep,
                                       boolean notify) {

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 import org.json.JSONException;
@@ -9,7 +25,8 @@ import javax.crypto.spec.SecretKeySpec;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 
 /**
- * Header for a SyncedList, contains all information about a list
+ * Header for a SyncedList, contains all information about a list (included
+ * secrets)
  */
 public class SyncedListHeader {
     private String id;
@@ -24,9 +41,9 @@ public class SyncedListHeader {
     private String listSize;
 
     /**
-     * Called when loading a list
+     * Load a header from JSON.
      *
-     * @param jsonObject
+     * @param jsonObject header as JSON
      * @throws JSONException
      */
     public SyncedListHeader(JSONObject jsonObject) throws JSONException {
@@ -46,12 +63,12 @@ public class SyncedListHeader {
     }
 
     /**
-     * Called when creating a list
+     * Create a SyncedListHeader
      *
-     * @param id
-     * @param name
-     * @param secret
-     * @param localSecret
+     * @param id          id of the list
+     * @param name        name of the list
+     * @param secret      access secret of the list
+     * @param localSecret localSecret to encrypt the list
      */
     public SyncedListHeader(String id,
                             String name,
@@ -150,6 +167,11 @@ public class SyncedListHeader {
         this.listSize = listSize;
     }
 
+    /**
+     * Get the SyncedListHeader as JSON
+     *
+     * @return SyncedListHeader as JSON
+     */
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         try {

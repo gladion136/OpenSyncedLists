@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package eu.schmidt.systems.opensyncedlists.network;
 
 import android.net.Uri;
@@ -16,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handle a http request inside a AsyncTask
+ * A AsyncTask to handle the Requests to a REST API.
  */
 class RESTRequestTask
         extends AsyncTask<HashMap<String, String>, Void, JSONObject> {
@@ -24,10 +41,24 @@ class RESTRequestTask
     private Exception exception;
     private final Callback callback;
 
+    /**
+     * Initialize Variables
+     *
+     * @param callback Callback to call after execution.
+     */
     public RESTRequestTask(Callback callback) {
         this.callback = callback;
     }
 
+    /**
+     * Execute a REST Request.
+     *
+     * @param param Parameters for the Request 1-3 HashMaps
+     *              0: Header Infos about the request
+     *              1: Query parameters
+     *              2: Body data for POST Requests
+     * @return JSON result
+     */
     @SafeVarargs
     protected final JSONObject doInBackground(HashMap<String, String>... param) {
         try {
@@ -93,12 +124,21 @@ class RESTRequestTask
         }
     }
 
-    protected void onPostExecute(JSONObject string) {
-        this.callback.callback(string, this.exception);
+    /**
+     * After execute, call the callback
+     *
+     * @param result JSON result
+     */
+    protected void onPostExecute(JSONObject result) {
+        this.callback.callback(result, this.exception);
     }
 
-
-
+    /**
+     * Convert a HashMap to JSON
+     *
+     * @param map Map to convert
+     * @return Map as JSON
+     */
     private static JSONObject fromMap(HashMap<String, String> map) {
         JSONObject jsonObject = new JSONObject();
         for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -111,9 +151,11 @@ class RESTRequestTask
         return jsonObject;
     }
 
+    /**
+     * Interface to handle result from Request.
+     */
     public interface Callback {
         void callback(JSONObject string, Exception exception);
     }
-
 }
 

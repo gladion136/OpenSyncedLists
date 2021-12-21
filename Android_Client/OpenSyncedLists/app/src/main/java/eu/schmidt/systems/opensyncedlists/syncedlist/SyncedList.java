@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 import android.util.Log;
@@ -9,8 +26,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.crypto.SecretKey;
 
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
@@ -24,6 +39,12 @@ public class SyncedList {
             uncheckedElementsBuffer;
     ArrayList<SyncedListStep> elementSteps;
 
+    /**
+     * Load the list from JSON.
+     *
+     * @param jsonObject list as JSON
+     * @throws JSONException
+     */
     public SyncedList(JSONObject jsonObject) throws JSONException {
         this.syncedListHeader =
                 new SyncedListHeader(jsonObject.getJSONObject("header"));
@@ -38,6 +59,13 @@ public class SyncedList {
         recalculateBuffers();
     }
 
+    /**
+     * Load a list from the storage.
+     *
+     * @param syncedListHeader Header of the list
+     * @param jsonObject Data of the list (steps)
+     * @throws JSONException
+     */
     public SyncedList(SyncedListHeader syncedListHeader, JSONObject jsonObject)
             throws JSONException {
         this.syncedListHeader = syncedListHeader;
@@ -52,13 +80,25 @@ public class SyncedList {
         recalculateBuffers();
     }
 
+    /**
+     * Load a list from Header and elementSteps. Called for creating a new
+     * list for example.
+     *
+     * @param syncedListHeader Header
+     * @param elementSteps Steps
+     */
     public SyncedList(SyncedListHeader syncedListHeader,
                       ArrayList<SyncedListStep> elementSteps) {
         this.syncedListHeader = syncedListHeader;
         this.elementSteps = elementSteps;
-        this.elementsBuffer = new ArrayList<>();
+        recalculateBuffers();
     }
 
+    /**
+     * Calculate the element of a list.
+     *
+     * @return elements of the list
+     */
     public ArrayList<SyncedListElement> getReformatElements() {
         Log.d(Constant.LOG_TITLE_BUILDING,
               "Build list with " + this.elementSteps.size() + " Steps");
@@ -139,6 +179,9 @@ public class SyncedList {
         return result;
     }
 
+    /**
+     * Recalculate all buffers. elementsBuffer, checkedElementsBuffer and uncheckedElementsBuffer
+     */
     public void recalculateBuffers() {
         elementsBuffer = getReformatElements();
         if (getHeader().isCheckOption()) {
@@ -157,6 +200,11 @@ public class SyncedList {
         }
     }
 
+    /**
+     * Get all elements of a list
+     *
+     * @return elementsBuffer
+     */
     public ArrayList<SyncedListElement> getElements() {
         if (elementsBuffer == null) {
             recalculateBuffers();
@@ -164,14 +212,23 @@ public class SyncedList {
         return elementsBuffer;
     }
 
+    /**
+     * Get all checked elements
+     *
+     * @return checkedElementsBuffer
+     */
     public ArrayList<SyncedListElement> getCheckedElements() {
         if (elementsBuffer == null) {
             recalculateBuffers();
         }
-
         return checkedElementsBuffer;
     }
 
+    /**
+     * Get alö unchecked elements
+     *
+     * @return uncheckedElementsBuffer
+     */
     public ArrayList<SyncedListElement> getUncheckedElements() {
         if (elementsBuffer == null) {
             recalculateBuffers();
@@ -199,32 +256,30 @@ public class SyncedList {
         return Cryptography.byteArrayToString(syncedListHeader.getSecret());
     }
 
-    public boolean compareSecret(byte[] target) {
-        for (int i = 0; i < target.length; i++) {
-            if (this.syncedListHeader.getSecret()[i] != target[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void setSecret(String secret) {
-        this.syncedListHeader.setSecret(Cryptography.getSHA(secret));
-    }
-
-    public void setLocalSecret(SecretKey keypair) {
-        this.syncedListHeader.setLocalSecret(keypair);
-    }
-
+    /**
+     * Get all element steps
+     *
+     * @return elementSteps
+     */
     public ArrayList<SyncedListStep> getElementSteps() {
         return elementSteps;
     }
 
+    /**
+     * Set all elementSteps
+     *
+     * @param elementSteps all updated elementSteps
+     */
     public void setElementSteps(ArrayList<SyncedListStep> elementSteps) {
         this.elementSteps = elementSteps;
         recalculateBuffers();
     }
 
+    /**
+     * Add one elementStep and recalculate the buffers.
+     *
+     * @param elementStep new elementStep
+     */
     public void addElementStep(SyncedListStep elementStep) {
         if (elementStep.changeAction == ACTION.CLEAR) {
             this.elementSteps.clear();
@@ -233,6 +288,14 @@ public class SyncedList {
         recalculateBuffers();
     }
 
+    /**
+     *
+     *
+     * @param sourceIndex old Index
+     * @param targetIndex new Index
+     * @param list list to change
+     * @param <T> Object type inside the list
+     */
     public static <T> void moveItem(int sourceIndex,
                                     int targetIndex,
                                     List<T> list) {
@@ -243,6 +306,11 @@ public class SyncedList {
         }
     }
 
+    /**
+     * Generate a unique element Id in the list
+     *
+     * @return unique Id
+     */
     public String generateUniqueElementId() {
         String newId = Cryptography.generatingRandomString(50);
         for (int i = 0; i < elementsBuffer.size(); i++) {
@@ -255,10 +323,9 @@ public class SyncedList {
     }
 
     /**
-     * Convert to JSON (HEADER not included)
+     * Convert to JSON (HEADER not included).
      *
-     * @return SyncedList steps
-     * @throws JSONException
+     * @return SyncedList steps as JSON
      */
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
@@ -275,10 +342,9 @@ public class SyncedList {
     }
 
     /**
-     * Convert to JSON (Header with secrets included)
+     * Convert to JSON (Header with secrets included).
      *
-     * @return SyncedList with secrets
-     * @throws JSONException
+     * @return SyncedList with header(secrets included)
      */
     public JSONObject toJsonWithHeader() {
         JSONObject jsonObject = toJSON();
@@ -294,29 +360,34 @@ public class SyncedList {
         return syncedListHeader;
     }
 
-    public String getAsReadableString() {
+    /**
+     * Get list elements as Markdown.
+     *
+     * @return list as Markdown formatted String
+     */
+    public String getAsMarkdown() {
         StringBuilder list = new StringBuilder(getName());
         if (getHeader().isCheckedList()) {
             for (SyncedListElement element : uncheckedElementsBuffer) {
-                list.append("\n").append(element.getAsReadableString());
+                list.append("\n").append(element.getAsMarkdown());
             }
 
             for (SyncedListElement element : checkedElementsBuffer) {
-                list.append("\n").append(element.getAsReadableString());
+                list.append("\n").append(element.getAsMarkdown());
             }
         } else {
             for (SyncedListElement element : elementsBuffer) {
-                list.append("\n").append(element.getAsReadableString());
+                list.append("\n").append(element.getAsMarkdown());
             }
         }
         return list.toString();
     }
 
     /**
-     * Sync lists and return solution
+     * Sync lists and return solution.
      *
-     * @param syncedList1
-     * @param syncedList2
+     * @param syncedList1 base
+     * @param syncedList2 syncWith
      * @return synchronized List
      */
     public static SyncedList sync(SyncedList syncedList1,
@@ -365,12 +436,22 @@ public class SyncedList {
         return syncedList1;
     }
 
+    /**
+     * Synchronize the list.
+     *
+     * @param syncedList list to sync with.
+     */
     public void sync(SyncedList syncedList) {
         SyncedList newList = SyncedList.sync(this, syncedList);
         syncedListHeader = newList.getHeader();
         setElementSteps(newList.getElementSteps());
     }
 
+    /**
+     * Get full list with header encrypted.
+     *
+     * @return encrypted list with header
+     */
     public String getFullListEncrypted() {
         String data = toJsonWithHeader().toString();
         return Cryptography.encryptRSA(getHeader().getLocalSecret(), data);

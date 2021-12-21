@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package eu.schmidt.systems.opensyncedlists.storages;
 
 import android.content.Context;
@@ -22,7 +39,7 @@ public class SecureStorage {
     final SharedPreferences sharedPref;
 
     /**
-     * Open private local shared preferences storage
+     * Open private local shared preferences storage.
      *
      * @param context Context
      */
@@ -34,9 +51,9 @@ public class SecureStorage {
     }
 
     /**
-     * Save on list in local storage
+     * Save one list in local storage
      *
-     * @param list List
+     * @param list List to store
      * @throws IOException
      * @throws JSONException
      */
@@ -50,9 +67,9 @@ public class SecureStorage {
     }
 
     /**
-     * Read on list from local storage
+     * Read one list from local storage
      *
-     * @param id
+     * @param id id of list
      * @return SyncedList
      * @throws IOException
      * @throws JSONException
@@ -66,9 +83,9 @@ public class SecureStorage {
     }
 
     /**
-     * Get all lists headers
+     * Get the headers from all lists.
      *
-     * @return ArrayList<SyncedListHeader>
+     * @return all Headers
      * @throws Exception
      */
     public ArrayList<SyncedListHeader> getListsHeaders() throws Exception {
@@ -85,6 +102,12 @@ public class SecureStorage {
         return result;
     }
 
+    /**
+     * Get all list ids.
+     *
+     * @return all list ids
+     * @throws Exception
+     */
     public ArrayList<String> getListsIds() throws Exception {
         String data = sharedPref.getString("IDs", "");
         if (data.equals("")) {
@@ -99,6 +122,12 @@ public class SecureStorage {
         return result;
     }
 
+    /**
+     * Set all list ids.
+     *
+     * @param ids all ids
+     * @throws Exception
+     */
     public void setListsIds(ArrayList<String> ids) throws Exception {
         SharedPreferences.Editor editor = sharedPref.edit();
         JSONArray jsonArray = new JSONArray();
@@ -110,6 +139,13 @@ public class SecureStorage {
         Log.d(Constant.LOG_TITLE_STORAGE, "Save " + ids.size() + " Lists IDs");
     }
 
+    /**
+     * Get the header from a list.
+     *
+     * @param id id of the list
+     * @return header of the list
+     * @throws Exception
+     */
     public SyncedListHeader getListHeader(String id) throws Exception {
         String data = sharedPref.getString("HEADER_" + id, "");
         if (data.equals("")) {
@@ -118,6 +154,12 @@ public class SecureStorage {
         return new SyncedListHeader(new JSONObject(data));
     }
 
+    /**
+     * Delete a list.
+     *
+     * @param id id of the list
+     * @throws Exception
+     */
     public void deleteList(String id) throws Exception {
         ArrayList<String> ids = getListsIds();
         for (int i = 0; i < ids.size(); i++) {
@@ -133,6 +175,13 @@ public class SecureStorage {
         editor.apply();
     }
 
+    /**
+     * Add a list.
+     *
+     * @param syncedList list to add
+     * @return info text for example if another list got overridden.
+     * @throws Exception
+     */
     public String addList(SyncedList syncedList) throws Exception {
         String result = "";
         boolean newList = true;

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package eu.schmidt.systems.opensyncedlists.adapters;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
@@ -35,7 +52,7 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 /**
- * RecyclerView Adapter for ListActivity
+ * RecyclerView Adapter for ListActivity.
  */
 public class SyncedListAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -47,7 +64,7 @@ public class SyncedListAdapter
     private int jumpDistance;
 
     /**
-     * ViewHolder for one element
+     * ViewHolder for one element.
      */
     public static class ElementViewHolder extends RecyclerView.ViewHolder {
         public final CheckBox checkBox;
@@ -68,7 +85,7 @@ public class SyncedListAdapter
     }
 
     /**
-     * ViewHolder for the isolator
+     * ViewHolder for the isolator. (Isolate checked and unchecked elements)
      */
     public static class IsolatorViewHolder extends RecyclerView.ViewHolder {
 
@@ -77,6 +94,13 @@ public class SyncedListAdapter
         }
     }
 
+    /**
+     * Initialize the recyclerview
+     *
+     * @param listActivity ListActivity
+     * @param recyclerView RecyclerView to fill
+     * @param syncedList selected SyncedList
+     */
     public SyncedListAdapter(ListActivity listActivity,
                              RecyclerView recyclerView,
                              SyncedList syncedList) {
@@ -148,7 +172,7 @@ public class SyncedListAdapter
     }
 
     /**
-     * Return the size of elements (invoked by the layout manager)
+     * Return the size of elements in the list
      *
      * @return size of elements
      */
@@ -162,11 +186,11 @@ public class SyncedListAdapter
     }
 
     /**
-     * Create new views (invoked by the layout manager)
+     * Create and choose correct ViewHolder
      *
      * @param viewGroup viewGroup
-     * @param viewType  viewType
-     * @return viewHolder
+     * @param viewType  viewType represents layout id
+     * @return viewHolder as IsolatorViewHolder or ElementViewHolder
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup,
@@ -193,6 +217,12 @@ public class SyncedListAdapter
         return viewHolder;
     }
 
+    /**
+     * Get correct viewType (layout) for one element.
+     *
+     * @param position Position of the element
+     * @return viewType represents layout id
+     */
     @Override public int getItemViewType(int position) {
         if (syncedList.getHeader().isCheckedList() &&
                 syncedList.getUncheckedElements().size() == position) {
@@ -205,9 +235,10 @@ public class SyncedListAdapter
     }
 
     /**
-     * Replace content of a view (override given because it got recycled)
+     * Replace the content of a view (and override given because it got
+     * recycled).
      *
-     * @param viewHolder viewHolder
+     * @param viewHolder viewHolder to fill with content
      * @param position   current position
      */
     @Override public void onBindViewHolder(RecyclerView.ViewHolder viewHolder,
@@ -305,14 +336,13 @@ public class SyncedListAdapter
     }
 
     /**
-     * Check element name changed and submit (create new SyncedListStep)
+     * Check if element name changed and submit (create new SyncedListStep).
      *
-     * @param viewHolder
-     * @param syncedListElement
+     * @param viewHolder viewHolder of element
+     * @param syncedListElement the buffered element
      */
     public void checkNameChangesAndSubmit(ElementViewHolder viewHolder,
                                           SyncedListElement syncedListElement) {
-
         String newName = viewHolder.eTName.getText().toString();
         if (!newName.equals("") &&
                 !newName.equals(syncedListElement.getName())) {
@@ -326,12 +356,12 @@ public class SyncedListAdapter
     }
 
     /**
-     * OnClick on Element
+     * OnClick on a element
      *
-     * @param v View of Element
+     * @param view View of Element
      */
-    @Override public void onClick(View v) {
-        int itemPosition = recyclerView.getChildLayoutPosition(v);
+    @Override public void onClick(View view) {
+        int itemPosition = recyclerView.getChildLayoutPosition(view);
         SyncedListElement syncedListElement =
                 getElementOnPosition(itemPosition);
         BottomSheetDialogFragment bottomSheetDialogFragment =
@@ -344,10 +374,10 @@ public class SyncedListAdapter
     }
 
     /**
-     * Get element by position inside recyclerview
+     * Get element by position inside recyclerview.
      *
-     * @param position
-     * @return syncedListElement
+     * @param position position in recyclerview.
+     * @return syncedListElement on this position
      */
     public SyncedListElement getElementOnPosition(int position) {
         if (syncedList.getHeader().isCheckedList()) {
@@ -363,10 +393,10 @@ public class SyncedListAdapter
     }
 
     /**
-     * Get position of element inside recyclerview
+     * Get position of element inside recyclerview.
      *
-     * @param syncedListElement
-     * @return
+     * @param syncedListElement element to search
+     * @return position in recyclerview
      */
     public int getPositionOfElement(SyncedListElement syncedListElement) {
         int position = 0;
@@ -403,10 +433,12 @@ public class SyncedListAdapter
     }
 
     /**
-     * Move element inside list (checked and unchecked list separated
+     * Move element inside list (checked and unchecked list separated), map
+     * to limits. Move inside SyncedList order, Counting inside Recyclerview
+     * order
      *
      * @param syncedListElement Element to move
-     * @param dir               direction and strength
+     * @param dir               direction and strength, positive = down
      */
     public void moveElementAndSave(SyncedListElement syncedListElement,
                                    int dir) {

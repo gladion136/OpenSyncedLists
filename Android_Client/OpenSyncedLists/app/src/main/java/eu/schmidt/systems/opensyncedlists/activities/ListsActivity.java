@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
@@ -48,29 +64,41 @@ import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 
 /**
- * ListsActivity displays all lists on device
+ * Activity to displaying all lists stored on the device
  */
 public class ListsActivity extends AppCompatActivity {
 
-    ActivityResultLauncher onImportLauncher;
-    SecureStorage secureStorage;
-    SharedPreferences globalSharedPreferences;
-    ArrayList<SyncedListHeader> syncedListsHeaders;
-    FloatingActionButton fab;
+    /**
+     * Result launcher for importing a list
+     */
+    private ActivityResultLauncher onImportLauncher;
+    /**
+     * Stores the global settings
+     */
+    private SharedPreferences globalSharedPreferences;
+    private SecureStorage secureStorage;
+    private ArrayList<SyncedListHeader> syncedListsHeaders;
+    private FloatingActionButton fab;
+    private ListView lVLists;
+    private ListsAdapter listsAdapter;
 
-    ListView lVLists;
-    ListsAdapter listsAdapter;
-
+    /**
+     * In onCreate the layout is set and the global Variables are
+     * initialised.
+     *
+     * @param savedInstanceState In this case just used for the super call.
+     */
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists);
         lVLists = findViewById(R.id.lVLists);
         fab = findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(v -> showCreateListDialog());
-
+        secureStorage = new SecureStorage(this);
         onImportLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
+                    // File selected?
                     if (result.getResultCode() == RESULT_OK) {
                         Uri importFile = result.getData().getData();
                         importFile(importFile);
@@ -78,24 +106,34 @@ public class ListsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * In onResume the init function is called.
+     */
     @Override protected void onResume() {
         init();
         super.onResume();
     }
 
+    /**
+     * Handles start events of the activity.
+     *
+     * @param intent started with this intent
+     */
     @Override protected void onNewIntent(Intent intent) {
         if (intent.getType() != null &&
                 intent.getType().equals("application" + "/json")) {
+            // Started to open a json file
             Uri receivedFile = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             importFile(receivedFile);
         } else if (intent.getData() != null) {
+            // Started to open a link (import list via link)
             Uri uri = intent.getData();
             String id = uri.getQueryParameter("id");
             String secret = uri.getQueryParameter("secret");
             String localSecret = uri.getQueryParameter("localSecret");
-            String hostname =
-                    uri.getScheme() + "://" + uri.getAuthority();
-            Log.d(LOG_TITLE_DEFAULT, "Import list via link from host: " + hostname);
+            String hostname = uri.getScheme() + "://" + uri.getAuthority();
+            Log.d(LOG_TITLE_DEFAULT,
+                  "Import list via link from host: " + hostname);
             if (id != null && secret != null && localSecret != null &&
                     hostname != null) {
                 byte[] encodedLocalSecret =
@@ -111,60 +149,136 @@ public class ListsActivity extends AppCompatActivity {
         super.onNewIntent(intent);
     }
 
-    public void importListFromHost(String hostname,
-                                   String id,
-                                   String secret,
-                                   SecretKey localSecret) {
-        ServerWrapper.getList(hostname, id, secret,
-                              (jsonListFromServer, exceptionListFromServer) -> {
-                                     if (jsonListFromServer == null ||
-                                             exceptionListFromServer != null) {
-                                         Log.e(LOG_TITLE_NETWORK, "Error: " +
-                                                 exceptionListFromServer
-                                                         .toString());
-                                         if (exceptionListFromServer instanceof ServerException) {
-                                             if (exceptionListFromServer
-                                                     .getMessage()
-                                                     .equals("Not found")) {
-                                                 Toast.makeText(this, getString(
-                                                         R.string.cant_import_list) +
-                                                                        " " + getString(
-                                                         R.string.not_found),
-                                                                Toast.LENGTH_SHORT)
-                                                         .show();
-                                             }
-                                         } else {
-                                             Toast.makeText(this, getString(
-                                                     R.string.cant_import_list) +
-                                                                    " " + getString(
-                                                     R.string.no_connection),
-                                                            Toast.LENGTH_SHORT)
-                                                     .show();
-                                         }
-                                         return;
-                                     }
-                                     try {
-                                         SyncedList receivedList =
-                                                 new SyncedList(new JSONObject(
-                                                         Cryptography
-                                                                 .decryptRSA(
-                                                                         localSecret,
-                                                                         jsonListFromServer
-                                                                                 .getJSONObject(
-                                                                                         "msg")
-                                                                                 .getString(
-                                                                                         "data"))));
-                                         addListAndHandleCallback(receivedList);
-                                     } catch (JSONException e) {
-                                         // Shouldn't entered if the server
-                                         // worked fine
-                                         Log.e(LOG_TITLE_NETWORK, e.toString());
-                                         e.printStackTrace();
-                                     }
-                                 });
+    /**
+     * In onCreateOptionsMenu the menu from the ActionBar is inflated.
+     *
+     * @param menu Menu to inflate
+     * @return true
+     */
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.all_lists_menu, menu);
+        return true;
     }
 
-    public String getUniqueListId() {
+    /**
+     * onOptionsItemSelected handles the events from the ActionBar.
+     *
+     * @param item selected item
+     * @return action handled?
+     */
+    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_list:
+                // Create new list
+                showCreateListDialog();
+                return true;
+            case R.id.import_lists:
+                // Import list/s from file
+                Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+                chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
+                chooseFile.setType("application/json");
+                Intent intent = Intent.createChooser(chooseFile, getString(
+                        R.string.choose_file_to_import));
+                onImportLauncher.launch(intent);
+                return true;
+            case R.id.export_lists:
+                // Export all lists to json file
+                ArrayList<SyncedList> syncedLists = new ArrayList<>();
+                for (SyncedListHeader header : syncedListsHeaders) {
+                    try {
+                        syncedLists.add(secureStorage.getList(header.getId()));
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+                String absolutePath =
+                        FileStorage.exportLists(this, syncedLists);
+                Log.i(LOG_TITLE_DEFAULT,
+                      "Export all files to: " + absolutePath);
+                FileStorage.shareFile(this, absolutePath);
+                return true;
+            case R.id.settings:
+                // Open global settings
+                Intent settingsIntent =
+                        new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            case R.id.about:
+                // Show about activity
+                Intent aboutIntent = new Intent(this, AboutActivity.class);
+                startActivity(aboutIntent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Import a list from a server
+     *
+     * @param hostname    Hostname with protocoll and port
+     * @param id          Id of the list
+     * @param secret      Secret to access to the list
+     * @param localSecret localSecret to decrypt the list
+     */
+    private void importListFromHost(String hostname,
+                                    String id,
+                                    String secret,
+                                    SecretKey localSecret) {
+        ServerWrapper.getList(hostname, id, secret,
+                              (jsonListFromServer, exceptionListFromServer) -> {
+                                  if (jsonListFromServer == null ||
+                                          exceptionListFromServer != null) {
+                                      Log.e(LOG_TITLE_NETWORK, "Error: " +
+                                              exceptionListFromServer
+                                                      .toString());
+                                      if (exceptionListFromServer instanceof ServerException) {
+                                          if (exceptionListFromServer
+                                                  .getMessage()
+                                                  .equals("Not found")) {
+                                              Toast.makeText(this, getString(
+                                                      R.string.cant_import_list) +
+                                                                     " " + getString(
+                                                      R.string.not_found),
+                                                             Toast.LENGTH_SHORT)
+                                                      .show();
+                                          }
+                                      } else {
+                                          Toast.makeText(this, getString(
+                                                  R.string.cant_import_list) +
+                                                                 " " + getString(
+                                                  R.string.no_connection),
+                                                         Toast.LENGTH_SHORT)
+                                                  .show();
+                                      }
+                                      return;
+                                  }
+                                  try {
+                                      SyncedList receivedList = new SyncedList(
+                                              new JSONObject(Cryptography
+                                                                     .decryptRSA(
+                                                                             localSecret,
+                                                                             jsonListFromServer
+                                                                                     .getJSONObject(
+                                                                                             "msg")
+                                                                                     .getString(
+                                                                                             "data"))));
+                                      addListAndHandleCallback(receivedList);
+                                  } catch (JSONException e) {
+                                      // Shouldn't entered if the server
+                                      // worked fine
+                                      Log.e(LOG_TITLE_NETWORK, e.toString());
+                                      e.printStackTrace();
+                                  }
+                              });
+    }
+
+    /**
+     * Generate a local unique list id
+     *
+     * @return unique list name
+     */
+    private String getUniqueListId() {
         String newId = Cryptography.generatingRandomString(50);
         for (int i = 0; i < syncedListsHeaders.size(); i++) {
             if (newId.equals(syncedListsHeaders.get(i).getId())) {
@@ -175,14 +289,11 @@ public class ListsActivity extends AppCompatActivity {
         return newId;
     }
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.all_lists_menu, menu);
-        return true;
-    }
-
-    public void init() {
-        secureStorage = new SecureStorage(this);
+    /**
+     * Initialize fills the activity with content. (Fill list view, read
+     * settings, ..)
+     */
+    private void init() {
         try {
             syncedListsHeaders = secureStorage.getListsHeaders();
         } catch (Exception e) {
@@ -212,7 +323,10 @@ public class ListsActivity extends AppCompatActivity {
         checkServerConnection();
     }
 
-    public void checkServerConnection() {
+    /**
+     * Checks connection to the default server and shows Toast on error.
+     */
+    protected void checkServerConnection() {
         String defaultHostname =
                 globalSharedPreferences.getString("default_server", "");
         if (defaultHostname.equals("")) {
@@ -231,51 +345,10 @@ public class ListsActivity extends AppCompatActivity {
                 });
     }
 
-    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.new_list:
-                showCreateListDialog();
-                return true;
-            case R.id.import_lists:
-                Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-                chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
-                chooseFile.setType("application/json");
-                Intent intent = Intent.createChooser(chooseFile, getString(
-                        R.string.choose_file_to_import));
-                onImportLauncher.launch(intent);
-                return true;
-            case R.id.export_lists:
-                ArrayList<SyncedList> syncedLists = new ArrayList<>();
-                for (SyncedListHeader header : syncedListsHeaders) {
-                    try {
-                        syncedLists.add(secureStorage.getList(header.getId()));
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                    }
-                }
-                String absolutePath =
-                        FileStorage.exportLists(this, syncedLists);
-                Log.i(LOG_TITLE_DEFAULT,
-                      "Export all files to: " + absolutePath);
-                FileStorage.shareFile(this, absolutePath);
-                return true;
-            case R.id.settings:
-                Intent settingsIntent =
-                        new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return true;
-            case R.id.about:
-                Intent aboutIntent = new Intent(this, AboutActivity.class);
-                startActivity(aboutIntent);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
-     * Show and handle create list dialog
+     * Shows and handle create new list dialog.
      */
-    public void showCreateListDialog() {
+    protected void showCreateListDialog() {
         DialogBuilder
                 .editTextDialog(this, getString(R.string.create_list_title),
                                 getString(R.string.create_list_msg),
@@ -311,7 +384,12 @@ public class ListsActivity extends AppCompatActivity {
                                 });
     }
 
-    public void addListAndHandleCallback(SyncedList syncedList) {
+    /**
+     * Adds a list, save it, update views and handle exceptions.
+     *
+     * @param syncedList List to add
+     */
+    protected void addListAndHandleCallback(SyncedList syncedList) {
         String result;
         try {
             result = secureStorage.addList(syncedList);
@@ -326,11 +404,11 @@ public class ListsActivity extends AppCompatActivity {
     }
 
     /**
-     * MOVE FUNCTION TO SECURESTORAGE ??
+     * Import new list from file.
      *
-     * @param uri
+     * @param uri Filepath
      */
-    public void importFile(Uri uri) {
+    protected void importFile(Uri uri) {
         try {
             InputStream in = getContentResolver().openInputStream(uri);
             BufferedReader r = new BufferedReader(new InputStreamReader(in));
@@ -360,7 +438,6 @@ public class ListsActivity extends AppCompatActivity {
                 }
             }
         } catch (IOException ignored) {
-
         }
     }
 }
