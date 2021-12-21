@@ -34,7 +34,7 @@
     <string name="text_about">Enstanden während des Moduls "Mobile
         Systeme" an der Technischen Hochschule Ostwestfalen-Lippe.\n\n\n
         Entwickelt von Etienne Schmidt\n\n
-        Lizensiert unter GNU GPL v3</string>
+        Lizensiert unter <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
 
     <string name="title_activity_settings">Einstellungen</string>
 

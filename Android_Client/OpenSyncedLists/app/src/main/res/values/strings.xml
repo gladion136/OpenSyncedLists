@@ -24,7 +24,7 @@
     <string name="share_before_name">Import the list \"</string>
     <string name="share_after_name">\" to OpenSyncedLists with the following Link: \n\n</string>
     <string name="share_after_link">\n\n Please open the link with the OpenSyncedLists app.</string>
-    <string name="text_about">Created by Etienne Schmidt\n\nLicensed under GNU GPL v3</string>
+    <string name="text_about">Created by Etienne Schmidt\n\nLicensed under <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE>GNU GPL v3</a>]]></string>
     <string name="title_activity_settings">Settings</string>
     <string name="general_header">General</string>
     <string name="sync_header">Synchronization</string>

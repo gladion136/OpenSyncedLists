@@ -185,7 +185,7 @@ public class ListsActivity extends AppCompatActivity {
         secureStorage = new SecureStorage(this);
         try {
             syncedListsHeaders = secureStorage.getListsHeaders();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
@@ -320,7 +320,7 @@ public class ListsActivity extends AppCompatActivity {
             }
             syncedListsHeaders = secureStorage.getListsHeaders();
             listsAdapter.updateItems(syncedListsHeaders);
-        } catch (JSONException | IOException exception) {
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
     }

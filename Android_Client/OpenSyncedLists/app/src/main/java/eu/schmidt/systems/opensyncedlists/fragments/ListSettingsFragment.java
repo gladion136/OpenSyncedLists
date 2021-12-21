@@ -51,6 +51,14 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
         // Set listeners for preferences
         EditTextPreference editTextPreference = findPreference("list_name");
+        Preference deleteBtn = findPreference("delete_btn");
+        SwitchPreferenceCompat checkOptionPref = findPreference("check_option");
+        SwitchPreferenceCompat checkListPref = findPreference("checked_list");
+        SwitchPreferenceCompat invertElementPref = findPreference("invert_element");
+        SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
+        EditTextPreference serverNamePref = findPreference("server_name");
+        Preference deleteOnlineBtn = findPreference("delete_online_btn");
+
         editTextPreference.setText(syncedList.getName());
         editTextPreference
                 .setOnPreferenceChangeListener((preference, newValue) -> {
@@ -63,7 +71,6 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
                     return true;
                 });
 
-        Preference deleteBtn = findPreference("delete_btn");
         deleteBtn.setOnPreferenceClickListener(v -> {
             try {
                 secureStorage.deleteList(syncedList.getId());
@@ -76,31 +83,31 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
             return true;
         });
 
-        SwitchPreferenceCompat checkOptionPref = findPreference("check_option");
         checkOptionPref.setChecked(syncedList.getHeader().isCheckOption());
         checkOptionPref
                 .setOnPreferenceChangeListener(((preference, newValue) -> {
                     boolean newVal = (boolean) newValue;
                     if (newVal != syncedList.getHeader().isCheckOption()) {
                         syncedList.getHeader().setCheckOption(newVal);
+                        syncedList.getHeader().setCheckedList(newVal);
+                        checkListPref.setChecked(syncedList.getHeader().isCheckedList());
+                        syncedList.recalculateBuffers();
                         save();
                     }
                     return true;
                 }));
 
-        SwitchPreferenceCompat checkListPref = findPreference("checked_list");
         checkListPref.setChecked(syncedList.getHeader().isCheckedList());
         checkListPref.setOnPreferenceChangeListener(((preference, newValue) -> {
             boolean newVal = (boolean) newValue;
             if (newVal != syncedList.getHeader().isCheckedList()) {
                 syncedList.getHeader().setCheckedList(newVal);
+                syncedList.recalculateBuffers();
                 save();
             }
             return true;
         }));
 
-        SwitchPreferenceCompat invertElementPref =
-                findPreference("invert_element");
         invertElementPref.setChecked(syncedList.getHeader().isInvertElement());
         invertElementPref
                 .setOnPreferenceChangeListener(((preference, newValue) -> {
@@ -112,7 +119,6 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
                     return true;
                 }));
 
-        SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
         autoSyncPref.setChecked(syncedList.getHeader().isAutoSync());
         autoSyncPref.setOnPreferenceChangeListener(((preference, newValue) -> {
             boolean newVal = (boolean) newValue;
@@ -123,7 +129,6 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
             return true;
         }));
 
-        EditTextPreference serverNamePref = findPreference("server_name");
         serverNamePref.setText(syncedList.getHeader().getHostname());
         serverNamePref
                 .setOnPreferenceChangeListener(((preference, newValue) -> {
@@ -135,7 +140,6 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
                     return true;
                 }));
 
-        Preference deleteOnlineBtn = findPreference("delete_online_btn");
         deleteOnlineBtn.setOnPreferenceClickListener(v -> {
             ServerWrapper.removeList(syncedList.getHeader().getHostname(),
                                      syncedList.getId(),
@@ -179,7 +183,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
 
     public void save() {
         try {
-            secureStorage.setList(syncedList, true);
+            secureStorage.setList(syncedList);
         } catch (IOException | JSONException e) {
             Log.e(Constant.LOG_TITLE_DEFAULT,
                   "Local storage " + "write" + " error: " + e);

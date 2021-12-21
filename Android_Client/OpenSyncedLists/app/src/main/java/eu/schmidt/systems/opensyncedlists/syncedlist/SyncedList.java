@@ -141,7 +141,7 @@ public class SyncedList {
 
     public void recalculateBuffers() {
         elementsBuffer = getReformatElements();
-        if (getHeader().isCheckedList()) {
+        if (getHeader().isCheckOption()) {
             checkedElementsBuffer = new ArrayList<>();
             uncheckedElementsBuffer = new ArrayList<>();
             for (SyncedListElement element : elementsBuffer) {
@@ -151,6 +151,9 @@ public class SyncedList {
                     uncheckedElementsBuffer.add(element);
                 }
             }
+            getHeader().setListSize(checkedElementsBuffer.size() + " / " + elementsBuffer.size());
+        }else {
+            getHeader().setListSize(String.valueOf(elementsBuffer.size()));
         }
     }
 

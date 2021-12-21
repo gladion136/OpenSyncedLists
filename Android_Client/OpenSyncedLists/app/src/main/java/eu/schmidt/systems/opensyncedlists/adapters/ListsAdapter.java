@@ -43,7 +43,8 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
      * ViewHolder for on list element
      */
     private static class ViewHolder {
-        TextView txtName;
+        TextView tVName;
+        TextView tVSize;
     }
 
     /**
@@ -57,7 +58,7 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
     @Override public View getView(int position,
                                   View convertView,
                                   ViewGroup parent) {
-        SyncedListHeader dataModel = syncedListsHeaders.get(position);
+        SyncedListHeader header = syncedListsHeaders.get(position);
 
         ViewHolder viewHolder;
         if (convertView == null) {
@@ -65,15 +66,17 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView =
                     inflater.inflate(R.layout.element_lists, parent, false);
-            viewHolder.txtName = convertView.findViewById(R.id.textView);
+            viewHolder.tVName = convertView.findViewById(R.id.tVName);
+            viewHolder.tVSize = convertView.findViewById(R.id.tVSize);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.txtName.setText(dataModel.getName());
+        viewHolder.tVName.setText(header.getName());
+        viewHolder.tVSize.setText(header.getListSize());
         convertView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ListActivity.class);
-            intent.putExtra("id", dataModel.getId());
+            intent.putExtra("id", header.getId());
             context.startActivity(intent);
         });
         return convertView;

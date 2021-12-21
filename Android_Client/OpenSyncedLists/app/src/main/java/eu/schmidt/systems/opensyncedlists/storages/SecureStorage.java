@@ -3,6 +3,7 @@ package eu.schmidt.systems.opensyncedlists.storages;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,24 +40,13 @@ public class SecureStorage {
      * @throws IOException
      * @throws JSONException
      */
-    public void setList(SyncedList list, boolean headerChanged)
-            throws IOException, JSONException {
+    public void setList(SyncedList list) throws IOException, JSONException {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("LIST_" + list.getId(), list.toJSON().toString());
-        editor.apply();
+        editor.putString("HEADER_" + list.getId(),
+                         list.getHeader().toJSON().toString());
         Log.d(Constant.LOG_TITLE_STORAGE, "Save List");
-        if (headerChanged) {
-            ArrayList<SyncedListHeader> headers = getListsHeaders();
-            for (int i = 0; i < headers.size(); i++) {
-                if (headers.get(i).getId().equals(list.getId())) {
-                    headers.set(i, list.getHeader());
-                    Log.d(Constant.LOG_TITLE_STORAGE,
-                          "Header of list changed");
-                    break;
-                }
-            }
-            setListsHeaders(headers);
-        }
+        editor.apply();
     }
 
     /**
@@ -72,7 +62,6 @@ public class SecureStorage {
         if (data.equals("")) {
             return null;
         }
-
         return new SyncedList(getListHeader(id), new JSONObject(data));
     }
 
@@ -80,72 +69,77 @@ public class SecureStorage {
      * Get all lists headers
      *
      * @return ArrayList<SyncedListHeader>
-     * @throws JSONException
+     * @throws Exception
      */
-    public ArrayList<SyncedListHeader> getListsHeaders() throws JSONException {
-        String data = sharedPref.getString("LISTS_HEADERS", "");
-        if (data.equals("")) {
+    public ArrayList<SyncedListHeader> getListsHeaders() throws Exception {
+        ArrayList<String> ids = getListsIds();
+        if (ids.size() <= 0) {
             return new ArrayList<>();
         }
         ArrayList<SyncedListHeader> result = new ArrayList<>();
-        JSONArray jsonArrayLists = new JSONArray(data);
-        for (int i = 0; i < jsonArrayLists.length(); i++) {
-            result.add(
-                    new SyncedListHeader((JSONObject) jsonArrayLists.get(i)));
+        for (String id : ids) {
+            String data = sharedPref.getString("HEADER_" + id, "");
+            result.add(new SyncedListHeader(new JSONObject(data)));
         }
         Log.d(Constant.LOG_TITLE_STORAGE, "Load Lists Headers");
         return result;
     }
 
-    public SyncedListHeader getListHeader(String id) throws Exception {
-        ArrayList<SyncedListHeader> headers = getListsHeaders();
-        for (int i = 0; i < headers.size(); i++) {
-            if (headers.get(i).getId().equals(id)) {
-                return headers.get(i);
-            }
+    public ArrayList<String> getListsIds() throws Exception {
+        String data = sharedPref.getString("IDs", "");
+        if (data.equals("")) {
+            return new ArrayList<>();
         }
-        throw new Exception("Header not found");
+        ArrayList<String> result = new ArrayList<>();
+        JSONArray jsonArrayLists = new JSONArray(data);
+        for (int i = 0; i < jsonArrayLists.length(); i++) {
+            result.add(jsonArrayLists.getString(i));
+        }
+        Log.d(Constant.LOG_TITLE_STORAGE, "Load Lists IDs");
+        return result;
     }
 
-    /**
-     * Override all lists headers
-     *
-     * @param headers all Headers
-     */
-    public void setListsHeaders(ArrayList<SyncedListHeader> headers) {
+    public void setListsIds(ArrayList<String> ids) throws Exception {
         SharedPreferences.Editor editor = sharedPref.edit();
         JSONArray jsonArray = new JSONArray();
-        for (SyncedListHeader header : headers) {
-            jsonArray.put(header.toJSON());
+        for (String id : ids) {
+            jsonArray.put(id);
         }
-        editor.putString("LISTS_HEADERS", jsonArray.toString());
+        editor.putString("IDs", jsonArray.toString());
         editor.apply();
-        Log.d(Constant.LOG_TITLE_STORAGE, "Save Lists Headers");
+        Log.d(Constant.LOG_TITLE_STORAGE, "Save " + ids.size() + " Lists IDs");
+    }
+
+    public SyncedListHeader getListHeader(String id) throws Exception {
+        String data = sharedPref.getString("HEADER_" + id, "");
+        if (data.equals("")) {
+            throw new Exception("Header not found");
+        }
+        return new SyncedListHeader(new JSONObject(data));
     }
 
     public void deleteList(String id) throws Exception {
-        ArrayList<SyncedListHeader> headers = getListsHeaders();
-        for (int i = 0; i < headers.size(); i++) {
-            if (headers.get(i).getId().equals(id)) {
-                headers.remove(i);
+        ArrayList<String> ids = getListsIds();
+        for (int i = 0; i < ids.size(); i++) {
+            if (ids.get(i).equals(id)) {
+                ids.remove(i);
                 break;
             }
         }
-        setListsHeaders(headers);
+        setListsIds(ids);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.remove("LIST_" + id);
+        editor.remove("HEADER_" + id);
         editor.apply();
     }
 
-    public String addList(SyncedList syncedList)
-            throws JSONException, IOException {
+    public String addList(SyncedList syncedList) throws Exception {
         String result = "";
         boolean newList = true;
-        ArrayList<SyncedListHeader> syncedListsHeaders = getListsHeaders();
-        for (int i = 0; i < syncedListsHeaders.size(); i++) {
-            SyncedListHeader header = syncedListsHeaders.get(i);
-            if (header.getId().equals(syncedList.getId())) {
-                syncedListsHeaders.set(i, syncedList.getHeader());
+        ArrayList<String> ids = getListsIds();
+        for (int i = 0; i < ids.size(); i++) {
+            String id = ids.get(i);
+            if (id.equals(syncedList.getId())) {
                 newList = false;
                 result =
                         context.getString(R.string.list_with_id_got_overridden);
@@ -153,11 +147,10 @@ public class SecureStorage {
             }
         }
         if (newList) {
-            syncedListsHeaders.add(syncedList.getHeader());
+            ids.add(syncedList.getId());
+            setListsIds(ids);
         }
-
-        setList(syncedList, false);
-        setListsHeaders(syncedListsHeaders);
+        setList(syncedList);
         return result;
     }
 }

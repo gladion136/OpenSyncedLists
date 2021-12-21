@@ -382,8 +382,7 @@ public class ListActivity extends AppCompatActivity {
                                                  .post(() -> syncedListAdapter
                                                          .notifyDataSetChanged());
                                          try {
-                                             secureStorage.setList(syncedList,
-                                                                   false);
+                                             secureStorage.setList(syncedList);
                                          } catch (IOException | JSONException e) {
                                              e.printStackTrace();
                                          }
@@ -406,7 +405,7 @@ public class ListActivity extends AppCompatActivity {
         }
 
         try {
-            secureStorage.setList(syncedList, false);
+            secureStorage.setList(syncedList);
         } catch (IOException | JSONException e) {
             Log.e(Constant.LOG_TITLE_DEFAULT,
                   "Local storage " + "write" + " error: " + e);

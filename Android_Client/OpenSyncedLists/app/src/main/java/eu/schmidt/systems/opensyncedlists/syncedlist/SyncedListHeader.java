@@ -21,6 +21,7 @@ public class SyncedListHeader {
     private String hostname;
     private byte[] secret;
     private SecretKey localSecret;
+    private String listSize;
 
     /**
      * Called when loading a list
@@ -36,8 +37,8 @@ public class SyncedListHeader {
         autoSync = jsonObject.getBoolean("autoSync");
         invertElement = jsonObject.getBoolean("invertElement");
         hostname = jsonObject.getString("hostname");
+        listSize = jsonObject.getString("listSize");
         secret = Cryptography.stringToByteArray(jsonObject.getString("secret"));
-
         byte[] encodedKey = Cryptography
                 .stringToByteArray(jsonObject.getString("localSecret"));
         localSecret =
@@ -66,6 +67,7 @@ public class SyncedListHeader {
         this.checkedList = true;
         this.invertElement = false;
         this.autoSync = true;
+        this.listSize = "0 / 0";
     }
 
     public void setId(String id) {
@@ -140,6 +142,14 @@ public class SyncedListHeader {
         this.invertElement = invertElement;
     }
 
+    public String getListSize() {
+        return listSize;
+    }
+
+    public void setListSize(String listSize) {
+        this.listSize = listSize;
+    }
+
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -150,6 +160,7 @@ public class SyncedListHeader {
             jsonObject.put("checkedList", checkedList);
             jsonObject.put("autoSync", autoSync);
             jsonObject.put("invertElement", invertElement);
+            jsonObject.put("listSize", listSize);
             jsonObject.put("secret", Cryptography.byteArrayToString(secret));
             jsonObject.put("localSecret", Cryptography
                     .byteArrayToString(localSecret.getEncoded()));
