@@ -48,6 +48,10 @@ public class AboutActivity extends AppCompatActivity
         tv.setText(Html.fromHtml(getString(R.string.text_about)));
         tv.setMovementMethod(LinkMovementMethod.getInstance());
         
+        TextView tvOthers = findViewById(R.id.tVOthers);
+        tvOthers.setText(Html.fromHtml(getString(R.string.text_about_others)));
+        tvOthers.setMovementMethod(LinkMovementMethod.getInstance());
+        
         TextView tvVersion = findViewById(R.id.tVVersion);
         tvVersion.setText("Version: " + BuildConfig.VERSION_NAME);
     }
