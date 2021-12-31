@@ -32,6 +32,8 @@
     <string name="pref_design_system">System</string>
     <string name="pref_design_light">Light</string>
     <string name="pref_design_dark">Dark</string>
+    <string name="pref_sync_interval">Sync interval</string>
+    <string name="pref_sync_interval_summary">Sync interval in Seconds</string>
     <string name="jump_range_title">Jump range</string>
     <string name="jump_range_description">So far jumps the elements after clicked on the \"Up\"/\"Down\" Buttons.</string>
     <string name="sync_title">Automatic synchronization</string>

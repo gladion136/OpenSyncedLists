@@ -66,4 +66,6 @@
     <string name="create_list_cancel">Cancel</string>
     <string name="no_name_entered">Please enter a name first.</string>
     <string name="cant_import_file">Can\'t import file!</string>
+    <string name="pref_sync_interval">Sync interval</string>
+    <string name="pref_sync_interval_summary">Sync interval in Seconds</string>
 </resources>

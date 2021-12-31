@@ -4,38 +4,47 @@
     <PreferenceCategory android:title="@string/general_header">
 
         <ListPreference
+            android:defaultValue="@string/pref_design_system"
             android:entries="@array/pref_design"
             android:entryValues="@array/pref_design"
-            android:defaultValue="@string/pref_design_system"
             android:key="design"
             android:title="@string/design_mode_title" />
 
         <ListPreference
+            android:defaultValue="1"
             android:entries="@array/pref_jump_range"
             android:entryValues="@array/pref_jump_range"
-            android:defaultValue="1"
-            android:summary="@string/jump_range_description"
             android:key="jump_range"
+            android:summary="@string/jump_range_description"
             android:title="@string/jump_range_title" />
 
         <SwitchPreferenceCompat
-            android:key="scrollList"
             android:defaultValue="false"
-            android:title="@string/scroll_list_title"
-            android:summary="@string/scroll_list_summary"/>
+            android:key="scrollList"
+            android:summary="@string/scroll_list_summary"
+            android:title="@string/scroll_list_title" />
 
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/sync_header">
 
         <SwitchPreferenceCompat
-            android:key="sync"
             android:defaultValue="true"
+            android:key="sync"
             android:title="@string/sync_title" />
 
         <EditTextPreference
             android:key="default_server"
-            android:title="@string/default_server_title"/>
+            android:title="@string/default_server_title" />
+
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/pref_sync_interval"
+            android:entryValues="@array/pref_sync_interval"
+            android:key="sync_interval"
+            android:summary="@string/pref_sync_interval_summary"
+            android:title="@string/pref_sync_interval" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -26,8 +26,8 @@
     <string name="title_checked_list">Abgehakte Elemente:</string>
     <string name="eT_new_element">Neues Element</string>
     <string name="list_element_isolator_tV">Abgehakte Elemente:</string>
-    <string name="share_before_name">Importiere die Liste "</string>
-    <string name="share_after_name">" in OpenSyncedLists mit dem folgendem Link:\n\n</string>
+    <string name="share_before_name">Importiere die Liste \"</string>
+    <string name="share_after_name">\" in OpenSyncedLists mit dem folgendem Link:\n\n</string>
     <string name="share_after_link">\n\nDu solltest den Link nicht im Browser öffnen, sondern mit der OpenSyncedLists App!</string>
 
     <!--     About               -->
@@ -90,4 +90,6 @@
     <string name="create_list_cancel">Abbrechen</string>
     <string name="no_name_entered">Bitte gib vorher einen Namen ein.</string>
     <string name="cant_import_file">Die Datei konnte nicht importiert werden!</string>
+    <string name="pref_sync_interval">Synchronisations interval</string>
+    <string name="pref_sync_interval_summary">Synchronisations interval in Sekunden</string>
 </resources>

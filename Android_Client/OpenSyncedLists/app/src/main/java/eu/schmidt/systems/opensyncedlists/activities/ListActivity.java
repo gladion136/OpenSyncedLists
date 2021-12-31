@@ -21,6 +21,7 @@ import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWOR
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -69,6 +71,7 @@ public class ListActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private EditText eTNewElement;
     private ImageView iVNewElementTop, iVNewElementBottom;
+    private SharedPreferences globalSharedPreferences;
     
     /**
      * In onCreate the layout is set and the global Variables are initialised.
@@ -105,6 +108,18 @@ public class ListActivity extends AppCompatActivity
     {
         init();
         super.onResume();
+    }
+    
+    /**
+     * In onPause the list get synced (if enabled)
+     */
+    @Override protected void onPause()
+    {
+        if (syncedList.getHeader().isAutoSync())
+        {
+            syncWithHost();
+        }
+        super.onPause();
     }
     
     /**
@@ -417,6 +432,10 @@ public class ListActivity extends AppCompatActivity
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
+        // Load global preferances
+        globalSharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        
         // Update ActionBar
         setTitle(syncedList.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -435,7 +454,10 @@ public class ListActivity extends AppCompatActivity
             autoSyncRunnable = () ->
             {
                 syncWithHost();
-                autoSyncHandler.postDelayed(autoSyncRunnable, 10000);
+                int sync_interval = Integer.parseInt(
+                    globalSharedPreferences.getString("sync_interval", "10"))
+                    * 1000;
+                autoSyncHandler.postDelayed(autoSyncRunnable, sync_interval);
             };
             autoSyncHandler.post(autoSyncRunnable);
         }
