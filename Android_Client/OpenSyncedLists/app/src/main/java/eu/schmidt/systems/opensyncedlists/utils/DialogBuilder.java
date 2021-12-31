@@ -17,7 +17,6 @@
 package eu.schmidt.systems.opensyncedlists.utils;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.text.InputType;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -27,8 +26,9 @@ import androidx.appcompat.app.AlertDialog;
 /**
  * DialogBuilder to easily create simple dialogs.
  */
-public class DialogBuilder {
-
+public class DialogBuilder
+{
+    
     /**
      * Create a simple text dialog
      *
@@ -39,30 +39,29 @@ public class DialogBuilder {
      * @param noOption  text of the no/cancel option
      * @param callback  handle callback
      */
-    public static void editTextDialog(Context context,
-                                      String title,
-                                      String message,
-                                      String yesOption,
-                                      String noOption,
-                                      Callback callback) {
+    public static void editTextDialog(Context context, String title,
+        String message, String yesOption, String noOption, Callback callback)
+    {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
         final EditText editText = new EditText(context);
-
+        
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
+        
         alert.setTitle(title);
         alert.setMessage(message);
         alert.setView(editText);
         alert.setPositiveButton(yesOption, (dialog, whichButton) -> callback
-                .callback(editText.getText().toString()));
-        alert.setNegativeButton(noOption, (dialog, whichButton) -> callback
-                .callback(null));
-
+            .callback(editText.getText().toString()));
+        alert.setNegativeButton(noOption,
+            (dialog, whichButton) -> callback.callback(null));
+        
         AlertDialog dialog = alert.create();
-
-        editText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+        
+        editText.setOnEditorActionListener((v, actionId, event) ->
+        {
+            if (actionId == EditorInfo.IME_ACTION_DONE)
+            {
                 callback.callback(editText.getText().toString());
                 dialog.cancel();
                 return true;
@@ -71,11 +70,12 @@ public class DialogBuilder {
         });
         dialog.show();
     }
-
+    
     /**
      * Simple Callback interface
      */
-    public interface Callback {
+    public interface Callback
+    {
         void callback(String result);
     }
 }

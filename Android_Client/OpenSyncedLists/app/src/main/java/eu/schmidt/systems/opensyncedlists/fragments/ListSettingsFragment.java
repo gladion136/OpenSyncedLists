@@ -46,11 +46,11 @@ import eu.schmidt.systems.opensyncedlists.utils.Constant;
 /**
  * Fragment to handle the view of one list settings
  */
-public class ListSettingsFragment extends PreferenceFragmentCompat {
-
+public class ListSettingsFragment extends PreferenceFragmentCompat
+{
     SyncedList syncedList;
     SecureStorage secureStorage;
-
+    
     /**
      * Pass the preference list to show.
      *
@@ -58,10 +58,11 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
      * @param rootKey            RootKey
      */
     @Override public void onCreatePreferences(Bundle savedInstanceState,
-                                              String rootKey) {
+        String rootKey)
+    {
         setPreferencesFromResource(R.xml.preferences_list, rootKey);
     }
-
+    
     /**
      * Initialize the fragment, add listeners, fill preferences with current
      * data.
@@ -72,44 +73,53 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
      * @return the View with content and listeners
      */
     @Override public View onCreateView(@NonNull LayoutInflater inflater,
-                                       @Nullable ViewGroup container,
-                                       @Nullable Bundle savedInstanceState) {
+        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
         // Init Storage and read current list
         secureStorage = new SecureStorage(getContext());
-        try {
+        try
+        {
             syncedList = secureStorage.getList(getArguments().getString("id"));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Log.e(Constant.LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
-
+        
         // Set listeners for preferences
         EditTextPreference editTextPreference = findPreference("list_name");
         Preference deleteBtn = findPreference("delete_btn");
         SwitchPreferenceCompat checkOptionPref = findPreference("check_option");
         SwitchPreferenceCompat checkListPref = findPreference("checked_list");
         SwitchPreferenceCompat invertElementPref =
-                findPreference("invert_element");
+            findPreference("invert_element");
         SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
         EditTextPreference serverNamePref = findPreference("server_name");
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
-
+        
         editTextPreference.setText(syncedList.getName());
         editTextPreference
-                .setOnPreferenceChangeListener((preference, newValue) -> {
-                    String newName = (String) newValue;
-                    if (!newName.equals("") &&
-                            !newName.equals(syncedList.getName())) {
-                        syncedList.setName(newName);
-                        save();
-                    }
-                    return true;
-                });
-
-        deleteBtn.setOnPreferenceClickListener(v -> {
-            try {
+            .setOnPreferenceChangeListener((preference, newValue) ->
+            {
+                String newName = (String) newValue;
+                if (!newName.equals("") && !newName
+                    .equals(syncedList.getName()))
+                {
+                    syncedList.setName(newName);
+                    save();
+                }
+                return true;
+            });
+        
+        deleteBtn.setOnPreferenceClickListener(v ->
+        {
+            try
+            {
                 secureStorage.deleteList(syncedList.getId());
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 exception.printStackTrace();
             }
             Intent intent = new Intent(getContext(), ListsActivity.class);
@@ -117,113 +127,129 @@ public class ListSettingsFragment extends PreferenceFragmentCompat {
             getActivity().finish();
             return true;
         });
-
+        
         checkOptionPref.setChecked(syncedList.getHeader().isCheckOption());
-        checkOptionPref
-                .setOnPreferenceChangeListener(((preference, newValue) -> {
-                    boolean newVal = (boolean) newValue;
-                    if (newVal != syncedList.getHeader().isCheckOption()) {
-                        syncedList.getHeader().setCheckOption(newVal);
-                        syncedList.getHeader().setCheckedList(newVal);
-                        checkListPref.setChecked(
-                                syncedList.getHeader().isCheckedList());
-                        syncedList.recalculateBuffers();
-                        save();
-                    }
-                    return true;
-                }));
-
-        checkListPref.setChecked(syncedList.getHeader().isCheckedList());
-        checkListPref.setOnPreferenceChangeListener(((preference, newValue) -> {
+        checkOptionPref.setOnPreferenceChangeListener(((preference, newValue) ->
+        {
             boolean newVal = (boolean) newValue;
-            if (newVal != syncedList.getHeader().isCheckedList()) {
+            if (newVal != syncedList.getHeader().isCheckOption())
+            {
+                syncedList.getHeader().setCheckOption(newVal);
+                syncedList.getHeader().setCheckedList(newVal);
+                checkListPref
+                    .setChecked(syncedList.getHeader().isCheckedList());
+                syncedList.recalculateBuffers();
+                save();
+            }
+            return true;
+        }));
+        
+        checkListPref.setChecked(syncedList.getHeader().isCheckedList());
+        checkListPref.setOnPreferenceChangeListener(((preference, newValue) ->
+        {
+            boolean newVal = (boolean) newValue;
+            if (newVal != syncedList.getHeader().isCheckedList())
+            {
                 syncedList.getHeader().setCheckedList(newVal);
                 syncedList.recalculateBuffers();
                 save();
             }
             return true;
         }));
-
+        
         invertElementPref.setChecked(syncedList.getHeader().isInvertElement());
         invertElementPref
-                .setOnPreferenceChangeListener(((preference, newValue) -> {
-                    boolean newVal = (boolean) newValue;
-                    if (newVal != syncedList.getHeader().isInvertElement()) {
-                        syncedList.getHeader().setInvertElement(newVal);
-                        save();
-                    }
-                    return true;
-                }));
-
+            .setOnPreferenceChangeListener(((preference, newValue) ->
+            {
+                boolean newVal = (boolean) newValue;
+                if (newVal != syncedList.getHeader().isInvertElement())
+                {
+                    syncedList.getHeader().setInvertElement(newVal);
+                    save();
+                }
+                return true;
+            }));
+        
         autoSyncPref.setChecked(syncedList.getHeader().isAutoSync());
-        autoSyncPref.setOnPreferenceChangeListener(((preference, newValue) -> {
+        autoSyncPref.setOnPreferenceChangeListener(((preference, newValue) ->
+        {
             boolean newVal = (boolean) newValue;
-            if (newVal != syncedList.getHeader().isAutoSync()) {
+            if (newVal != syncedList.getHeader().isAutoSync())
+            {
                 syncedList.getHeader().setAutoSync(newVal);
                 save();
             }
             return true;
         }));
-
+        
         serverNamePref.setText(syncedList.getHeader().getHostname());
-        serverNamePref
-                .setOnPreferenceChangeListener(((preference, newValue) -> {
-                    String newHost = (String) newValue;
-                    if (!newHost.equals(syncedList.getHeader().getHostname())) {
-                        syncedList.getHeader().setHostname(newHost);
-                        save();
-                    }
-                    return true;
-                }));
-
-        deleteOnlineBtn.setOnPreferenceClickListener(v -> {
+        serverNamePref.setOnPreferenceChangeListener(((preference, newValue) ->
+        {
+            String newHost = (String) newValue;
+            if (!newHost.equals(syncedList.getHeader().getHostname()))
+            {
+                syncedList.getHeader().setHostname(newHost);
+                save();
+            }
+            return true;
+        }));
+        
+        deleteOnlineBtn.setOnPreferenceClickListener(v ->
+        {
             ServerWrapper.removeList(syncedList.getHeader().getHostname(),
-                                     syncedList.getId(), syncedList.getSecret(),
-                                     (jsonResult, exceptionFromServer) -> {
-                                         if (jsonResult == null ||
-                                                 exceptionFromServer != null) {
-                                             if (exceptionFromServer instanceof ServerException) {
-                                                 Toast.makeText(getContext(),
-                                                                getString(
-                                                                        R.string.unexpected_error),
-                                                                Toast.LENGTH_LONG)
-                                                         .show();
-                                             } else {
-                                                 Toast.makeText(getContext(),
-                                                                getString(
-                                                                        R.string.no_connection),
-                                                                Toast.LENGTH_LONG)
-                                                         .show();
-                                             }
-                                         } else {
-                                             try {
-                                                 secureStorage.deleteList(
-                                                         syncedList.getId());
-                                             } catch (Exception exception) {
-                                                 exception.printStackTrace();
-                                             }
-                                             Intent intent =
-                                                     new Intent(getContext(),
-                                                                ListsActivity.class);
-                                             startActivity(intent);
-                                             getActivity().finish();
-                                         }
-                                     });
+                syncedList.getId(), syncedList.getSecret(),
+                (jsonResult, exceptionFromServer) ->
+                {
+                    if (jsonResult == null || exceptionFromServer != null)
+                    {
+                        if (exceptionFromServer instanceof ServerException)
+                        {
+                            Toast.makeText(getContext(),
+                                getString(R.string.unexpected_error),
+                                Toast.LENGTH_LONG).show();
+                        }
+                        else
+                        {
+                            Toast.makeText(getContext(),
+                                getString(R.string.no_connection),
+                                Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            secureStorage.deleteList(syncedList.getId());
+                        }
+                        catch (Exception exception)
+                        {
+                            exception.printStackTrace();
+                        }
+                        Intent intent =
+                            new Intent(getContext(), ListsActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+                });
             return true;
         });
-
+        
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-
+    
     /**
      * Save the list to storage and handle exceptions.
      */
-    private void save() {
-        try {
+    private void save()
+    {
+        try
+        {
             secureStorage.setList(syncedList);
-        } catch (IOException | JSONException e) {
+        }
+        catch (IOException | JSONException e)
+        {
             Log.e(Constant.LOG_TITLE_DEFAULT,
-                  "Local storage " + "write" + " error: " + e);
+                "Local storage " + "write" + " error: " + e);
             e.printStackTrace();
         }
     }

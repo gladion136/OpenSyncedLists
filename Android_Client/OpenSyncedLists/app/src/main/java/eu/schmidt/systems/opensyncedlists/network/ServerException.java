@@ -14,14 +14,15 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package eu.schmidt.systems.opensyncedlists.network;
 
 /**
  * Exception from the server. For example wrong hash.
  */
-public class ServerException extends Exception {
-    public ServerException(String message) {
+public class ServerException extends Exception
+{
+    public ServerException(String message)
+    {
         super(message);
     }
 }

@@ -14,12 +14,12 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package eu.schmidt.systems.opensyncedlists.syncedlist;
 
 /**
  * Possible Actions of a SyncedListStep
  */
-public enum ACTION {
+public enum ACTION
+{
     ADD, REMOVE, UPDATE, MOVE, SWAP, CLEAR
 }

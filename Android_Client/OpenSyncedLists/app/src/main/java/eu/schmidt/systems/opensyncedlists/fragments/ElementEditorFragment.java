@@ -36,43 +36,24 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 /**
  * Fragment to edit one element. Displayed as BottomSheetDialog
  */
-public class ElementEditorFragment extends BottomSheetDialogFragment {
+public class ElementEditorFragment extends BottomSheetDialogFragment
+{
     EditText eTName, eTDescription;
     Button btnApplyChanges, btnDelete;
-
-    /**
-     * Buffered Element
-     **/
+    /** Buffered Element */
     SyncedListElement syncedListElement;
-    /**
-     * Callback to add a SyncedListStep to the List
-     */
+    /** Callback to add a SyncedListStep to the List */
     Callback callback;
-
+    
     /**
-     * Fragments needs an empty constructor for creation from the android
-     * system via newInstance.
+     * Fragments needs an empty constructor for creation from the android system
+     * via newInstance.
      */
-    public ElementEditorFragment() {
-
+    public ElementEditorFragment()
+    {
+    
     }
-
-    /**
-     * Creates and initialize the Fragment
-     *
-     * @param syncedListElement buffered SyncedListElement
-     * @param callback          Callback to handle new SyncedListSteps
-     * @return initialized Fragment
-     */
-    public static ElementEditorFragment newInstance(SyncedListElement syncedListElement,
-                                                    Callback callback) {
-        ElementEditorFragment elementEditorFragment =
-                new ElementEditorFragment();
-        elementEditorFragment.syncedListElement = syncedListElement;
-        elementEditorFragment.callback = callback;
-        return elementEditorFragment;
-    }
-
+    
     /**
      * Inflate the fragment.
      *
@@ -82,12 +63,12 @@ public class ElementEditorFragment extends BottomSheetDialogFragment {
      * @return the View
      */
     @Override public View onCreateView(LayoutInflater inflater,
-                                       ViewGroup container,
-                                       Bundle savedInstanceState) {
+        ViewGroup container, Bundle savedInstanceState)
+    {
         return inflater
-                .inflate(R.layout.fragment_element_editor, container, false);
+            .inflate(R.layout.fragment_element_editor, container, false);
     }
-
+    
     /**
      * Fills the view with content and listeners.
      *
@@ -95,47 +76,66 @@ public class ElementEditorFragment extends BottomSheetDialogFragment {
      * @param savedInstanceState Just used for super call.
      */
     @Override public void onViewCreated(@NonNull View view,
-                                        @Nullable Bundle savedInstanceState) {
+        @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
         eTName = view.findViewById(R.id.eTName);
         eTDescription = view.findViewById(R.id.eTDescription);
         btnApplyChanges = view.findViewById(R.id.btnApplyChanges);
         btnDelete = view.findViewById(R.id.btnDelete);
-
+        
         eTName.setText(syncedListElement.getName());
         eTDescription.setText(syncedListElement.getDescription());
-
-        btnApplyChanges.setOnClickListener(v -> {
+        
+        btnApplyChanges.setOnClickListener(v ->
+        {
             String newName = eTName.getText().toString();
             String newDescription = eTDescription.getText().toString();
-            if (!newName.equals("") &&
-                    (!newName.equals(syncedListElement.getName()) ||
-                            !newDescription.equals(syncedListElement
-                                                           .getDescription()))) {
+            if (!newName.equals("") && (
+                !newName.equals(syncedListElement.getName()) || !newDescription
+                    .equals(syncedListElement.getDescription())))
+            {
                 SyncedListElement updated = syncedListElement.clone();
                 updated.setName(newName);
                 updated.setDescription(newDescription);
                 SyncedListStep newStep =
-                        new SyncedListStep(updated.getId(), ACTION.UPDATE,
-                                           updated);
+                    new SyncedListStep(updated.getId(), ACTION.UPDATE, updated);
                 callback.addNewStep(newStep);
                 dismiss();
             }
         });
-
-        btnDelete.setOnClickListener(v -> {
+        
+        btnDelete.setOnClickListener(v ->
+        {
             SyncedListStep newStep =
-                    new SyncedListStep(syncedListElement.getId(),
-                                       ACTION.REMOVE);
+                new SyncedListStep(syncedListElement.getId(), ACTION.REMOVE);
             callback.addNewStep(newStep);
             dismiss();
         });
     }
-
+    
+    /**
+     * Creates and initialize the Fragment
+     *
+     * @param syncedListElement buffered SyncedListElement
+     * @param callback          Callback to handle new SyncedListSteps
+     * @return initialized Fragment
+     */
+    public static ElementEditorFragment newInstance(
+        SyncedListElement syncedListElement, Callback callback)
+    {
+        ElementEditorFragment elementEditorFragment =
+            new ElementEditorFragment();
+        elementEditorFragment.syncedListElement = syncedListElement;
+        elementEditorFragment.callback = callback;
+        return elementEditorFragment;
+    }
+    
     /**
      * Interface to handle new SyncedListSteps.
      */
-    public interface Callback {
+    public interface Callback
+    {
         void addNewStep(SyncedListStep syncedListStep);
     }
 }

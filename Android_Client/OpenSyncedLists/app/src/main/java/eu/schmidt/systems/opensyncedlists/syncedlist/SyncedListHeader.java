@@ -28,7 +28,8 @@ import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
  * Header for a SyncedList, contains all information about a list (included
  * secrets)
  */
-public class SyncedListHeader {
+public class SyncedListHeader
+{
     private String id;
     private String name;
     private boolean checkOption;
@@ -39,14 +40,15 @@ public class SyncedListHeader {
     private byte[] secret;
     private SecretKey localSecret;
     private String listSize;
-
+    
     /**
      * Load a header from JSON.
      *
      * @param jsonObject header as JSON
      * @throws JSONException
      */
-    public SyncedListHeader(JSONObject jsonObject) throws JSONException {
+    public SyncedListHeader(JSONObject jsonObject) throws JSONException
+    {
         id = jsonObject.getString("id");
         name = jsonObject.getString("name");
         checkOption = jsonObject.getBoolean("checkOption");
@@ -56,12 +58,12 @@ public class SyncedListHeader {
         hostname = jsonObject.getString("hostname");
         listSize = jsonObject.getString("listSize");
         secret = Cryptography.stringToByteArray(jsonObject.getString("secret"));
-        byte[] encodedKey = Cryptography
-                .stringToByteArray(jsonObject.getString("localSecret"));
+        byte[] encodedKey =
+            Cryptography.stringToByteArray(jsonObject.getString("localSecret"));
         localSecret =
-                new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+            new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
     }
-
+    
     /**
      * Create a SyncedListHeader
      *
@@ -70,11 +72,9 @@ public class SyncedListHeader {
      * @param secret      access secret of the list
      * @param localSecret localSecret to encrypt the list
      */
-    public SyncedListHeader(String id,
-                            String name,
-                            String hostname,
-                            byte[] secret,
-                            SecretKey localSecret) {
+    public SyncedListHeader(String id, String name, String hostname,
+        byte[] secret, SecretKey localSecret)
+    {
         this.id = id;
         this.name = name;
         this.hostname = hostname;
@@ -86,95 +86,117 @@ public class SyncedListHeader {
         this.autoSync = true;
         this.listSize = "0 / 0";
     }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
+    
+    public String getId()
+    {
         return id;
     }
-
-    public String getName() {
+    
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+    
+    public String getName()
+    {
         return name;
     }
-
-    public void setName(String name) {
+    
+    public void setName(String name)
+    {
         this.name = name;
     }
-
-    public boolean isCheckOption() {
+    
+    public boolean isCheckOption()
+    {
         return checkOption;
     }
-
-    public void setCheckOption(boolean checkOption) {
+    
+    public void setCheckOption(boolean checkOption)
+    {
         this.checkOption = checkOption;
     }
-
-    public boolean isCheckedList() {
+    
+    public boolean isCheckedList()
+    {
         return checkedList;
     }
-
-    public void setCheckedList(boolean checkedList) {
+    
+    public void setCheckedList(boolean checkedList)
+    {
         this.checkedList = checkedList;
     }
-
-    public boolean isAutoSync() {
+    
+    public boolean isAutoSync()
+    {
         return autoSync;
     }
-
-    public void setAutoSync(boolean autoSync) {
+    
+    public void setAutoSync(boolean autoSync)
+    {
         this.autoSync = autoSync;
     }
-
-    public String getHostname() {
+    
+    public String getHostname()
+    {
         return hostname;
     }
-
-    public void setHostname(String hostname) {
+    
+    public void setHostname(String hostname)
+    {
         this.hostname = hostname;
     }
-
-    public byte[] getSecret() {
+    
+    public byte[] getSecret()
+    {
         return secret;
     }
-
-    public void setSecret(byte[] secret) {
+    
+    public void setSecret(byte[] secret)
+    {
         this.secret = secret;
     }
-
-    public SecretKey getLocalSecret() {
+    
+    public SecretKey getLocalSecret()
+    {
         return localSecret;
     }
-
-    public void setLocalSecret(SecretKey localSecret) {
+    
+    public void setLocalSecret(SecretKey localSecret)
+    {
         this.localSecret = localSecret;
     }
-
-    public boolean isInvertElement() {
+    
+    public boolean isInvertElement()
+    {
         return invertElement;
     }
-
-    public void setInvertElement(boolean invertElement) {
+    
+    public void setInvertElement(boolean invertElement)
+    {
         this.invertElement = invertElement;
     }
-
-    public String getListSize() {
+    
+    public String getListSize()
+    {
         return listSize;
     }
-
-    public void setListSize(String listSize) {
+    
+    public void setListSize(String listSize)
+    {
         this.listSize = listSize;
     }
-
+    
     /**
      * Get the SyncedListHeader as JSON
      *
      * @return SyncedListHeader as JSON
      */
-    public JSONObject toJSON() {
+    public JSONObject toJSON()
+    {
         JSONObject jsonObject = new JSONObject();
-        try {
+        try
+        {
             jsonObject.put("id", id);
             jsonObject.put("name", name);
             jsonObject.put("hostname", hostname);
@@ -184,9 +206,11 @@ public class SyncedListHeader {
             jsonObject.put("invertElement", invertElement);
             jsonObject.put("listSize", listSize);
             jsonObject.put("secret", Cryptography.byteArrayToString(secret));
-            jsonObject.put("localSecret", Cryptography
-                    .byteArrayToString(localSecret.getEncoded()));
-        } catch (JSONException exception) {
+            jsonObject.put("localSecret",
+                Cryptography.byteArrayToString(localSecret.getEncoded()));
+        }
+        catch (JSONException exception)
+        {
             exception.printStackTrace();
         }
         return jsonObject;

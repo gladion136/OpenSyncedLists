@@ -27,51 +27,64 @@ import androidx.preference.PreferenceManager;
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.fragments.SettingsFragment;
 
+/**
+ * Activity to handle global settings
+ */
 public class SettingsActivity extends AppCompatActivity
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
-
+    implements SharedPreferences.OnSharedPreferenceChangeListener
+{
+    
     /**
      * onCreate initialize the view, fragment and PreferenceManager.
      *
      * @param savedInstanceState
      */
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null)
+        {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.settings, new SettingsFragment()).commit();
+                .replace(R.id.settings, new SettingsFragment()).commit();
         }
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null)
+        {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
+            PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
     }
-
+    
     /**
      * onSharedPreferenceChanged use the changed preferences
      *
      * @param sharedPreferences SharedPreferences
      * @param key               Key of changed preference
      */
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                                          String key) {
-        if (key.equals("design")) {
+    @Override public void onSharedPreferenceChanged(
+        SharedPreferences sharedPreferences, String key)
+    {
+        if (key.equals("design"))
+        {
             if (sharedPreferences.getString("design", "")
-                    .equals(getString(R.string.pref_design_light))) {
+                .equals(getString(R.string.pref_design_light)))
+            {
                 AppCompatDelegate
-                        .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            } else if (sharedPreferences.getString("design", "")
-                    .equals(getString(R.string.pref_design_dark))) {
+                    .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+            else if (sharedPreferences.getString("design", "")
+                .equals(getString(R.string.pref_design_dark)))
+            {
                 AppCompatDelegate
-                        .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
+                    .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+            else
+            {
                 AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             }
         }
     }

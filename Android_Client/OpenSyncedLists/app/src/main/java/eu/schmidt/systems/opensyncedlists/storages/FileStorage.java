@@ -40,13 +40,12 @@ import eu.schmidt.systems.opensyncedlists.BuildConfig;
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 
-public class FileStorage {
-    /**
-     * File Provider Authority to allow access
-     */
+public class FileStorage
+{
+    /** File Provider Authority to allow access */
     public final static String FILE_PROVIDER_AUTHORITY =
-            BuildConfig.APPLICATION_ID + ".fileprovider";
-
+        BuildConfig.APPLICATION_ID + ".fileprovider";
+    
     /**
      * Export a list as JSON File
      *
@@ -54,23 +53,29 @@ public class FileStorage {
      * @param syncedList List to export
      * @return Filepath
      */
-    public static String exportList(Context context, SyncedList syncedList) {
+    public static String exportList(Context context, SyncedList syncedList)
+    {
         File file =
-                new File(context.getFilesDir(), syncedList.getName() + ".json");
-        try {
+            new File(context.getFilesDir(), syncedList.getName() + ".json");
+        try
+        {
             FileWriter fileWriter = new FileWriter(file, false);
             fileWriter.write(syncedList.toJsonWithHeader().toString());
             fileWriter.close();
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e)
+        {
             e.printStackTrace();
             Log.e(LOG_TITLE_STORAGE, "File not found.");
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
             e.printStackTrace();
         }
         return file.getAbsolutePath();
     }
-
+    
     /**
      * Export lists to JSON
      *
@@ -79,47 +84,58 @@ public class FileStorage {
      * @return Filepath
      */
     public static String exportLists(Context context,
-                                     ArrayList<SyncedList> syncedLists) {
+        ArrayList<SyncedList> syncedLists)
+    {
         File file = new File(context.getFilesDir(), "lists_export.json");
-        try {
+        try
+        {
             JSONArray jsonArray = new JSONArray();
-            for (SyncedList list : syncedLists) {
+            for (SyncedList list : syncedLists)
+            {
                 jsonArray.put(list.toJsonWithHeader());
             }
             FileWriter fileWriter = new FileWriter(file, false);
             fileWriter.write(jsonArray.toString());
             fileWriter.close();
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e)
+        {
             e.printStackTrace();
             Log.e(LOG_TITLE_STORAGE, "File not found.");
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
             e.printStackTrace();
         }
         return file.getAbsolutePath();
     }
-
+    
     /**
      * Share a File to another app.
      *
      * @param context     Context
      * @param absolutPath File to share
      */
-    public static void shareFile(Context context, String absolutPath) {
+    public static void shareFile(Context context, String absolutPath)
+    {
         Uri path = FileProvider.getUriForFile(context, FILE_PROVIDER_AUTHORITY,
-                                              new File(absolutPath));
+            new File(absolutPath));
         Intent i = new Intent(Intent.ACTION_SEND);
         i.putExtra(Intent.EXTRA_STREAM, path);
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         i.setType("plain/*");
-        try {
+        try
+        {
             context.startActivity(i);
-        } catch (ActivityNotFoundException exception) {
+        }
+        catch (ActivityNotFoundException exception)
+        {
             Log.e(LOG_TITLE_DEFAULT,
-                  "No activity found to receive " + "file: " + exception);
-            Toast.makeText(context, context.getString(
-                    R.string.no_app_for_intent_installed), Toast.LENGTH_SHORT)
-                    .show();
+                "No activity found to receive " + "file: " + exception);
+            Toast.makeText(context,
+                context.getString(R.string.no_app_for_intent_installed),
+                Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -28,25 +28,27 @@ import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 /**
  * ServerWrapper to handle requests.
  */
-public abstract class ServerWrapper {
-
+public abstract class ServerWrapper
+{
+    
     /**
      * Check connection to a server.
      *
      * @param callback Callback for Request
      */
     public static void checkConnection(String hostname,
-                                       RESTRequestTask.Callback callback) {
+        RESTRequestTask.Callback callback)
+    {
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", hostname);
         info.put("path", "/test");
         info.put("type", "GET");
-
+        
         Log.d(LOG_TITLE_NETWORK,
-              "Send Request: checkConnection to " + info.get("hostname"));
+            "Send Request: checkConnection to " + info.get("hostname"));
         new RESTRequestTask(callback).execute(info);
     }
-
+    
     /**
      * Get a syncedList from a server.
      *
@@ -55,24 +57,23 @@ public abstract class ServerWrapper {
      * @param secret   secret to access
      * @param callback Callback for Request
      */
-    public static void getList(String hostname,
-                               String id,
-                               String secret,
-                               RESTRequestTask.Callback callback) {
+    public static void getList(String hostname, String id, String secret,
+        RESTRequestTask.Callback callback)
+    {
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", hostname);
         info.put("path", "/list/get");
         info.put("type", "GET");
-
+        
         HashMap<String, String> query = new HashMap<>();
         query.put("id", id);
         query.put("secret", secret);
-
+        
         Log.d(LOG_TITLE_NETWORK,
-              "Send Request: getList to " + info.get("hostname"));
+            "Send Request: getList to " + info.get("hostname"));
         new RESTRequestTask(callback).execute(info, query);
     }
-
+    
     /**
      * Override a list on a server.
      *
@@ -80,30 +81,30 @@ public abstract class ServerWrapper {
      * @param basedOnHash List on server must match to this Hash
      * @param callback    Callback for Request
      */
-    public static void setList(SyncedList syncedList,
-                               String basedOnHash,
-                               RESTRequestTask.Callback callback) {
+    public static void setList(SyncedList syncedList, String basedOnHash,
+        RESTRequestTask.Callback callback)
+    {
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", syncedList.getHeader().getHostname());
         info.put("path", "/list/set");
         info.put("type", "POST");
-
+        
         HashMap<String, String> query = new HashMap<>();
         query.put("id", syncedList.getId());
         query.put("secret", syncedList.getSecret());
-
+        
         HashMap<String, String> data = new HashMap<>();
         String fullListEncrypted = syncedList.getFullListEncrypted();
         data.put("data", fullListEncrypted);
         data.put("hash", Cryptography.getSHAasString(fullListEncrypted));
         // Only success if basedOnHash equals hash inside database
         data.put("basedOnHash", basedOnHash);
-
+        
         Log.d(LOG_TITLE_NETWORK,
-              "Send Request: setList to " + info.get("hostname"));
+            "Send Request: setList to " + info.get("hostname"));
         new RESTRequestTask(callback).execute(info, query, data);
     }
-
+    
     /**
      * Remove a list from the server.
      *
@@ -112,24 +113,23 @@ public abstract class ServerWrapper {
      * @param secret   access secret from the list
      * @param callback Callback for Request
      */
-    public static void removeList(String hostname,
-                                  String id,
-                                  String secret,
-                                  RESTRequestTask.Callback callback) {
+    public static void removeList(String hostname, String id, String secret,
+        RESTRequestTask.Callback callback)
+    {
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", hostname);
         info.put("path", "/list/remove");
         info.put("type", "GET");
-
+        
         HashMap<String, String> query = new HashMap<>();
         query.put("id", id);
         query.put("secret", secret);
-
+        
         Log.d(LOG_TITLE_NETWORK,
-              "Send Request: removeList to " + info.get("hostname"));
+            "Send Request: removeList to " + info.get("hostname"));
         new RESTRequestTask(callback).execute(info, query);
     }
-
+    
     /**
      * Add a list to a server
      *
@@ -137,23 +137,24 @@ public abstract class ServerWrapper {
      * @param callback   Callback for Request
      */
     public static void addList(SyncedList syncedList,
-                               RESTRequestTask.Callback callback) {
+        RESTRequestTask.Callback callback)
+    {
         HashMap<String, String> info = new HashMap<>();
         info.put("hostname", syncedList.getHeader().getHostname());
         info.put("path", "/list/add");
         info.put("type", "POST");
-
+        
         HashMap<String, String> query = new HashMap<>();
         query.put("id", syncedList.getId());
         query.put("secret", syncedList.getSecret());
-
+        
         HashMap<String, String> data = new HashMap<>();
         String fullListEncrypted = syncedList.getFullListEncrypted();
         data.put("data", fullListEncrypted);
         data.put("hash", Cryptography.getSHAasString(fullListEncrypted));
-
+        
         Log.d(LOG_TITLE_NETWORK,
-              "Send Request: addList to " + info.get("hostname"));
+            "Send Request: addList to " + info.get("hostname"));
         new RESTRequestTask(callback).execute(info, query, data);
     }
 }

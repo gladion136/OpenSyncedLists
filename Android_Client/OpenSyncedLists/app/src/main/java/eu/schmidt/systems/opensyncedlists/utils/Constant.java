@@ -14,13 +14,13 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package eu.schmidt.systems.opensyncedlists.utils;
 
 /**
- * Constant that can used without context.
+ * Constants that can used without context.
  */
-public class Constant {
+public class Constant
+{
     public final static String LOG_TITLE_DEFAULT = "DefaultLog";
     public final static String LOG_TITLE_BUILDING = "BuildingLog";
     public final static String LOG_TITLE_STORAGE = "StorageLog";

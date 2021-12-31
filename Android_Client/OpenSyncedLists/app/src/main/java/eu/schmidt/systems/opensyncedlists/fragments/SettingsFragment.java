@@ -14,7 +14,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package eu.schmidt.systems.opensyncedlists.fragments;
 
 import android.os.Bundle;
@@ -26,16 +25,18 @@ import eu.schmidt.systems.opensyncedlists.R;
 /**
  * Fragment to handle global settings.
  */
-public class SettingsFragment extends PreferenceFragmentCompat {
-
+public class SettingsFragment extends PreferenceFragmentCompat
+{
+    
     /**
      * Pass the preference list to handle.
      *
      * @param savedInstanceState not used
      * @param rootKey            RootKey
      */
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+    @Override public void onCreatePreferences(Bundle savedInstanceState,
+        String rootKey)
+    {
         setPreferencesFromResource(R.xml.preferences_root, rootKey);
     }
 }

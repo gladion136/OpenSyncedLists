@@ -14,7 +14,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package eu.schmidt.systems.opensyncedlists.activities;
 
 import android.os.Bundle;
@@ -30,23 +29,25 @@ import eu.schmidt.systems.opensyncedlists.R;
 /**
  * Activity for showing things about the app like author, licence, version.
  */
-public class AboutActivity extends AppCompatActivity {
-
+public class AboutActivity extends AppCompatActivity
+{
+    
     /**
-     * In onCreate the layout is set and the associated textViews got
-     * filled with content.
+     * In onCreate the layout is set and the associated textViews got filled
+     * with content.
      *
      * @param savedInstanceState In this case just used for the super call.
      */
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         setTitle(getString(R.string.menu_about));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        TextView tv = (TextView) findViewById(R.id.tVAbout);
+        TextView tv = findViewById(R.id.tVAbout);
         tv.setText(Html.fromHtml(getString(R.string.text_about)));
         tv.setMovementMethod(LinkMovementMethod.getInstance());
-
+        
         TextView tvVersion = findViewById(R.id.tVVersion);
         tvVersion.setText("Version: " + BuildConfig.VERSION_NAME);
     }

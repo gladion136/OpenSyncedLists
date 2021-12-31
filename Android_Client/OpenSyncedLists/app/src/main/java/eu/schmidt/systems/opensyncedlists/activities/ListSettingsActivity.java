@@ -14,7 +14,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package eu.schmidt.systems.opensyncedlists.activities;
 
 import android.content.Intent;
@@ -31,52 +30,57 @@ import eu.schmidt.systems.opensyncedlists.fragments.ListSettingsFragment;
 /**
  * Activity to displaying settings for one SyncedList
  */
-public class ListSettingsActivity extends AppCompatActivity {
-
+public class ListSettingsActivity extends AppCompatActivity
+{
     ListSettingsFragment listSettingsFragment;
-
+    
     /**
-     * In onCreate the layout is set and the global Variables are
-     * initialised.
+     * In onCreate the layout is set and the global Variables are initialised.
      *
      * @param savedInstanceState If null the fragment will replaced.
      */
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
+        
         // Pass extras to fragment (list id)
         listSettingsFragment = new ListSettingsFragment();
         listSettingsFragment.setArguments(getIntent().getExtras());
-
-        if (savedInstanceState == null) {
+        
+        if (savedInstanceState == null)
+        {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.settings, listSettingsFragment).commit();
+                .replace(R.id.settings, listSettingsFragment).commit();
         }
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null)
+        {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
+    
     /**
      * onOptionsItemSelected handles the events from the ActionBar.
      *
      * @param item selected item
      * @return action handled?
      */
-    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
             onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
+    
     /**
      * onBackPressed show the selected list in listActivity
      */
-    @Override public void onBackPressed() {
+    @Override public void onBackPressed()
+    {
         Intent intent = new Intent(this, ListActivity.class);
         intent.putExtras(getIntent().getExtras());
         startActivity(intent);

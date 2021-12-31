@@ -35,11 +35,11 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 /**
  * ListView Adapter for ListsActivity.
  */
-public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
-
+public class ListsAdapter extends ArrayAdapter<SyncedListHeader>
+{
     final ArrayList<SyncedListHeader> syncedListsHeaders;
     final Context context;
-
+    
     /**
      * Adapter constructor
      *
@@ -47,22 +47,14 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
      * @param resource Resource
      * @param objects  List elements
      */
-    public ListsAdapter(@NonNull Context context,
-                        int resource,
-                        @NonNull ArrayList<SyncedListHeader> objects) {
+    public ListsAdapter(@NonNull Context context, int resource,
+        @NonNull ArrayList<SyncedListHeader> objects)
+    {
         super(context, resource, objects);
         syncedListsHeaders = objects;
         this.context = context;
     }
-
-    /**
-     * ViewHolder for one list element.
-     */
-    private static class ViewHolder {
-        TextView tVName;
-        TextView tVSize;
-    }
-
+    
     /**
      * getView for one element in list.
      *
@@ -71,41 +63,55 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader> {
      * @param parent      parent
      * @return convertView with content and listeners
      */
-    @Override public View getView(int position,
-                                  View convertView,
-                                  ViewGroup parent) {
+    @Override public View getView(int position, View convertView,
+        ViewGroup parent)
+    {
         SyncedListHeader header = syncedListsHeaders.get(position);
-
+        
         ViewHolder viewHolder;
-        if (convertView == null) {
+        if (convertView == null)
+        {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView =
-                    inflater.inflate(R.layout.element_lists, parent, false);
+                inflater.inflate(R.layout.element_lists, parent, false);
             viewHolder.tVName = convertView.findViewById(R.id.tVName);
             viewHolder.tVSize = convertView.findViewById(R.id.tVSize);
             convertView.setTag(viewHolder);
-        } else {
+        }
+        else
+        {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.tVName.setText(header.getName());
         viewHolder.tVSize.setText(header.getListSize());
-        convertView.setOnClickListener(v -> {
+        convertView.setOnClickListener(v ->
+        {
             Intent intent = new Intent(context, ListActivity.class);
             intent.putExtra("id", header.getId());
             context.startActivity(intent);
         });
         return convertView;
     }
-
+    
     /**
      * Update all list elements.
      *
      * @param listData updated elements
      */
-    public void updateItems(ArrayList<SyncedListHeader> listData) {
+    public void updateItems(ArrayList<SyncedListHeader> listData)
+    {
         this.syncedListsHeaders.clear();
         this.syncedListsHeaders.addAll(listData);
         this.notifyDataSetChanged();
+    }
+    
+    /**
+     * ViewHolder for one list element.
+     */
+    private static class ViewHolder
+    {
+        TextView tVName;
+        TextView tVSize;
     }
 }
