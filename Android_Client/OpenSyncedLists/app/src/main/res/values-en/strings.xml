@@ -22,7 +22,8 @@
     <string name="share_before_name">Import the list \"</string>
     <string name="share_after_name">\" to OpenSyncedLists with the following Link: \n\n</string>
     <string name="share_after_link">\n\n Please open the link with the OpenSyncedLists app.</string>
-    <string name="text_about">Created by Etienne Schmidt\n\nLicensed under <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
+    <string name="text_about">Created by Etienne Schmidt<![CDATA[<br/><br/>]]>
+        Webpage to this App: <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">on Schmidt-Systems.eu</a><br/><br/>]]>Licensed under <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
     <string name="title_activity_settings">Settings</string>
     <string name="general_header">General</string>
     <string name="sync_header">Synchronization</string>
@@ -68,4 +69,5 @@
     <string name="cant_import_file">Can\'t import file!</string>
     <string name="pref_sync_interval">Sync interval</string>
     <string name="pref_sync_interval_summary">Sync interval in Seconds</string>
+    <string name="text_about_others">Most assets are from <![CDATA[<div><a href="https://www.freepik.com" title="Freepik">Freepik</a> published on <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>]]> got used and changed.</string>
 </resources>
