@@ -67,8 +67,8 @@
     <string name="list_pref_sync_off">Deaktiviert</string>
     <string name="list_pref_checked_list_title">Liste für abgehakte Elemente</string>
     <string name="list_pref_checked_list_summary">Extra Liste für abgehakte Elemente am Ende der Liste</string>
-    <string name="list_pref_invert_element_title">Checkbox rechts</string>
-    <string name="list_pref_invert_element_summary">Checkbox rechts und Buttons links abbilden.</string>
+    <string name="list_pref_invert_element_title">Knöpfe links</string>
+    <string name="list_pref_invert_element_summary">Zeige die Knöpfe links und die CheckBox rechts an.</string>
 
     <string name="list_pref_delete_btn_title">Liste löschen</string>
     <string name="list_pref_delete_btn_summary">Achtung! Die Liste wird nur lokal gelöscht!</string>

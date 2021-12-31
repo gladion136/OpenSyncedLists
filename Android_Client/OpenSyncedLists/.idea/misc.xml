@@ -10,8 +10,8 @@
         <entry key="app/src/main/res/layout/activity_list.xml" value="0.35833333333333334" />
         <entry key="app/src/main/res/layout/activity_lists.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/element_list.xml" value="0.75" />
-        <entry key="app/src/main/res/layout/element_list_invert.xml" value="0.67" />
+        <entry key="app/src/main/res/layout/element_list.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/element_list_invert.xml" value="0.33" />
         <entry key="app/src/main/res/layout/element_lists.xml" value="0.5" />
         <entry key="app/src/main/res/layout/fragment_element_editor.xml" value="0.33" />
         <entry key="app/src/main/res/layout/list_element.xml" value="0.33" />
