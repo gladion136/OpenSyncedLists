@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
   ~
   ~     This program is free software: you can redistribute it and/or modify
@@ -17,24 +16,16 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/list_clear"
-        android:title="@string/menu_list_clear" />
-
-    <item android:id="@+id/export_md"
-        android:title="@string/menu_export_share_md" />
-
-    <item android:id="@+id/export_link"
-        android:title="@string/menu_export_share" />
-
-    <item android:id="@+id/export_list_json"
-        android:title="@string/menu_export_list_json" />
-
-    <item android:id="@+id/manual_sync"
-        android:title="@string/menu_manual_sync" />
-
-    <item android:id="@+id/list_settings"
-        android:title="@string/menu_list_settings" />
-
-    <item android:id="@+id/settings"
-        android:title="@string/menu_settings" />
+    <item
+        android:id="@+id/openInPlayStore"
+        android:title="@string/menu_open_in_playstore"/>
+    <item
+        android:id="@+id/contact_developer"
+        android:title="@string/menu_contact_developer"/>
+    <item
+        android:id="@+id/openWebpage"
+        android:title="@string/menu_open_webpage"/>
+    <item
+        android:id="@+id/showSourceCode"
+        android:title="@string/menu_show_source"/>
 </menu>

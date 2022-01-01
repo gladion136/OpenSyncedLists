@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/layout/activity_list.xml" value="0.35833333333333334" />
         <entry key="app/src/main/res/layout/activity_lists.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_settings.xml" value="0.35833333333333334" />
         <entry key="app/src/main/res/layout/element_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/element_list_invert.xml" value="0.33" />
         <entry key="app/src/main/res/layout/element_list_isolator.xml" value="0.67" />
@@ -20,6 +21,7 @@
         <entry key="app/src/main/res/layout/list_element_isolater.xml" value="0.35833333333333334" />
         <entry key="app/src/main/res/layout/lists_element.xml" value="0.22" />
         <entry key="app/src/main/res/layout/settings_activity.xml" value="0.17451874366767983" />
+        <entry key="app/src/main/res/menu/about_menu.xml" value="0.35833333333333334" />
         <entry key="app/src/main/res/menu/all_lists_menu.xml" value="0.3528205128205128" />
         <entry key="app/src/main/res/menu/one_list_menu.xml" value="0.3528205128205128" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.37447916666666664" />

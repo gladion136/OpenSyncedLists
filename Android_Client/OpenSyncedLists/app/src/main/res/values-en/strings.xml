@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <resources>
     <string name="apply_changes">Accept changes</string>
     <string name="delete">Delete</string>
@@ -22,8 +39,8 @@
     <string name="share_before_name">Import the list \"</string>
     <string name="share_after_name">\" to OpenSyncedLists with the following Link: \n\n</string>
     <string name="share_after_link">\n\n Please open the link with the OpenSyncedLists app.</string>
-    <string name="text_about">Created by Etienne Schmidt<![CDATA[<br/><br/>]]>
-        Webpage to this App: <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">on Schmidt-Systems.eu</a><br/><br/>]]>Licensed under <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
+    <string name="text_about">Created by Etienne Schmidt.<![CDATA[<br/><br/>]]>
+        Webpage to this App <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">on Schmidt-Systems.eu</a><br/><br/>]]>Licensed under <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
     <string name="title_activity_settings">Settings</string>
     <string name="general_header">General</string>
     <string name="sync_header">Synchronization</string>
@@ -69,5 +86,9 @@
     <string name="cant_import_file">Can\'t import file!</string>
     <string name="pref_sync_interval">Sync interval</string>
     <string name="pref_sync_interval_summary">Sync interval in Seconds</string>
-    <string name="text_about_others">Most assets are from <![CDATA[<div><a href="https://www.freepik.com" title="Freepik">Freepik</a> published on <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>]]> got used and changed.</string>
+    <string name="text_about_others">Icons made by <![CDATA[<div><a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>]]> got used and changed.</string>
+    <string name="menu_open_in_playstore">Open in PlayStore</string>
+    <string name="menu_contact_developer">Contact the developer</string>
+    <string name="menu_open_webpage">Open Webpage</string>
+    <string name="menu_show_source">Show Source Code</string>
 </resources>

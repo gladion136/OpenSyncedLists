@@ -1,3 +1,20 @@
+<!--
+  ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <resources>
     <!-- Change before publish!  -->
 
@@ -31,10 +48,10 @@
     <string name="share_after_link">\n\nDu solltest den Link nicht im Browser öffnen, sondern mit der OpenSyncedLists App!</string>
 
     <!--     About               -->
-    <string name="text_about">Enstanden während des Moduls \"Mobile
-        Systeme\" an der Technischen Hochschule Ostwestfalen-Lippe.<![CDATA[<br/><br/>]]>
+    <string name="text_about">Diese App ist im Rahmen des Moduls \"Mobile
+        Systeme\" an der Technischen Hochschule Ostwestfalen-Lippe entstanden.<![CDATA[<br/><br/>]]>
         Entwickelt von Etienne Schmidt.<![CDATA[<br/><br/>]]>
-        Webseite zur App: <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">auf Schmidt-Systems.eu</a><br/><br/>]]>
+        Webseite zur App <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">auf Schmidt-Systems.eu</a><br/><br/>]]>
         Lizensiert unter <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
 
     <string name="text_about_others">Es wurden Icons von <![CDATA[<a href="https://www.freepik.com" title="Freepik">Freepik</a>, veröffentlicht auf <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>]]>, verwendet und editiert.</string>
@@ -94,4 +111,8 @@
     <string name="cant_import_file">Die Datei konnte nicht importiert werden!</string>
     <string name="pref_sync_interval">Synchronisations interval</string>
     <string name="pref_sync_interval_summary">Synchronisations interval in Sekunden</string>
+    <string name="menu_open_in_playstore">Im PlayStore öffnen</string>
+    <string name="menu_contact_developer">Entwickler kontaktieren</string>
+    <string name="menu_open_webpage">Webseite öffnen</string>
+    <string name="menu_show_source">Quellcode anzeigen</string>
 </resources>
