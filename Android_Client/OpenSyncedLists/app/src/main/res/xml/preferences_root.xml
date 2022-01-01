@@ -36,7 +36,7 @@
             android:title="@string/jump_range_title" />
 
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="scrollList"
             android:summary="@string/scroll_list_summary"
             android:title="@string/scroll_list_title" />
