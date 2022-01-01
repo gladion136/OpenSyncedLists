@@ -22,9 +22,25 @@
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:text="@string/edit_element_title"
             android:textSize="26sp" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            android:textColor="?attr/colorOnPrimary"
+            app:backgroundTint="@color/design_default_color_error" />
+
+        <Button
+            android:id="@+id/btnApplyChanges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/apply_changes"
+            android:textColor="?attr/colorOnPrimary"
+            app:backgroundTint="@color/design_default_color_primary" />
 
         <EditText
             android:id="@+id/eTName"
@@ -35,31 +51,28 @@
             android:inputType="text"
             android:minHeight="48dp" />
 
-        <EditText
-            android:id="@+id/eTDescription"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="start|top"
-            android:hint="@string/edit_element_description"
-            android:inputType="textMultiLine"
-            android:minHeight="48dp" />
+            android:layout_marginBottom="5dp">
 
-        <Button
-            android:id="@+id/btnApplyChanges"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/apply_changes"
-            android:textColor="?attr/colorOnPrimary"
-            app:backgroundTint="@color/design_default_color_primary" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/delete"
-            android:textColor="?attr/colorOnPrimary"
-            app:backgroundTint="@color/design_default_color_error" />
+                <EditText
+                    android:id="@+id/eTDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:hint="@string/edit_element_description"
+                    android:inputType="textMultiLine"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+        </ScrollView>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
