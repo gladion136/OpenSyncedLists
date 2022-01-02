@@ -65,7 +65,7 @@
     <string name="list_pref_sync_on">Enabled</string>
     <string name="list_pref_sync_off">Disabled</string>
     <string name="list_pref_checked_list_title">List for checked elements</string>
-    <string name="list_pref_checked_list_summary">Extra list for checked elements on buttom.</string>
+    <string name="list_pref_checked_list_summary">Extra list for checked elements on bottom.</string>
     <string name="list_pref_invert_element_title">Buttons left</string>
     <string name="list_pref_invert_element_summary">Display the buttons left and the checkbox right</string>
     <string name="list_pref_delete_btn_title">Delete list</string>
