@@ -1,0 +1,10 @@
+Create easy to sort lists and synchronize it with your own server.
+
+Features:
+- Easily manage, create, edit and share lists
+- Easy sorting of list items (through 5 movement options)
+- Collaboration between multiple devices through fast and automatic synchronization
+- Share lists via URL
+- Export lists as Markdown, Clipboard, Message, JSON and more
+- Different servers for synchronization per list is possible
+- Server can/must be self-hosted (we don't collect data!)

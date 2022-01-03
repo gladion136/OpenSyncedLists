@@ -1,0 +1,3 @@
+- Design improvments
+- Update about page (add links)
+- Redesign edit element screen

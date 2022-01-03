@@ -1,0 +1,2 @@
+- Syncinterval setting
+- Design improvments

@@ -1,0 +1,4 @@
+- Performance improments
+- Design improvements
+- Add translations de+en
+- Add version code to about page
