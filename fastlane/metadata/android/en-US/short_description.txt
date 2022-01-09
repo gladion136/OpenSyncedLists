@@ -1,1 +1,1 @@
-App to create easily to sort lists
+Create easy to sort lists
