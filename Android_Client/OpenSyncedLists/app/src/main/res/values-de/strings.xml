@@ -109,8 +109,8 @@
     <string name="create_list_cancel">Abbrechen</string>
     <string name="no_name_entered">Bitte gib vorher einen Namen ein.</string>
     <string name="cant_import_file">Die Datei konnte nicht importiert werden!</string>
-    <string name="pref_sync_interval">Synchronisations interval</string>
-    <string name="pref_sync_interval_summary">Synchronisations interval in Sekunden</string>
+    <string name="pref_sync_interval">Synchronisations intervall</string>
+    <string name="pref_sync_interval_summary">Synchronisations intervall in Sekunden</string>
     <string name="menu_open_in_playstore">Im PlayStore öffnen</string>
     <string name="menu_contact_developer">Entwickler kontaktieren</string>
     <string name="menu_open_webpage">Webseite öffnen</string>
