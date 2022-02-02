@@ -99,15 +99,7 @@ public class ListActivity extends AppCompatActivity
         iVNewElementTop.setOnClickListener(v -> createNewElement(true));
         iVNewElementBottom.setOnClickListener(v -> createNewElement(false));
         secureStorage = new SecureStorage(this);
-    }
-    
-    /**
-     * In onResume the init function is called.
-     */
-    @Override protected void onResume()
-    {
         init();
-        super.onResume();
     }
     
     /**
@@ -524,9 +516,10 @@ public class ListActivity extends AppCompatActivity
                     Log.d(LOG_TITLE_NETWORK, "Finish sync!");
                     // Sync successfull written to server,
                     // so sync again and apply changes.
-                    if(syncedList.sync(synchronizedList)) {
-                        this.recyclerView
-                            .post(() -> syncedListAdapter.notifyDataSetChanged());
+                    if (syncedList.sync(synchronizedList))
+                    {
+                        this.recyclerView.post(
+                            () -> syncedListAdapter.notifyDataSetChanged());
                     }
                     try
                     {

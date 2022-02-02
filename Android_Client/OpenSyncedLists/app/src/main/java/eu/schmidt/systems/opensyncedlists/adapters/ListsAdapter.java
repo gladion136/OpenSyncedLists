@@ -16,82 +16,147 @@
  */
 package eu.schmidt.systems.opensyncedlists.adapters;
 
-import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
+import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
+import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
 /**
  * ListView Adapter for ListsActivity.
  */
-public class ListsAdapter extends ArrayAdapter<SyncedListHeader>
+public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     final ArrayList<SyncedListHeader> syncedListsHeaders;
-    final Context context;
+    final ListsActivity listsActivity;
     
-    /**
-     * Adapter constructor
-     *
-     * @param context  Context
-     * @param resource Resource
-     * @param objects  List elements
-     */
-    public ListsAdapter(@NonNull Context context, int resource,
-        @NonNull ArrayList<SyncedListHeader> objects)
+    public ListsAdapter(ListsActivity listsActivity,
+        ArrayList<SyncedListHeader> syncedListsHeaders,
+        RecyclerView recyclerView)
     {
-        super(context, resource, objects);
-        syncedListsHeaders = objects;
-        this.context = context;
+        this.listsActivity = listsActivity;
+        this.syncedListsHeaders = syncedListsHeaders;
+        LayoutInflater.from(listsActivity);
+        
+        // Add ItemTouchHelper for drag and drop events
+        ItemTouchHelper itemTouchHelper =
+            new ItemTouchHelper(new ItemTouchHelper.Callback()
+            {
+                @Override public int getMovementFlags(RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder)
+                {
+                    return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                        ItemTouchHelper.DOWN | ItemTouchHelper.UP);
+                }
+                
+                public boolean onMove(RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder,
+                    RecyclerView.ViewHolder target)
+                {
+                    SecureStorage secureStorage =
+                        new SecureStorage(listsActivity);
+                    int fromPosition = viewHolder.getAdapterPosition();
+                    int toPosition = target.getAdapterPosition();
+                    try
+                    {
+                        
+                        ArrayList<String> ids = secureStorage.getListsIds();
+                        if (fromPosition < toPosition)
+                        {
+                            for (int i = fromPosition; i < toPosition; i++)
+                            {
+                                Collections.swap(ids, i, i + 1);
+                            }
+                        }
+                        else
+                        {
+                            for (int i = fromPosition; i > toPosition; i--)
+                            {
+                                Collections.swap(ids, i, i - 1);
+                            }
+                        }
+                        secureStorage.setListsIds(ids);
+                        notifyItemMoved(fromPosition, toPosition);
+                        return true;
+                    }
+                    catch (Exception exception)
+                    {
+                        exception.printStackTrace();
+                    }
+                    return false;
+                }
+                
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder,
+                    int direction)
+                {
+                    Log.d(Constant.LOG_TITLE_DEFAULT, "SWIPED: " + direction);
+                }
+            });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
     
-    /**
-     * getView for one element in list.
-     *
-     * @param position    current position
-     * @param convertView convertView
-     * @param parent      parent
-     * @return convertView with content and listeners
-     */
-    @Override public View getView(int position, View convertView,
-        ViewGroup parent)
+    @NonNull @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+        int viewType)
     {
-        SyncedListHeader header = syncedListsHeaders.get(position);
-        
-        ViewHolder viewHolder;
-        if (convertView == null)
+        RecyclerView.ViewHolder viewHolder;
+        switch (viewType)
         {
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView =
-                inflater.inflate(R.layout.element_lists, parent, false);
-            viewHolder.tVName = convertView.findViewById(R.id.tVName);
-            viewHolder.tVSize = convertView.findViewById(R.id.tVSize);
-            convertView.setTag(viewHolder);
+            case R.layout.element_lists:
+                View view = LayoutInflater.from(parent.getContext())
+                    .inflate(viewType, parent, false);
+                viewHolder = new ViewHolder(view);
+                break;
+            default:
+                throw new IllegalStateException(
+                    "Unexpected value: " + viewType);
         }
-        else
+        return viewHolder;
+    }
+    
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,
+        int position)
+    {
+        if (holder instanceof ViewHolder)
         {
-            viewHolder = (ViewHolder) convertView.getTag();
+            SyncedListHeader header = syncedListsHeaders.get(position);
+            ListsAdapter.ViewHolder viewHolder = (ViewHolder) holder;
+            viewHolder.tVName.setText(header.getName());
+            viewHolder.tVSize.setText(header.getListSize());
+            viewHolder.view.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(listsActivity, ListActivity.class);
+                intent.putExtra("id", header.getId());
+                listsActivity.startActivity(intent);
+            });
         }
-        viewHolder.tVName.setText(header.getName());
-        viewHolder.tVSize.setText(header.getListSize());
-        convertView.setOnClickListener(v ->
-        {
-            Intent intent = new Intent(context, ListActivity.class);
-            intent.putExtra("id", header.getId());
-            context.startActivity(intent);
-        });
-        return convertView;
+    }
+    
+    @Override public int getItemViewType(int position)
+    {
+        return R.layout.element_lists;
+    }
+    
+    @Override public int getItemCount()
+    {
+        return syncedListsHeaders.size();
     }
     
     /**
@@ -99,19 +164,34 @@ public class ListsAdapter extends ArrayAdapter<SyncedListHeader>
      *
      * @param listData updated elements
      */
-    public void updateItems(ArrayList<SyncedListHeader> listData)
+    public void updateItems(ArrayList<SyncedListHeader> listData,
+        boolean notify)
     {
         this.syncedListsHeaders.clear();
         this.syncedListsHeaders.addAll(listData);
-        this.notifyDataSetChanged();
+        Log.d(Constant.LOG_TITLE_DEFAULT,
+            "Update Elements: " + syncedListsHeaders.size());
+        if (notify)
+        {
+            this.notifyDataSetChanged();
+        }
     }
     
     /**
      * ViewHolder for one list element.
      */
-    private static class ViewHolder
+    public static class ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView tVName;
-        TextView tVSize;
+        public final View view;
+        public final TextView tVName;
+        public final TextView tVSize;
+        
+        public ViewHolder(@NonNull View itemView)
+        {
+            super(itemView);
+            view = itemView;
+            tVName = itemView.findViewById(R.id.tVName);
+            tVSize = itemView.findViewById(R.id.tVSize);
+        }
     }
 }

@@ -36,7 +36,7 @@
         app:srcCompat="@drawable/add"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lVLists"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -45,5 +45,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" >
 
-    </ListView>
+    </androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>

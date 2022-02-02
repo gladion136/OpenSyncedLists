@@ -202,7 +202,7 @@ public class SyncedListAdapter
             {
                 elementViewHolder.checkBox.setVisibility(View.GONE);
             }
-            if(!syncedList.getHeader().isJumpButtons())
+            if (!syncedList.getHeader().isJumpButtons())
             {
                 elementViewHolder.layoutJumpButtons.setVisibility(View.GONE);
             }

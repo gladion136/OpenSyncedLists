@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,6 +35,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -75,7 +76,7 @@ public class ListsActivity extends AppCompatActivity
     private SecureStorage secureStorage;
     private ArrayList<SyncedListHeader> syncedListsHeaders;
     private FloatingActionButton fab;
-    private ListView lVLists;
+    private RecyclerView recyclerView;
     private ListsAdapter listsAdapter;
     
     /**
@@ -87,7 +88,7 @@ public class ListsActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists);
-        lVLists = findViewById(R.id.lVLists);
+        recyclerView = findViewById(R.id.lVLists);
         fab = findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(v -> showCreateListDialog());
         secureStorage = new SecureStorage(this);
@@ -101,6 +102,7 @@ public class ListsActivity extends AppCompatActivity
                     importFile(importFile);
                 }
             });
+        init();
     }
     
     /**
@@ -142,15 +144,6 @@ public class ListsActivity extends AppCompatActivity
             }
         }
         super.onNewIntent(intent);
-    }
-    
-    /**
-     * In onResume the init function is called.
-     */
-    @Override protected void onResume()
-    {
-        init();
-        super.onResume();
     }
     
     /**
@@ -270,23 +263,23 @@ public class ListsActivity extends AppCompatActivity
                                 Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        SyncedListHeader header = new SyncedListHeader(getUniqueListId(), result,
-                            globalSharedPreferences
-                                .getString("default_server", ""),
-                            Cryptography.stringToByteArray(
-                                Cryptography.generatingRandomString(50)),
-                            Cryptography.generateAESKey());
+                        SyncedListHeader header =
+                            new SyncedListHeader(getUniqueListId(), result,
+                                globalSharedPreferences
+                                    .getString("default_server", ""),
+                                Cryptography.stringToByteArray(
+                                    Cryptography.generatingRandomString(50)),
+                                Cryptography.generateAESKey());
                         header.setCheckOption(globalSharedPreferences
-                            .getBoolean("check_option",true));
+                            .getBoolean("check_option", true));
                         header.setCheckedList(globalSharedPreferences
-                            .getBoolean("checked_list",true));
+                            .getBoolean("checked_list", true));
                         header.setJumpButtons(globalSharedPreferences
-                            .getBoolean("jump_buttons",false));
+                            .getBoolean("jump_buttons", false));
                         header.setInvertElement(globalSharedPreferences
-                            .getBoolean("invert_element",false));
-                        SyncedList newList = new SyncedList(
-                            header,
-                            new ArrayList<>());
+                            .getBoolean("invert_element", false));
+                        SyncedList newList =
+                            new SyncedList(header, new ArrayList<>());
                         addListAndHandleCallback(newList);
                     }
                 });
@@ -359,7 +352,7 @@ public class ListsActivity extends AppCompatActivity
                 Toast.makeText(this, result, Toast.LENGTH_LONG).show();
             }
             syncedListsHeaders = secureStorage.getListsHeaders();
-            listsAdapter.updateItems(syncedListsHeaders);
+            listsAdapter.updateItems(syncedListsHeaders, true);
         }
         catch (Exception exception)
         {
@@ -382,9 +375,12 @@ public class ListsActivity extends AppCompatActivity
             Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
-        listsAdapter = new ListsAdapter(this, R.layout.element_lists,
-            (ArrayList<SyncedListHeader>) syncedListsHeaders.clone());
-        lVLists.setAdapter(listsAdapter);
+        
+        listsAdapter = new ListsAdapter(this,
+            (ArrayList<SyncedListHeader>) syncedListsHeaders.clone(),
+            recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(listsAdapter);
         
         // Read and use preferences
         globalSharedPreferences =
