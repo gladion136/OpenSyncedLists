@@ -515,12 +515,16 @@ public class SyncedList
      * Synchronize the list.
      *
      * @param syncedList list to sync with.
+     * @return true if changes happen
      */
-    public void sync(SyncedList syncedList)
+    public boolean sync(SyncedList syncedList)
     {
         SyncedList newList = SyncedList.sync(this, syncedList);
+        boolean changes =
+            !toJSON().toString().equals(newList.toJSON().toString());
         syncedListHeader = newList.getHeader();
         setElementSteps(newList.getElementSteps());
+        return changes;
     }
     
     /**

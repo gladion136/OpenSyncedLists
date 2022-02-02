@@ -524,9 +524,10 @@ public class ListActivity extends AppCompatActivity
                     Log.d(LOG_TITLE_NETWORK, "Finish sync!");
                     // Sync successfull written to server,
                     // so sync again and apply changes.
-                    syncedList.sync(synchronizedList);
-                    this.recyclerView
-                        .post(() -> syncedListAdapter.notifyDataSetChanged());
+                    if(syncedList.sync(synchronizedList)) {
+                        this.recyclerView
+                            .post(() -> syncedListAdapter.notifyDataSetChanged());
+                    }
                     try
                     {
                         secureStorage.setList(syncedList);
