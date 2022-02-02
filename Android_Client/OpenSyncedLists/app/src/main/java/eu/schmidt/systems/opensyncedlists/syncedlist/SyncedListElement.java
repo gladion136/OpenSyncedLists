@@ -144,10 +144,17 @@ public class SyncedListElement
      *
      * @return SyncedListElement as Markdown
      */
-    public String getAsMarkdown()
+    public String getAsMarkdown(boolean isCheckedList)
     {
         String result = "";
-        result += checked ? "[x]" : "[ ]";
+        if (isCheckedList)
+        {
+            result += checked ? "- [x]" : "- [ ]";
+        }
+        else
+        {
+            result += "-";
+        }
         result += " " + getName();
         if (!getDescription().equals(""))
         {

@@ -431,19 +431,19 @@ public class SyncedList
         {
             for (SyncedListElement element : uncheckedElementsBuffer)
             {
-                list.append("\n").append(element.getAsMarkdown());
+                list.append("\n").append(element.getAsMarkdown(getHeader().isCheckedList()));
             }
             
             for (SyncedListElement element : checkedElementsBuffer)
             {
-                list.append("\n").append(element.getAsMarkdown());
+                list.append("\n").append(element.getAsMarkdown(getHeader().isCheckedList()));
             }
         }
         else
         {
             for (SyncedListElement element : elementsBuffer)
             {
-                list.append("\n").append(element.getAsMarkdown());
+                list.append("\n").append(element.getAsMarkdown(getHeader().isCheckedList()));
             }
         }
         return list.toString();
