@@ -117,4 +117,6 @@
     <string name="menu_show_source">Quellcode anzeigen</string>
     <string name="defaults_list">Standard Listen Einstellungen</string>
     <string name="defaults_list_summary">Wird beim erstellen einer neuen Liste übernommen</string>
+    <string name="list_pref_jump_buttons_title">Sprungknöpfe</string>
+    <string name="list_pref_jump_buttons_summary">Zeige Sprungknöpfe an, die Reichweite kann in den globalen Einstellungen angepasst werden.</string>
 </resources>

@@ -93,4 +93,6 @@
     <string name="menu_show_source">Show Source Code</string>
     <string name="defaults_list">Default list settings</string>
     <string name="defaults_list_summary">Will be applied when creating a new list</string>
+    <string name="list_pref_jump_buttons_title">Jump Buttons</string>
+    <string name="list_pref_jump_buttons_summary">Display jump buttons, set range in global settings</string>
 </resources>
