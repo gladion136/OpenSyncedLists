@@ -45,6 +45,18 @@
 
     <PreferenceCategory android:title="@string/sync_header">
 
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/pref_sync_interval"
+            android:entryValues="@array/pref_sync_interval"
+            android:key="sync_interval"
+            android:summary="@string/pref_sync_interval_summary"
+            android:title="@string/pref_sync_interval" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/defaults_list" android:summary="@string/defaults_list_summary">
+
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="sync"
@@ -54,13 +66,23 @@
             android:key="default_server"
             android:title="@string/default_server_title" />
 
-        <ListPreference
-            android:defaultValue="5"
-            android:entries="@array/pref_sync_interval"
-            android:entryValues="@array/pref_sync_interval"
-            android:key="sync_interval"
-            android:summary="@string/pref_sync_interval_summary"
-            android:title="@string/pref_sync_interval" />
+        <SwitchPreferenceCompat
+            android:key="check_option"
+            android:title="@string/list_pref_check_option_title"
+            android:defaultValue="true"/>
+
+        <SwitchPreferenceCompat
+            android:key="checked_list"
+            android:title="@string/list_pref_checked_list_title"
+            android:summary="@string/list_pref_checked_list_summary"
+            android:dependency="check_option"
+            android:defaultValue="true"/>
+
+        <SwitchPreferenceCompat
+            android:key="invert_element"
+            android:title="@string/list_pref_invert_element_title"
+            android:summary="@string/list_pref_invert_element_summary"
+            android:defaultValue="false"/>
 
     </PreferenceCategory>
 

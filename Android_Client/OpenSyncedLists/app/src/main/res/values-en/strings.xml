@@ -91,4 +91,6 @@
     <string name="menu_contact_developer">Contact the developer</string>
     <string name="menu_open_webpage">Open Webpage</string>
     <string name="menu_show_source">Show Source Code</string>
+    <string name="defaults_list">Default list settings</string>
+    <string name="defaults_list_summary">Will be applied when creating a new list</string>
 </resources>

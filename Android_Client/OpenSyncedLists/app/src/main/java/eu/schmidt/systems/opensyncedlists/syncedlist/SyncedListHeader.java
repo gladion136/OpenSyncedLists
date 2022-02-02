@@ -119,7 +119,7 @@ public class SyncedListHeader
     
     public boolean isCheckedList()
     {
-        return checkedList;
+        return checkOption ? checkedList : false;
     }
     
     public void setCheckedList(boolean checkedList)

@@ -41,7 +41,6 @@
             android:key="invert_element"
             android:title="@string/list_pref_invert_element_title"
             android:summary="@string/list_pref_invert_element_summary"
-            android:dependency="check_option"
             android:persistent="false" />
 
         <Preference

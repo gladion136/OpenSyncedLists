@@ -115,4 +115,6 @@
     <string name="menu_contact_developer">Entwickler kontaktieren</string>
     <string name="menu_open_webpage">Webseite öffnen</string>
     <string name="menu_show_source">Quellcode anzeigen</string>
+    <string name="defaults_list">Standard Listen Einstellungen</string>
+    <string name="defaults_list_summary">Wird beim erstellen einer neuen Liste übernommen</string>
 </resources>

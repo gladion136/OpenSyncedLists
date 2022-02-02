@@ -97,4 +97,6 @@
     <string name="dev_mail_subject" translatable="false">OpenSyncedLists: </string>
     <string name="app_webpage" translatable="false">https://schmidt-systems.eu/docs/opensyncedlists</string>
     <string name="sourcecode_webpage" translatable="false">https://gitlab.com/gladion136/opensyncedlists</string>
+    <string name="defaults_list">Default list settings</string>
+    <string name="defaults_list_summary">Will be applied when creating a new list</string>
 </resources>

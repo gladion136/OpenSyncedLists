@@ -270,13 +270,20 @@ public class ListsActivity extends AppCompatActivity
                                 Toast.LENGTH_SHORT).show();
                             return;
                         }
+                        SyncedListHeader header = new SyncedListHeader(getUniqueListId(), result,
+                            globalSharedPreferences
+                                .getString("default_server", ""),
+                            Cryptography.stringToByteArray(
+                                Cryptography.generatingRandomString(50)),
+                            Cryptography.generateAESKey());
+                        header.setCheckOption(globalSharedPreferences
+                            .getBoolean("check_option",true));
+                        header.setCheckedList(globalSharedPreferences
+                            .getBoolean("checked_list",true));
+                        header.setInvertElement(globalSharedPreferences
+                            .getBoolean("invert_element",false));
                         SyncedList newList = new SyncedList(
-                            new SyncedListHeader(getUniqueListId(), result,
-                                globalSharedPreferences
-                                    .getString("default_server", ""),
-                                Cryptography.stringToByteArray(
-                                    Cryptography.generatingRandomString(50)),
-                                Cryptography.generateAESKey()),
+                            header,
                             new ArrayList<>());
                         addListAndHandleCallback(newList);
                     }
