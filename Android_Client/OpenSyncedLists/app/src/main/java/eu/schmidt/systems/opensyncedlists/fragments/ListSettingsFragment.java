@@ -95,6 +95,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         SwitchPreferenceCompat invertElementPref =
             findPreference("invert_element");
         SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
+        SwitchPreferenceCompat jumpButtons = findPreference("jump_buttons");
         EditTextPreference serverNamePref = findPreference("server_name");
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
         
@@ -177,6 +178,17 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
             if (newVal != syncedList.getHeader().isAutoSync())
             {
                 syncedList.getHeader().setAutoSync(newVal);
+                save();
+            }
+            return true;
+        }));
+    
+        jumpButtons.setChecked(syncedList.getHeader().isJumpButtons());
+        jumpButtons.setOnPreferenceChangeListener(((preference, newValue) -> {
+            boolean newVal = (boolean) newValue;
+            if (newVal != syncedList.getHeader().isJumpButtons())
+            {
+                syncedList.getHeader().setJumpButtons(newVal);
                 save();
             }
             return true;

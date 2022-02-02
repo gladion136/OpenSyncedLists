@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -200,6 +201,10 @@ public class SyncedListAdapter
             if (!syncedList.getHeader().isCheckOption())
             {
                 elementViewHolder.checkBox.setVisibility(View.GONE);
+            }
+            if(!syncedList.getHeader().isJumpButtons())
+            {
+                elementViewHolder.layoutJumpButtons.setVisibility(View.GONE);
             }
             
             // name edittext
@@ -498,6 +503,7 @@ public class SyncedListAdapter
         public final EditText eTName;
         public final TextView tVDescription;
         public final ImageView iVBtnUp, iVBtnDown, iVTop, iVBottom;
+        public final ConstraintLayout layoutJumpButtons;
         
         public ElementViewHolder(View view)
         {
@@ -509,6 +515,7 @@ public class SyncedListAdapter
             iVBtnDown = view.findViewById(R.id.btnJumpDown);
             iVTop = view.findViewById(R.id.btnJumpTop);
             iVBottom = view.findViewById(R.id.btnJumpBottom);
+            layoutJumpButtons = view.findViewById(R.id.layoutJumpButtons);
         }
     }
     

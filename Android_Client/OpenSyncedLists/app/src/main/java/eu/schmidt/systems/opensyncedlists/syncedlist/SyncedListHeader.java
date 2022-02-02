@@ -36,6 +36,7 @@ public class SyncedListHeader
     private boolean checkedList;
     private boolean autoSync;
     private boolean invertElement;
+    private boolean jumpButtons;
     private String hostname;
     private byte[] secret;
     private SecretKey localSecret;
@@ -57,6 +58,14 @@ public class SyncedListHeader
         invertElement = jsonObject.getBoolean("invertElement");
         hostname = jsonObject.getString("hostname");
         listSize = jsonObject.getString("listSize");
+        if (jsonObject.has("jumpButtons"))
+        {
+            jumpButtons = jsonObject.getBoolean("jumpButtons");
+        }
+        else
+        {
+            jumpButtons = true;
+        }
         secret = Cryptography.stringToByteArray(jsonObject.getString("secret"));
         byte[] encodedKey =
             Cryptography.stringToByteArray(jsonObject.getString("localSecret"));
@@ -115,6 +124,16 @@ public class SyncedListHeader
     public void setCheckOption(boolean checkOption)
     {
         this.checkOption = checkOption;
+    }
+    
+    public boolean isJumpButtons()
+    {
+        return jumpButtons;
+    }
+    
+    public void setJumpButtons(boolean jumpButtons)
+    {
+        this.jumpButtons = jumpButtons;
     }
     
     public boolean isCheckedList()
@@ -205,6 +224,7 @@ public class SyncedListHeader
             jsonObject.put("autoSync", autoSync);
             jsonObject.put("invertElement", invertElement);
             jsonObject.put("listSize", listSize);
+            jsonObject.put("jumpButtons", jumpButtons);
             jsonObject.put("secret", Cryptography.byteArrayToString(secret));
             jsonObject.put("localSecret",
                 Cryptography.byteArrayToString(localSecret.getEncoded()));

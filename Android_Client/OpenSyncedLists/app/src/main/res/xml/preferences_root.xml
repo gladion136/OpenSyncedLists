@@ -79,6 +79,12 @@
             android:defaultValue="true"/>
 
         <SwitchPreferenceCompat
+            android:key="jump_buttons"
+            android:title="@string/list_pref_jump_buttons_title"
+            android:summary="@string/list_pref_jump_buttons_summary"
+            android:defaultValue="true" />
+
+        <SwitchPreferenceCompat
             android:key="invert_element"
             android:title="@string/list_pref_invert_element_title"
             android:summary="@string/list_pref_invert_element_summary"

@@ -280,6 +280,8 @@ public class ListsActivity extends AppCompatActivity
                             .getBoolean("check_option",true));
                         header.setCheckedList(globalSharedPreferences
                             .getBoolean("checked_list",true));
+                        header.setJumpButtons(globalSharedPreferences
+                            .getBoolean("jump_buttons",false));
                         header.setInvertElement(globalSharedPreferences
                             .getBoolean("invert_element",false));
                         SyncedList newList = new SyncedList(
