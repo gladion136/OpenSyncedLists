@@ -55,7 +55,7 @@
     <string name="jump_range_title">Jump range</string>
     <string name="jump_range_description">So far jumps the elements after clicked on the \"Up\"/\"Down\" Buttons.</string>
     <string name="sync_title">Automatic synchronization</string>
-    <string name="default_server_title">Default server</string>
+    <string name="default_server_title">Server hostname with protocol</string>
     <string name="list_settings_title">List settings</string>
     <string name="list_pref_sync_summary">List settings don\'t get synced</string>
     <string name="list_pref_check_option_title">Checkbox for each element</string>

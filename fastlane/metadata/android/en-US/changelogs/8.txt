@@ -1,5 +1,5 @@
 - new feature: default list settings
-- new feature: disable jump buttons option
+- new feature: disable jump buttons
 - new feature: sort lists
 - fix: drag and drop while sync
 - update: german translation

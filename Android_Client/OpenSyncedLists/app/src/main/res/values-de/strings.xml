@@ -71,14 +71,14 @@
 
     <!-- Sync Preferences -->
     <string name="sync_title">Synchronisere Listen automatisch</string>
-    <string name="default_server_title">Standard Server</string>
+    <string name="default_server_title">Server Hostname mit Protocoll</string>
 
     <!-- Listen Einstellungen  -->
     <string name="list_settings_title">Listen Einstellungen</string>
     <string name="list_pref_sync_summary">Listen Einstellungen werden nicht synchronisiert!</string>
     <string name="list_pref_check_option_title">Haken für jedes Element</string>
     <string name="list_pref_name_title">Listen Name</string>
-    <string name="list_pref_server_name">Server Hostname</string>
+    <string name="list_pref_server_name">Server Hostname mit Protocoll</string>
     <string name="list_pref_sync_title">Automatische Synchronisation</string>
     <string name="list_pref_sync_on">Aktiviert</string>
     <string name="list_pref_sync_off">Deaktiviert</string>

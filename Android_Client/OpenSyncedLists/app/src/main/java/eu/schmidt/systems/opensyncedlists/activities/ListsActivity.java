@@ -146,6 +146,21 @@ public class ListsActivity extends AppCompatActivity
         super.onNewIntent(intent);
     }
     
+    @Override protected void onResume()
+    {
+        try
+        {
+            syncedListsHeaders = secureStorage.getListsHeaders();
+        }
+        catch (Exception e)
+        {
+            Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
+            e.printStackTrace();
+        }
+        listsAdapter.updateItems(syncedListsHeaders, true);
+        super.onResume();
+    }
+    
     /**
      * In onCreateOptionsMenu the menu from the ActionBar is inflated.
      *
