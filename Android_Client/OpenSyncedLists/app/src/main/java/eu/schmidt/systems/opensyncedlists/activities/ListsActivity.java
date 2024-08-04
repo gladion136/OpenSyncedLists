@@ -121,29 +121,38 @@ public class ListsActivity extends AppCompatActivity
         }
         else if (intent.getData() != null)
         {
-            // Started to open a link (import list via link)
-            Uri uri = intent.getData();
-            String id = uri.getQueryParameter("id");
-            String secret = uri.getQueryParameter("secret");
-            String localSecret = uri.getQueryParameter("localSecret");
-            String hostname = uri.getScheme() + "://" + uri.getAuthority();
-            Log.d(LOG_TITLE_DEFAULT,
-                "Import list via link from host: " + hostname);
-            if (id != null && secret != null && localSecret != null
-                && hostname != null)
-            {
-                byte[] encodedLocalSecret =
-                    Cryptography.stringToByteArray(localSecret);
-                SecretKey secretKey = new SecretKeySpec(encodedLocalSecret, 0,
-                    encodedLocalSecret.length, "AES");
-                importListFromHost(hostname, id, secret, secretKey);
-            }
-            else
-            {
-                Log.e(LOG_TITLE_DEFAULT, "Wrong query parameters");
-            }
+            importListFromUrl(intent.getData());
         }
         super.onNewIntent(intent);
+    }
+    
+    /**
+     * Import list from url
+     *
+     * @param url url to import
+     */
+    private void importListFromUrl(Uri url)
+    {
+        // Started to open a link (import list via link)
+        String id = url.getQueryParameter("id");
+        String secret = url.getQueryParameter("secret");
+        String localSecret = url.getQueryParameter("localSecret");
+        String hostname = url.getScheme() + "://" + url.getAuthority();
+        Log.d(LOG_TITLE_DEFAULT,
+            "Import list via link from host: " + hostname);
+        if (id != null && secret != null && localSecret != null
+            && hostname != null)
+        {
+            byte[] encodedLocalSecret =
+                Cryptography.stringToByteArray(localSecret);
+            SecretKey secretKey = new SecretKeySpec(encodedLocalSecret, 0,
+                encodedLocalSecret.length, "AES");
+            importListFromHost(hostname, id, secret, secretKey);
+        }
+        else
+        {
+            Log.e(LOG_TITLE_DEFAULT, "Wrong query parameters");
+        }
     }
     
     @Override protected void onResume()
@@ -197,6 +206,10 @@ public class ListsActivity extends AppCompatActivity
                     getString(R.string.choose_file_to_import));
                 onImportLauncher.launch(intent);
                 return true;
+            case R.id.import_lists_url:
+                // Import list from url
+                importListFromUrlDialog();
+                return true;
             case R.id.export_lists:
                 // Export all lists to json file
                 ArrayList<SyncedList> syncedLists = new ArrayList<>();
@@ -230,6 +243,22 @@ public class ListsActivity extends AppCompatActivity
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    private void importListFromUrlDialog()
+    {
+        DialogBuilder
+            .editTextDialog(this, getString(R.string.import_list_url_title),
+                getString(R.string.import_list_url_msg),
+                getString(R.string.import_list_url_yes),
+                getString(R.string.import_list_url_cancel), result ->
+                {
+                    if (result != null)
+                    {
+                        Uri url = Uri.parse(result);
+                        importListFromUrl(url);
+                    }
+                });
     }
     
     /**

@@ -95,4 +95,9 @@
     <string name="defaults_list_summary">Will be applied when creating a new list</string>
     <string name="list_pref_jump_buttons_title">Jump Buttons</string>
     <string name="list_pref_jump_buttons_summary">Display jump buttons, set range in global settings</string>
+    <string name="menu_import_url">Import list per link</string>
+    <string name="import_list_url_title">Import list</string>
+    <string name="import_list_url_msg">Import a list via link.</string>
+    <string name="import_list_url_yes">Ok</string>
+    <string name="import_list_url_cancel">Cancel</string>
 </resources>

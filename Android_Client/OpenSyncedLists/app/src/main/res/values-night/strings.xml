@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2024  Etienne Schmidt (eschmidt@schmidt-ti.eu)
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU General Public License as published by
@@ -16,17 +15,5 @@
   ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/new_list"
-        android:title="@string/menu_new_list" />
-    <item android:id="@+id/import_lists"
-        android:title="@string/menu_import" />
-    <item android:id="@+id/export_lists"
-        android:title="@string/menu_export"/>
-    <item android:id="@+id/import_lists_url"
-        android:title="@string/menu_import_url" />
-    <item android:id="@+id/settings"
-        android:title="@string/menu_settings" />
-    <item android:id="@+id/about"
-        android:title="@string/menu_about" />
-</menu>
+<resources>
+</resources>

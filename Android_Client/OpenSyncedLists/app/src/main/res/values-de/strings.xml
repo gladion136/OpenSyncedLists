@@ -119,4 +119,9 @@
     <string name="defaults_list_summary">Wird beim erstellen einer neuen Liste übernommen</string>
     <string name="list_pref_jump_buttons_title">Sprungknöpfe</string>
     <string name="list_pref_jump_buttons_summary">Zeige Sprungknöpfe an, die Reichweite kann in den globalen Einstellungen angepasst werden.</string>
+    <string name="menu_import_url">Liste aus Link importieren</string>
+    <string name="import_list_url_title">Liste importieren</string>
+    <string name="import_list_url_msg">Importiere eine List aus einem Link.</string>
+    <string name="import_list_url_yes">Ok</string>
+    <string name="import_list_url_cancel">Abbrechen</string>
 </resources>
