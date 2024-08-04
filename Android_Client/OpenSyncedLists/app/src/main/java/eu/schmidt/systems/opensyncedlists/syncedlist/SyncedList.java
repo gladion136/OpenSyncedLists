@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
@@ -118,6 +119,7 @@ public class SyncedList
                     result.add(currentStep.getChangeValueElement());
                     break;
                 case UPDATE:
+                    boolean success = false;
                     SyncedListElement changeElement =
                         currentStep.getChangeValueElement();
                     for (int x = 0; x < result.size(); x++)
@@ -126,8 +128,13 @@ public class SyncedList
                             .equals(currentStep.getChangeId()))
                         {
                             result.set(x, changeElement);
+                            success = true;
                             break;
                         }
+                    }
+                    if (!success)
+                    {
+                        result.add(changeElement);
                     }
                     break;
                 case SWAP:
@@ -330,6 +337,7 @@ public class SyncedList
             this.elementSteps.clear();
         }
         this.elementSteps.add(elementStep);
+        optimize();
         recalculateBuffers();
     }
     
@@ -431,19 +439,22 @@ public class SyncedList
         {
             for (SyncedListElement element : uncheckedElementsBuffer)
             {
-                list.append("\n").append(element.getAsMarkdown(getHeader().isCheckedList()));
+                list.append("\n")
+                    .append(element.getAsMarkdown(getHeader().isCheckedList()));
             }
             
             for (SyncedListElement element : checkedElementsBuffer)
             {
-                list.append("\n").append(element.getAsMarkdown(getHeader().isCheckedList()));
+                list.append("\n")
+                    .append(element.getAsMarkdown(getHeader().isCheckedList()));
             }
         }
         else
         {
             for (SyncedListElement element : elementsBuffer)
             {
-                list.append("\n").append(element.getAsMarkdown(getHeader().isCheckedList()));
+                list.append("\n")
+                    .append(element.getAsMarkdown(getHeader().isCheckedList()));
             }
         }
         return list.toString();
@@ -524,7 +535,91 @@ public class SyncedList
             !toJSON().toString().equals(newList.toJSON().toString());
         syncedListHeader = newList.getHeader();
         setElementSteps(newList.getElementSteps());
+        
         return changes;
+    }
+    
+    public void optimize()
+    {
+        int stepsBeforeOptimization = elementSteps.size();
+        // Step 1: Remove redundant swaps
+        for (int i = 0; i < elementSteps.size() - 1; i++)
+        {
+            SyncedListStep step = elementSteps.get(i);
+            if (step.getChangeAction() == ACTION.SWAP)
+            {
+                for (int j = i + 1; j < elementSteps.size(); j++)
+                {
+                    SyncedListStep nextStep = elementSteps.get(j);
+                    // Check if the next step swaps back the same elements
+                    if (nextStep.getChangeAction() == ACTION.SWAP
+                        && step.getChangeId()
+                        .equals(nextStep.getChangeValueString())
+                        && step.getChangeValueString()
+                        .equals(nextStep.getChangeId()))
+                    {
+                        // Remove both swap steps
+                        elementSteps.remove(j);
+                        elementSteps.remove(i);
+                        i--; // Adjust the index after removal
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Step 2: Optimize consecutive moves
+        HashMap<String, Integer> finalPositions = new HashMap<>();
+        for (int i = elementSteps.size() - 1; i >= 0; i--)
+        {
+            SyncedListStep step = elementSteps.get(i);
+            if (step.getChangeAction() == ACTION.MOVE)
+            {
+                if (finalPositions.containsKey(step.getChangeId()))
+                {
+                    // If a final position is already recorded, remove this
+                    // step as it's redundant
+                    elementSteps.remove(i);
+                }
+                else
+                {
+                    // Record the final position for this element
+                    finalPositions.put(step.getChangeId(),
+                        step.getChangeValueInt());
+                }
+            }
+        }
+        
+        // If an element is added and removed only the remove is needed
+        for (int i = 0; i < elementSteps.size(); i++)
+        {
+            SyncedListStep step = elementSteps.get(i);
+            if (step.getChangeAction() == ACTION.ADD)
+            {
+                for (int j = i + 1; j < elementSteps.size(); j++)
+                {
+                    SyncedListStep nextStep = elementSteps.get(j);
+                    if (nextStep.getChangeAction() == ACTION.REMOVE
+                        && step.getChangeId().equals(nextStep.getChangeId()))
+                    {
+                        elementSteps.remove(i);
+                        i--; // Adjust the index after removal
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (elementSteps.size() != stepsBeforeOptimization)
+        {
+            Log.d(Constant.LOG_TITLE_BUILDING,
+                "Optimized " + (stepsBeforeOptimization - elementSteps.size())
+                    + " steps");
+        }
+        else
+        {
+            Log.d(Constant.LOG_TITLE_BUILDING, "No optimization needed");
+        }
     }
     
     /**
