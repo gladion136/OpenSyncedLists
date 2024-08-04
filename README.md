@@ -19,6 +19,6 @@ You can download and install the apk from the repo:
 ## Install Express-Server
 
 The express server is easy to setup inside docker container. Move to "Express_Server" and just run:
-'''
+´´´
 sudo docker-compose up -d
-'''
+´´´
