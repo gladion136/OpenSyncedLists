@@ -108,8 +108,8 @@ public class SyncedListAdapter
                         SyncedListElement displacedElement =
                             getElementOnPosition(target.getAdapterPosition());
                         if (syncedList.getHeader().isCheckedList()
-                            && selectedElement.getChecked() != displacedElement
-                            .getChecked())
+                            && selectedElement.getChecked()
+                            != displacedElement.getChecked())
                         {
                             return false;
                         }
@@ -186,10 +186,8 @@ public class SyncedListAdapter
     @Override public void onBindViewHolder(RecyclerView.ViewHolder viewHolder,
         final int position)
     {
-        if (viewHolder instanceof ElementViewHolder)
+        if (viewHolder instanceof ElementViewHolder elementViewHolder)
         {
-            ElementViewHolder elementViewHolder =
-                (ElementViewHolder) viewHolder;
             // remove old listeners (because of recycling old views)
             elementViewHolder.checkBox.setOnCheckedChangeListener(null);
             elementViewHolder.eTName.setOnFocusChangeListener(null);
@@ -216,18 +214,18 @@ public class SyncedListAdapter
                         currentSyncedListElement);
                 }
             });
-            elementViewHolder.eTName
-                .setText(currentSyncedListElement.getName());
-            elementViewHolder.eTName
-                .setOnEditorActionListener((v, actionId, event) ->
+            elementViewHolder.eTName.setText(
+                currentSyncedListElement.getName());
+            elementViewHolder.eTName.setOnEditorActionListener(
+                (v, actionId, event) ->
                 {
                     if (actionId == EditorInfo.IME_ACTION_DONE)
                     {
                         checkNameChangesAndSubmit(elementViewHolder,
                             currentSyncedListElement);
                         InputMethodManager imm =
-                            (InputMethodManager) listActivity
-                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                            (InputMethodManager) listActivity.getSystemService(
+                                Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(
                             listActivity.getCurrentFocus().getWindowToken(), 0);
                         
@@ -235,15 +233,15 @@ public class SyncedListAdapter
                     }
                     return false;
                 });
-            elementViewHolder.tVDescription
-                .setText(currentSyncedListElement.getDescription());
+            elementViewHolder.tVDescription.setText(
+                currentSyncedListElement.getDescription());
             
             // Checkbox
-            elementViewHolder.checkBox
-                .setChecked(currentSyncedListElement.getChecked());
+            elementViewHolder.checkBox.setChecked(
+                currentSyncedListElement.getChecked());
             // on checked
-            elementViewHolder.checkBox
-                .setOnCheckedChangeListener((v, checked) ->
+            elementViewHolder.checkBox.setOnCheckedChangeListener(
+                (v, checked) ->
                 {
                     SyncedListElement updated =
                         currentSyncedListElement.clone();
@@ -345,8 +343,8 @@ public class SyncedListAdapter
             getElementOnPosition(itemPosition);
         BottomSheetDialogFragment bottomSheetDialogFragment =
             new ElementEditorFragment().newInstance(syncedListElement,
-                syncedListStep -> listActivity
-                    .addElementStepAndSave(syncedListStep, true));
+                syncedListStep -> listActivity.addElementStepAndSave(
+                    syncedListStep, true));
         bottomSheetDialogFragment.show(listActivity.getSupportFragmentManager(),
             bottomSheetDialogFragment.getTag());
     }

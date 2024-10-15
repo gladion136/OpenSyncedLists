@@ -138,7 +138,7 @@ public class SyncedListHeader
     
     public boolean isCheckedList()
     {
-        return checkOption ? checkedList : false;
+        return checkOption && checkedList;
     }
     
     public void setCheckedList(boolean checkedList)

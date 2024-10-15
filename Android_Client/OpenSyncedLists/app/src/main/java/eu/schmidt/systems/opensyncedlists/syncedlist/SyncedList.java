@@ -24,7 +24,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
@@ -110,6 +109,7 @@ public class SyncedList
         Log.d(Constant.LOG_TITLE_BUILDING,
             "Build list with " + this.elementSteps.size() + " Steps");
         ArrayList<SyncedListElement> result = new ArrayList<>();
+        
         for (int i = 0; i < this.elementSteps.size(); i++)
         {
             SyncedListStep currentStep = this.elementSteps.get(i);
@@ -118,6 +118,7 @@ public class SyncedList
                 case ADD:
                     result.add(currentStep.getChangeValueElement());
                     break;
+                
                 case UPDATE:
                     boolean success = false;
                     SyncedListElement changeElement =
@@ -137,6 +138,7 @@ public class SyncedList
                         result.add(changeElement);
                     }
                     break;
+                
                 case SWAP:
                     for (int x = 0; x < result.size(); x++)
                     {
@@ -164,20 +166,17 @@ public class SyncedList
                         }
                     }
                     break;
-                case REMOVE:
-                    for (int x = 0; x < result.size(); x++)
-                    {
-                        if (result.get(x).getId()
-                            .equals(currentStep.getChangeId()))
-                        {
-                            result.remove(x);
-                            break;
-                        }
-                    }
-                    break;
+                
                 case MOVE:
                     int srcIndex = -1;
-                    int dstIndex;
+                    int dstIndex = currentStep.getChangeValueInt();
+                    
+                    if (dstIndex >= result.size())
+                    {
+                        Log.e(Constant.LOG_TITLE_BUILDING,
+                            "Invalid destination index: " + dstIndex);
+                        break;
+                    }
                     
                     for (int x = 0; x < result.size(); x++)
                     {
@@ -188,18 +187,45 @@ public class SyncedList
                             break;
                         }
                     }
-                    if (srcIndex != -1)
+                    
+                    if (srcIndex != -1 && srcIndex != dstIndex)
                     {
-                        dstIndex = currentStep.getChangeValueInt();
                         moveItem(srcIndex, dstIndex, result);
                     }
                     break;
+                
+                case REMOVE:
+                    boolean removed = false;
+                    int removedIndex = -1;
+                    
+                    // Remove the element and record its index
+                    for (int x = 0; x < result.size(); x++)
+                    {
+                        if (result.get(x).getId()
+                            .equals(currentStep.getChangeId()))
+                        {
+                            removedIndex = x;
+                            result.remove(x);
+                            removed = true;
+                            // Break as we have found and removed the element
+                            break;
+                        }
+                    }
+                    
+                    if (!removed)
+                    {
+                        Log.e(Constant.LOG_TITLE_BUILDING,
+                            "Attempted to remove non-existent element");
+                    }
+                    break;
+                
                 case CLEAR:
                     result.clear();
                     break;
+                
                 default:
                     Log.e(Constant.LOG_TITLE_BUILDING,
-                        "Cant found step action");
+                        "Can't find step action");
             }
         }
         
@@ -350,13 +376,26 @@ public class SyncedList
     public static <T> void moveItem(int sourceIndex, int targetIndex,
         List<T> list)
     {
+        // Ensure indices are within bounds
+        if (sourceIndex < 0 || sourceIndex >= list.size() || targetIndex < 0
+            || targetIndex >= list.size())
+        {
+            throw new IndexOutOfBoundsException(
+                "Invalid indices: sourceIndex = " + sourceIndex
+                    + ", targetIndex = " + targetIndex + ", list size = "
+                    + list.size());
+        }
+        
+        // Adjust if necessary
         if (sourceIndex <= targetIndex)
         {
-            Collections.rotate(list.subList(sourceIndex, targetIndex + 1), -1);
+            Collections.rotate(list.subList(sourceIndex,
+                Math.min(targetIndex + 1, list.size())), -1);
         }
         else
         {
-            Collections.rotate(list.subList(targetIndex, sourceIndex + 1), 1);
+            Collections.rotate(
+                list.subList(Math.max(targetIndex, 0), sourceIndex + 1), 1);
         }
     }
     
@@ -509,16 +548,8 @@ public class SyncedList
                 result.add(0, currentStep);
             }
         }
-        // Optimize
-        for (int x = result.size() - 1; x > 0; x--)
-        {
-            if (result.get(x).getChangeAction() == ACTION.CLEAR)
-            {
-                result.removeAll(result.subList(0, x));
-                break;
-            }
-        }
         syncedList1.setElementSteps(result);
+        syncedList1.optimize();
         return syncedList1;
     }
     
@@ -541,85 +572,87 @@ public class SyncedList
     
     public void optimize()
     {
-        int stepsBeforeOptimization = elementSteps.size();
-        // Step 1: Remove redundant swaps
-        for (int i = 0; i < elementSteps.size() - 1; i++)
+        // Step 1: Clear steps after CLEAR action
+        for (int x = this.elementSteps.size() - 1; x > 0; x--)
         {
-            SyncedListStep step = elementSteps.get(i);
-            if (step.getChangeAction() == ACTION.SWAP)
+            if (this.elementSteps.get(x).getChangeAction() == ACTION.CLEAR)
             {
-                for (int j = i + 1; j < elementSteps.size(); j++)
-                {
-                    SyncedListStep nextStep = elementSteps.get(j);
-                    // Check if the next step swaps back the same elements
-                    if (nextStep.getChangeAction() == ACTION.SWAP
-                        && step.getChangeId()
-                        .equals(nextStep.getChangeValueString())
-                        && step.getChangeValueString()
-                        .equals(nextStep.getChangeId()))
-                    {
-                        // Remove both swap steps
-                        elementSteps.remove(j);
-                        elementSteps.remove(i);
-                        i--; // Adjust the index after removal
-                        break;
-                    }
-                }
+                this.elementSteps.removeAll(this.elementSteps.subList(0, x));
+                return; // Fully optimized
             }
         }
         
-        // Step 2: Optimize consecutive moves
-        HashMap<String, Integer> finalPositions = new HashMap<>();
-        for (int i = elementSteps.size() - 1; i >= 0; i--)
+        if (syncedListHeader.getHostname().equals(""))
         {
-            SyncedListStep step = elementSteps.get(i);
-            if (step.getChangeAction() == ACTION.MOVE)
-            {
-                if (finalPositions.containsKey(step.getChangeId()))
-                {
-                    // If a final position is already recorded, remove this
-                    // step as it's redundant
-                    elementSteps.remove(i);
-                }
-                else
-                {
-                    // Record the final position for this element
-                    finalPositions.put(step.getChangeId(),
-                        step.getChangeValueInt());
-                }
-            }
-        }
-        
-        // If an element is added and removed only the remove is needed
-        for (int i = 0; i < elementSteps.size(); i++)
-        {
-            SyncedListStep step = elementSteps.get(i);
-            if (step.getChangeAction() == ACTION.ADD)
-            {
-                for (int j = i + 1; j < elementSteps.size(); j++)
-                {
-                    SyncedListStep nextStep = elementSteps.get(j);
-                    if (nextStep.getChangeAction() == ACTION.REMOVE
-                        && step.getChangeId().equals(nextStep.getChangeId()))
-                    {
-                        elementSteps.remove(i);
-                        i--; // Adjust the index after removal
-                        break;
-                    }
-                }
-            }
-        }
-        
-        if (elementSteps.size() != stepsBeforeOptimization)
-        {
-            Log.d(Constant.LOG_TITLE_BUILDING,
-                "Optimized " + (stepsBeforeOptimization - elementSteps.size())
-                    + " steps");
+            // no hostname, ultimate optimization
+            fullOptimization();
         }
         else
         {
-            Log.d(Constant.LOG_TITLE_BUILDING, "No optimization needed");
+            // Sync supported optimization
+            syncSupportedOptimization();
         }
+    }
+    
+    /**
+     * This optimization is the most aggressive one. It will remove all MOVE and
+     * SWAP steps and replace them with the current positions of the elements.
+     * Does not support sync
+     */
+    public void fullOptimization()
+    {
+        // Rebuild the list from the current steps
+        ArrayList<SyncedListElement> result = getReformatElements();
+        // remove all steps
+        elementSteps.clear();
+        // Add all elements as ADD steps
+        for (SyncedListElement element : result)
+        {
+            SyncedListStep newAddStep =
+                new SyncedListStep(element.getId(), ACTION.ADD, element);
+            elementSteps.add(newAddStep);
+        }
+    }
+    
+    /**
+     * Optimizes the list listSteps. This optimization is less aggressive than
+     * fullOptimization. Does support sync.
+     */
+    public void syncSupportedOptimization()
+    {
+        // Step 2: Rebuild the list from the current steps
+        ArrayList<SyncedListElement> result = getReformatElements();
+        
+        // Step 3: Clear all MOVE and SWAP steps since we will replace them
+        // with the current positions
+        ArrayList<SyncedListStep> optimizedSteps = new ArrayList<>();
+        
+        for (SyncedListStep step : elementSteps)
+        {
+            // Keep all steps that are not MOVE or SWAP
+            if (step.getChangeAction() != ACTION.MOVE
+                && step.getChangeAction() != ACTION.SWAP)
+            {
+                optimizedSteps.add(step);
+            }
+        }
+        
+        // Step 4: Generate new MOVE steps based on the current positions of
+        // elements
+        for (int i = 0; i < result.size(); i++)
+        {
+            SyncedListElement element = result.get(i);
+            
+            // Create a new MOVE step for the current position
+            SyncedListStep newMoveStep =
+                new SyncedListStep(element.getId(), ACTION.MOVE, i);
+            
+            // Add the new MOVE step to optimizedSteps
+            optimizedSteps.add(newMoveStep);
+        }
+        
+        // Step 5: Replace the current elementSteps with the optimized list
+        this.elementSteps = optimizedSteps;
     }
     
     /**

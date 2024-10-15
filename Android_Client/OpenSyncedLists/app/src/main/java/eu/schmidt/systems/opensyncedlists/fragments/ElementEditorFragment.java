@@ -17,6 +17,7 @@
 package eu.schmidt.systems.opensyncedlists.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,8 +66,8 @@ public class ElementEditorFragment extends BottomSheetDialogFragment
     @Override public View onCreateView(LayoutInflater inflater,
         ViewGroup container, Bundle savedInstanceState)
     {
-        return inflater
-            .inflate(R.layout.fragment_element_editor, container, false);
+        return inflater.inflate(R.layout.fragment_element_editor, container,
+            false);
     }
     
     /**
@@ -92,8 +93,9 @@ public class ElementEditorFragment extends BottomSheetDialogFragment
             String newName = eTName.getText().toString();
             String newDescription = eTDescription.getText().toString();
             if (!newName.equals("") && (
-                !newName.equals(syncedListElement.getName()) || !newDescription
-                    .equals(syncedListElement.getDescription())))
+                !newName.equals(syncedListElement.getName())
+                    || !newDescription.equals(
+                    syncedListElement.getDescription())))
             {
                 SyncedListElement updated = syncedListElement.clone();
                 updated.setName(newName);

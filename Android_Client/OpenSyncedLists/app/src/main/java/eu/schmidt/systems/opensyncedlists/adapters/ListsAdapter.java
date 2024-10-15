@@ -116,16 +116,15 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         int viewType)
     {
         RecyclerView.ViewHolder viewHolder;
-        switch (viewType)
+        if (viewType == R.layout.element_lists)
         {
-            case R.layout.element_lists:
-                View view = LayoutInflater.from(parent.getContext())
-                    .inflate(viewType, parent, false);
-                viewHolder = new ViewHolder(view);
-                break;
-            default:
-                throw new IllegalStateException(
-                    "Unexpected value: " + viewType);
+            View view = LayoutInflater.from(parent.getContext())
+                .inflate(viewType, parent, false);
+            viewHolder = new ViewHolder(view);
+        }
+        else
+        {
+            throw new IllegalStateException("Unexpected value: " + viewType);
         }
         return viewHolder;
     }
@@ -134,10 +133,9 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,
         int position)
     {
-        if (holder instanceof ViewHolder)
+        if (holder instanceof ViewHolder viewHolder)
         {
             SyncedListHeader header = syncedListsHeaders.get(position);
-            ListsAdapter.ViewHolder viewHolder = (ViewHolder) holder;
             viewHolder.tVName.setText(header.getName());
             viewHolder.tVSize.setText(header.getListSize());
             viewHolder.view.setOnClickListener(v ->

@@ -468,7 +468,7 @@ public class ListActivity extends AppCompatActivity
                 if (exception instanceof ServerException)
                 {
                     Log.e(LOG_TITLE_NETWORK,
-                        "Unexpected Error: " + exception.toString());
+                        "Unexpected Error: " + exception);
                     Toast.makeText(this, getString(R.string.unexpected_error),
                         Toast.LENGTH_SHORT).show();
                     return;

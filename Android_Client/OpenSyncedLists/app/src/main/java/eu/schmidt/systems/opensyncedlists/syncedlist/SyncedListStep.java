@@ -110,6 +110,11 @@ public class SyncedListStep
         return changeValueInt;
     }
     
+    public void setChangeValueInt(Integer changeValueInt)
+    {
+        this.changeValueInt = changeValueInt;
+    }
+    
     public String getChangeValueString()
     {
         return changeValueString;

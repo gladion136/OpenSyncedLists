@@ -70,7 +70,7 @@ public class FileStorage
         }
         catch (IOException e)
         {
-            Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
+            Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e);
             e.printStackTrace();
         }
         return file.getAbsolutePath();
@@ -105,7 +105,7 @@ public class FileStorage
         }
         catch (IOException e)
         {
-            Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e.toString());
+            Log.e(LOG_TITLE_STORAGE, "Can't write file: " + e);
             e.printStackTrace();
         }
         return file.getAbsolutePath();

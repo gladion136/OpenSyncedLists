@@ -67,7 +67,7 @@
     <string name="list_pref_delete_btn_title">Delete list</string>
     <string name="list_pref_delete_btn_summary">Warning! The list got only deleted local!</string>
     <string name="list_pref_delete_online_btn_title">Delete list online and local</string>
-    <string name="list_pref_delete_online_btn_summary">Warning! The list got deletet local and online. If others devices has also access they could still upload it.</string>
+    <string name="list_pref_delete_online_btn_summary">Warning! The list will be deleted both local and online. If others devices has also access they could still upload it.</string>
     <string name="scroll_list_title">Scroll list</string>
     <string name="scroll_list_summary">Scroll list after edit element</string>
     <string name="unexpected_error">Error: Something wrent wrong.. Please try it again.</string>

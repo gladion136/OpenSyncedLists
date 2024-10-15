@@ -370,7 +370,7 @@ public class ListsActivity extends AppCompatActivity
                     Toast.makeText(this, getString(R.string.cant_import_file),
                         Toast.LENGTH_LONG).show();
                     Log.e(LOG_TITLE_DEFAULT,
-                        "Cant import file: " + exception.toString());
+                        "Cant import file: " + exception);
                 }
             }
         }
