@@ -1,5 +1,11 @@
 # Changelog of OpenSyncedLists
 
+## 1.0.10 (15.10.2024)
+
+- fix: delete items
+- update: improved optimization
+- update: english translation
+
 ## 1.0.9 (04.08.2024)
 
 - update: translations
