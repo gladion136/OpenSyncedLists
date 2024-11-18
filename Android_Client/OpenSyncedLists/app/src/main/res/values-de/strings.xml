@@ -124,4 +124,5 @@
     <string name="import_list_url_msg">Importiere eine List aus einem Link.</string>
     <string name="import_list_url_yes">Ok</string>
     <string name="import_list_url_cancel">Abbrechen</string>
+    <string name="search">Suchen</string>
 </resources>

@@ -28,6 +28,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
@@ -54,13 +57,16 @@ import eu.schmidt.systems.opensyncedlists.utils.Constant;
  */
 public class SyncedListAdapter
     extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-    implements View.OnClickListener
+    implements View.OnClickListener, Filterable
 {
     private final ListActivity listActivity;
     private final SyncedList syncedList;
     private final RecyclerView recyclerView;
     private final boolean scrollListTopBottom;
     private final int jumpDistance;
+    private boolean filterActive = false;
+    
+    private List<SyncedListElement> syncedListElementsFiltered;
     
     /**
      * Initialize the recyclerview
@@ -75,6 +81,7 @@ public class SyncedListAdapter
         this.listActivity = listActivity;
         this.recyclerView = recyclerView;
         this.syncedList = syncedList;
+        syncedListElementsFiltered = syncedList.getReformatElements();
         LayoutInflater.from(listActivity);
         
         // Add ItemTouchHelper for drag and drop events
@@ -84,6 +91,11 @@ public class SyncedListAdapter
                 @Override public int getMovementFlags(RecyclerView recyclerView,
                     RecyclerView.ViewHolder viewHolder)
                 {
+                    if (filterActive)
+                    {
+                        return 0;
+                    }
+                    
                     if (viewHolder instanceof ElementViewHolder)
                     {
                         return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
@@ -320,6 +332,10 @@ public class SyncedListAdapter
      */
     @Override public int getItemCount()
     {
+        if (filterActive)
+        {
+            return syncedListElementsFiltered.size();
+        }
         if (syncedList.getHeader().isCheckedList()
             && syncedList.getCheckedElements().size() > 0)
         {
@@ -357,6 +373,10 @@ public class SyncedListAdapter
      */
     public SyncedListElement getElementOnPosition(int position)
     {
+        if (filterActive)
+        {
+            return syncedListElementsFiltered.get(position);
+        }
         if (syncedList.getHeader().isCheckedList())
         {
             if (position > syncedList.getUncheckedElements().size())
@@ -452,6 +472,10 @@ public class SyncedListAdapter
      */
     public void moveElementAndSave(SyncedListElement syncedListElement, int dir)
     {
+        if (filterActive)
+        {
+            return;
+        }
         SyncedListElement displacedElement;
         
         // Choose list where the element should move
@@ -491,6 +515,56 @@ public class SyncedListAdapter
         listActivity.addElementStepAndSave(newStep, true);
         recyclerView.scrollToPosition(getPositionOfElement(syncedListElement));
     }
+    
+    @Override public Filter getFilter()
+    {
+        return syncedListFilter;
+    }
+    
+    private Filter syncedListFilter = new Filter()
+    {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            List<SyncedListElement> filteredList = new ArrayList<>();
+            
+            if (constraint == null || constraint.length() == 0)
+            {
+                filteredList.addAll(syncedList.getReformatElements());
+                Log.d("Filter", "No filter");
+                filterActive = false;
+            }
+            else
+            {
+                String filterPattern =
+                    constraint.toString().toLowerCase().trim();
+                Log.d("Filter", "Filter: " + filterPattern);
+                filterActive = true;
+                
+                for (SyncedListElement item : syncedList.getElements())
+                {
+                    if (item.getName().toLowerCase().contains(filterPattern)
+                        || item.getDescription().toLowerCase()
+                        .contains(filterPattern))
+                    {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+        
+        @Override protected void publishResults(CharSequence constraint,
+            FilterResults results)
+        {
+            syncedListElementsFiltered.clear();
+            syncedListElementsFiltered.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
     
     /**
      * ViewHolder for one element.

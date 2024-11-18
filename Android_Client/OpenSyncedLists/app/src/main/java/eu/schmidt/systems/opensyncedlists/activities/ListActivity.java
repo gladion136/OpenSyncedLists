@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -148,6 +150,44 @@ public class ListActivity extends AppCompatActivity
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.one_list_menu, menu);
+        
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        
+        if (searchView != null)
+        {
+            searchView.setOnSearchClickListener(new View.OnClickListener()
+            {
+                @Override public void onClick(View v)
+                {
+                    searchItem.setVisible(false);
+                }
+            });
+            
+            searchView.setOnCloseListener(new SearchView.OnCloseListener()
+            {
+                @Override public boolean onClose()
+                {
+                    searchItem.setVisible(true);
+                    return false;
+                }
+            });
+            searchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener()
+                {
+                    @Override public boolean onQueryTextSubmit(String query)
+                    {
+                        return false;
+                    }
+                    
+                    @Override public boolean onQueryTextChange(String newText)
+                    {
+                        syncedListAdapter.getFilter().filter(newText);
+                        return true;
+                    }
+                });
+        }
+        
         return true;
     }
     
@@ -169,8 +209,8 @@ public class ListActivity extends AppCompatActivity
                 // Export the list as markdown/text and send it to another app.
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent
-                    .putExtra(Intent.EXTRA_TEXT, syncedList.getAsMarkdown());
+                sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    syncedList.getAsMarkdown());
                 sendIntent.setType("text/plain");
                 Intent shareIntent =
                     Intent.createChooser(sendIntent, syncedList.getName());
@@ -220,10 +260,10 @@ public class ListActivity extends AppCompatActivity
                     Uri.Builder uriBuilder = new Uri.Builder().scheme(protocol)
                         .encodedAuthority(hostname).path("/list/share");
                     uriBuilder.appendQueryParameter("id", syncedList.getId());
-                    uriBuilder
-                        .appendQueryParameter("secret", syncedList.getSecret());
-                    uriBuilder.appendQueryParameter("localSecret", Cryptography
-                        .byteArrayToString(
+                    uriBuilder.appendQueryParameter("secret",
+                        syncedList.getSecret());
+                    uriBuilder.appendQueryParameter("localSecret",
+                        Cryptography.byteArrayToString(
                             syncedList.getHeader().getLocalSecret()
                                 .getEncoded()));
                     Uri uri = uriBuilder.build();
@@ -231,13 +271,13 @@ public class ListActivity extends AppCompatActivity
                     Intent sendUriIntent = new Intent();
                     sendUriIntent.setAction(Intent.ACTION_SEND);
                     sendUriIntent.putExtra(Intent.EXTRA_TEXT,
-                        getString(R.string.share_before_name) + syncedList
-                            .getName() + getString(R.string.share_after_name)
-                            + uri.toString() + getString(
-                            R.string.share_after_link));
+                        getString(R.string.share_before_name)
+                            + syncedList.getName() + getString(
+                            R.string.share_after_name) + uri.toString()
+                            + getString(R.string.share_after_link));
                     sendUriIntent.setType("text/plain");
-                    Intent shareUriIntent = Intent
-                        .createChooser(sendUriIntent, syncedList.getName());
+                    Intent shareUriIntent = Intent.createChooser(sendUriIntent,
+                        syncedList.getName());
                     startActivity(shareUriIntent);
                 }
                 else
@@ -271,8 +311,8 @@ public class ListActivity extends AppCompatActivity
         
         if (notify)
         {
-            this.recyclerView
-                .post(() -> syncedListAdapter.notifyDataSetChanged());
+            this.recyclerView.post(
+                () -> syncedListAdapter.notifyDataSetChanged());
         }
         
         try
@@ -328,9 +368,9 @@ public class ListActivity extends AppCompatActivity
                         jsonListFromServer.getJSONObject("msg")
                             .getString("data");
                     SyncedList receivedList = new SyncedList(new JSONObject(
-                        Cryptography
-                            .decryptRSA(syncedList.getHeader().getLocalSecret(),
-                                encryptedData)));
+                        Cryptography.decryptRSA(
+                            syncedList.getHeader().getLocalSecret(),
+                            encryptedData)));
                     // Start sync
                     syncAndUpdateListOnServer(receivedList,
                         Cryptography.getSHAasString(encryptedData));
@@ -467,8 +507,7 @@ public class ListActivity extends AppCompatActivity
             {
                 if (exception instanceof ServerException)
                 {
-                    Log.e(LOG_TITLE_NETWORK,
-                        "Unexpected Error: " + exception);
+                    Log.e(LOG_TITLE_NETWORK, "Unexpected Error: " + exception);
                     Toast.makeText(this, getString(R.string.unexpected_error),
                         Toast.LENGTH_SHORT).show();
                     return;

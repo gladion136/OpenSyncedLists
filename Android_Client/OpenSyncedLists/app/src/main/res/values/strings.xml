@@ -106,4 +106,5 @@
     <string name="import_list_url_msg">Import a list via link.</string>
     <string name="import_list_url_yes">Ok</string>
     <string name="import_list_url_cancel">Cancel</string>
+    <string name="search">Search</string>
 </resources>
