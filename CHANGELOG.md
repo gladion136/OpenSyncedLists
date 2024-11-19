@@ -1,5 +1,9 @@
 # Changelog of OpenSyncedLists
 
+## 1.0.11 (19.11.2024)
+
+- feat: search support
+
 ## 1.0.10 (15.10.2024)
 
 - fix: delete items
