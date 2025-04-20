@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
   ~
   ~     This program is free software: you can redistribute it and/or modify
@@ -29,10 +28,10 @@
 
 
         <SwitchPreferenceCompat
+            android:defaultValue="false"
             android:key="list_overview_instead_cards"
-            android:title="List overview as list instead of cards"
             android:summary="Display all lists inside a list view instead of a grid of cards"
-            android:defaultValue="false"/>
+            android:title="List overview as list instead of cards" />
 
 
     </PreferenceCategory>
@@ -63,7 +62,9 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/defaults_list" android:summary="@string/defaults_list_summary">
+    <PreferenceCategory
+        android:summary="@string/defaults_list_summary"
+        android:title="@string/defaults_list">
 
         <SwitchPreferenceCompat
             android:defaultValue="true"
@@ -75,28 +76,28 @@
             android:title="@string/default_server_title" />
 
         <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:key="check_option"
-            android:title="@string/list_pref_check_option_title"
-            android:defaultValue="true"/>
+            android:title="@string/list_pref_check_option_title" />
 
         <SwitchPreferenceCompat
-            android:key="checked_list"
-            android:title="@string/list_pref_checked_list_title"
-            android:summary="@string/list_pref_checked_list_summary"
+            android:defaultValue="true"
             android:dependency="check_option"
-            android:defaultValue="true"/>
+            android:key="checked_list"
+            android:summary="@string/list_pref_checked_list_summary"
+            android:title="@string/list_pref_checked_list_title" />
 
         <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:key="jump_buttons"
-            android:title="@string/list_pref_jump_buttons_title"
             android:summary="@string/list_pref_jump_buttons_summary"
-            android:defaultValue="true" />
+            android:title="@string/list_pref_jump_buttons_title" />
 
         <SwitchPreferenceCompat
+            android:defaultValue="false"
             android:key="invert_element"
-            android:title="@string/list_pref_invert_element_title"
             android:summary="@string/list_pref_invert_element_summary"
-            android:defaultValue="false"/>
+            android:title="@string/list_pref_invert_element_title" />
 
     </PreferenceCategory>
 

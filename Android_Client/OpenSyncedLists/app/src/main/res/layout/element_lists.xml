@@ -47,13 +47,13 @@
 
         <ImageButton
             android:id="@+id/imgBtnListMenu"
-            android:layout_width="14dp"
-            android:layout_height="17dp"
+            android:layout_width="17dp"
+            android:layout_height="23dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:adjustViewBounds="false"
             android:background="@null"
-            android:scaleType="centerCrop"
+            android:scaleType="centerInside"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/dot_menu_50" />
