@@ -27,6 +27,18 @@
             android:key="design"
             android:title="@string/design_mode_title" />
 
+
+        <SwitchPreferenceCompat
+            android:key="list_overview_instead_cards"
+            android:title="List overview as list instead of cards"
+            android:summary="Display all lists inside a list view instead of a grid of cards"
+            android:defaultValue="false"/>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Global list settings">
+
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/pref_jump_range"
@@ -40,10 +52,6 @@
             android:key="scrollList"
             android:summary="@string/scroll_list_summary"
             android:title="@string/scroll_list_title" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/sync_header">
 
         <ListPreference
             android:defaultValue="5"

@@ -18,6 +18,7 @@ package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
+import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,8 +63,10 @@ import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 
@@ -72,7 +78,7 @@ public class ListsActivity extends AppCompatActivity
     /** Result launcher for importing a list */
     private ActivityResultLauncher onImportLauncher;
     /** Stores the global settings */
-    private SharedPreferences globalSharedPreferences;
+    public SharedPreferences globalSharedPreferences;
     private SecureStorage secureStorage;
     private ArrayList<SyncedListHeader> syncedListsHeaders;
     private FloatingActionButton fab;
@@ -138,8 +144,7 @@ public class ListsActivity extends AppCompatActivity
         String secret = url.getQueryParameter("secret");
         String localSecret = url.getQueryParameter("localSecret");
         String hostname = url.getScheme() + "://" + url.getAuthority();
-        Log.d(LOG_TITLE_DEFAULT,
-            "Import list via link from host: " + hostname);
+        Log.d(LOG_TITLE_DEFAULT, "Import list via link from host: " + hostname);
         if (id != null && secret != null && localSecret != null
             && hostname != null)
         {
@@ -166,6 +171,7 @@ public class ListsActivity extends AppCompatActivity
             Log.e(LOG_TITLE_DEFAULT, "Local storage read error: " + e);
             e.printStackTrace();
         }
+        updateListSettings();
         listsAdapter.updateItems(syncedListsHeaders, true);
         super.onResume();
     }
@@ -247,18 +253,18 @@ public class ListsActivity extends AppCompatActivity
     
     private void importListFromUrlDialog()
     {
-        DialogBuilder
-            .editTextDialog(this, getString(R.string.import_list_url_title),
-                getString(R.string.import_list_url_msg),
-                getString(R.string.import_list_url_yes),
-                getString(R.string.import_list_url_cancel), result ->
+        DialogBuilder.editTextDialog(this,
+            getString(R.string.import_list_url_title),
+            getString(R.string.import_list_url_msg),
+            getString(R.string.import_list_url_yes),
+            getString(R.string.import_list_url_cancel), result ->
+            {
+                if (result != null)
                 {
-                    if (result != null)
-                    {
-                        Uri url = Uri.parse(result);
-                        importListFromUrl(url);
-                    }
-                });
+                    Uri url = Uri.parse(result);
+                    importListFromUrl(url);
+                }
+            });
     }
     
     /**
@@ -272,8 +278,8 @@ public class ListsActivity extends AppCompatActivity
         {
             return;
         }
-        ServerWrapper
-            .checkConnection(defaultHostname, (jsonResult, exception) ->
+        ServerWrapper.checkConnection(defaultHostname,
+            (jsonResult, exception) ->
             {
                 if (jsonResult == null || exception != null)
                 {
@@ -292,41 +298,44 @@ public class ListsActivity extends AppCompatActivity
      */
     protected void showCreateListDialog()
     {
-        DialogBuilder
-            .editTextDialog(this, getString(R.string.create_list_title),
-                getString(R.string.create_list_msg),
-                getString(R.string.create_list_yes),
-                getString(R.string.create_list_cancel), result ->
+        DialogBuilder.editTextDialog(this,
+            getString(R.string.create_list_title),
+            getString(R.string.create_list_msg),
+            getString(R.string.create_list_yes),
+            getString(R.string.create_list_cancel), result ->
+            {
+                if (result != null)
                 {
-                    if (result != null)
+                    if (result.equals(""))
                     {
-                        if (result.equals(""))
-                        {
-                            Toast.makeText(this,
-                                getString(R.string.no_name_entered),
-                                Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        SyncedListHeader header =
-                            new SyncedListHeader(getUniqueListId(), result,
-                                globalSharedPreferences
-                                    .getString("default_server", ""),
-                                Cryptography.stringToByteArray(
-                                    Cryptography.generatingRandomString(50)),
-                                Cryptography.generateAESKey());
-                        header.setCheckOption(globalSharedPreferences
-                            .getBoolean("check_option", true));
-                        header.setCheckedList(globalSharedPreferences
-                            .getBoolean("checked_list", true));
-                        header.setJumpButtons(globalSharedPreferences
-                            .getBoolean("jump_buttons", false));
-                        header.setInvertElement(globalSharedPreferences
-                            .getBoolean("invert_element", false));
-                        SyncedList newList =
-                            new SyncedList(header, new ArrayList<>());
-                        addListAndHandleCallback(newList);
+                        Toast.makeText(this,
+                            getString(R.string.no_name_entered),
+                            Toast.LENGTH_SHORT).show();
+                        return;
                     }
-                });
+                    SyncedListHeader header =
+                        new SyncedListHeader(getUniqueListId(), result,
+                            globalSharedPreferences.getString("default_server",
+                                ""), Cryptography.stringToByteArray(
+                            Cryptography.generatingRandomString(50)),
+                            Cryptography.generateAESKey());
+                    header.setCheckOption(
+                        globalSharedPreferences.getBoolean("check_option",
+                            true));
+                    header.setCheckedList(
+                        globalSharedPreferences.getBoolean("checked_list",
+                            true));
+                    header.setJumpButtons(
+                        globalSharedPreferences.getBoolean("jump_buttons",
+                            false));
+                    header.setInvertElement(
+                        globalSharedPreferences.getBoolean("invert_element",
+                            false));
+                    SyncedList newList =
+                        new SyncedList(header, new ArrayList<>());
+                    addListAndHandleCallback(newList);
+                }
+            });
     }
     
     /**
@@ -369,8 +378,7 @@ public class ListsActivity extends AppCompatActivity
                 {
                     Toast.makeText(this, getString(R.string.cant_import_file),
                         Toast.LENGTH_LONG).show();
-                    Log.e(LOG_TITLE_DEFAULT,
-                        "Cant import file: " + exception);
+                    Log.e(LOG_TITLE_DEFAULT, "Cant import file: " + exception);
                 }
             }
         }
@@ -420,33 +428,49 @@ public class ListsActivity extends AppCompatActivity
             e.printStackTrace();
         }
         
-        listsAdapter = new ListsAdapter(this,
-            (ArrayList<SyncedListHeader>) syncedListsHeaders.clone(),
-            recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(listsAdapter);
-        
         // Read and use preferences
         globalSharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this);
         if (globalSharedPreferences.getString("design", "")
             .equals(getString(R.string.pref_design_light)))
         {
-            AppCompatDelegate
-                .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_NO);
         }
         else if (globalSharedPreferences.getString("design", "")
             .equals(getString(R.string.pref_design_dark)))
         {
-            AppCompatDelegate
-                .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES);
         }
         else
         {
             AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
+        
+        listsAdapter = new ListsAdapter(this,
+            (ArrayList<SyncedListHeader>) syncedListsHeaders.clone(),
+            recyclerView);
+        updateListSettings();
+        recyclerView.setAdapter(listsAdapter);
+        
         checkServerConnection();
+    }
+    
+    private void updateListSettings()
+    {
+        if (globalSharedPreferences.getBoolean("list_overview_instead_cards",
+            false))
+        {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            Log.d("ListsActivity", "List view");
+        }
+        else
+        {
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+            Log.d("ListsActivity", "Card view");
+        }
     }
     
     /**
@@ -482,8 +506,8 @@ public class ListsActivity extends AppCompatActivity
                     else
                     {
                         Toast.makeText(this,
-                            getString(R.string.cant_import_list) + getString(
-                                R.string.no_connection), Toast.LENGTH_SHORT)
+                                getString(R.string.cant_import_list) + getString(
+                                    R.string.no_connection), Toast.LENGTH_SHORT)
                             .show();
                     }
                     return;
@@ -523,5 +547,116 @@ public class ListsActivity extends AppCompatActivity
             }
         }
         return newId;
+    }
+    
+    public void showListMenu(View view, SyncedListHeader header)
+    {
+        Log.d("ListsActivity", "Show list menu");
+        PopupMenu popup = new PopupMenu(this, view);
+        popup.getMenuInflater()
+            .inflate(R.menu.one_list_options_overview, popup.getMenu());
+        
+        SyncedList syncedList;
+        
+        secureStorage = new SecureStorage(this);
+        try
+        {
+            syncedList = secureStorage.getList(header.getId());
+        }
+        catch (Exception e)
+        {
+            Log.e("ListsActivity", "Error, cant get List: " + e);
+            return;
+        }
+        
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+        {
+            @Override public boolean onMenuItemClick(MenuItem item)
+            {
+                
+                Log.d("ListsActivity", "Clicked on: " + item.getTitle());
+                
+                switch (item.getItemId())
+                {
+                    case R.id.export_md:
+                        // Export the list as markdown/text and send it to
+                        // another app.
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            syncedList.getAsMarkdown());
+                        sendIntent.setType("text/plain");
+                        Intent shareIntent = Intent.createChooser(sendIntent,
+                            syncedList.getName());
+                        startActivity(shareIntent);
+                        return true;
+                    case R.id.export_list_json:
+                        // Export the list as json and share the file.
+                        String absolutPath =
+                            FileStorage.exportList(ListsActivity.this,
+                                syncedList);
+                        Log.i(LOG_TITLE_STORAGE,
+                            "Exported list to: " + absolutPath);
+                        FileStorage.shareFile(ListsActivity.this, absolutPath);
+                        return true;
+                    case R.id.list_settings:
+                        // Open the list settings
+                        Intent listSettingsIntent =
+                            new Intent(ListsActivity.this,
+                                ListSettingsActivity.class);
+                        listSettingsIntent.putExtra("id", syncedList.getId());
+                        startActivity(listSettingsIntent);
+                        return true;
+                    case R.id.export_link:
+                        // Share the list as link (via server)
+                        if (!syncedList.getHeader().getHostname().equals(""))
+                        {
+                            // Build link/uri
+                            String hostname =
+                                syncedList.getHeader().getHostname();
+                            String[] splitHost = hostname.split("://");
+                            String protocol = splitHost[0];
+                            hostname = splitHost[1];
+                            Uri.Builder uriBuilder =
+                                new Uri.Builder().scheme(protocol)
+                                    .encodedAuthority(hostname)
+                                    .path("/list/share");
+                            uriBuilder.appendQueryParameter("id",
+                                syncedList.getId());
+                            uriBuilder.appendQueryParameter("secret",
+                                syncedList.getSecret());
+                            uriBuilder.appendQueryParameter("localSecret",
+                                Cryptography.byteArrayToString(
+                                    syncedList.getHeader().getLocalSecret()
+                                        .getEncoded()));
+                            Uri uri = uriBuilder.build();
+                            // Share the link to another app
+                            Intent sendUriIntent = new Intent();
+                            sendUriIntent.setAction(Intent.ACTION_SEND);
+                            sendUriIntent.putExtra(Intent.EXTRA_TEXT,
+                                getString(R.string.share_before_name)
+                                    + syncedList.getName() + getString(
+                                    R.string.share_after_name) + uri.toString()
+                                    + getString(R.string.share_after_link));
+                            sendUriIntent.setType("text/plain");
+                            Intent shareUriIntent =
+                                Intent.createChooser(sendUriIntent,
+                                    syncedList.getName());
+                            startActivity(shareUriIntent);
+                        }
+                        else
+                        {
+                            Toast.makeText(ListsActivity.this,
+                                getString(R.string.no_server_selected),
+                                Toast.LENGTH_LONG).show();
+                        }
+                        return true;
+                }
+                
+                return false;
+            }
+        });
+        
+        popup.show();
     }
 }

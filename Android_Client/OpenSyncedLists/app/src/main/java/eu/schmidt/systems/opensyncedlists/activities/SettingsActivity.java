@@ -72,14 +72,14 @@ public class SettingsActivity extends AppCompatActivity
             if (sharedPreferences.getString("design", "")
                 .equals(getString(R.string.pref_design_light)))
             {
-                AppCompatDelegate
-                    .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_NO);
             }
             else if (sharedPreferences.getString("design", "")
                 .equals(getString(R.string.pref_design_dark)))
             {
-                AppCompatDelegate
-                    .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES);
             }
             else
             {

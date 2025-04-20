@@ -75,16 +75,5 @@ public class ListSettingsActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
-    
-    /**
-     * onBackPressed show the selected list in listActivity
-     */
-    @Override public void onBackPressed()
-    {
-        Intent intent = new Intent(this, ListActivity.class);
-        intent.putExtras(getIntent().getExtras());
-        startActivity(intent);
-        finish();
-    }
 }
 

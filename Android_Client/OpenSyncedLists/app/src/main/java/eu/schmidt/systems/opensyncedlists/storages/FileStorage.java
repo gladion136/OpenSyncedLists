@@ -36,7 +36,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import eu.schmidt.systems.opensyncedlists.BuildConfig;
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 
@@ -44,7 +43,7 @@ public class FileStorage
 {
     /** File Provider Authority to allow access */
     public final static String FILE_PROVIDER_AUTHORITY =
-        BuildConfig.APPLICATION_ID + ".fileprovider";
+        "eu.schmidt.systems.opensyncedlists.fileprovider";
     
     /**
      * Export a list as JSON File

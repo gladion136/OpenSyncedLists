@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -61,7 +62,8 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     RecyclerView.ViewHolder viewHolder)
                 {
                     return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
-                        ItemTouchHelper.DOWN | ItemTouchHelper.UP);
+                        ItemTouchHelper.DOWN | ItemTouchHelper.UP
+                            | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
                 }
                 
                 public boolean onMove(RecyclerView recyclerView,
@@ -116,7 +118,8 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         int viewType)
     {
         RecyclerView.ViewHolder viewHolder;
-        if (viewType == R.layout.element_lists)
+        if (viewType == R.layout.element_lists
+            || viewType == R.layout.element_lists_small_height)
         {
             View view = LayoutInflater.from(parent.getContext())
                 .inflate(viewType, parent, false);
@@ -138,6 +141,10 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             SyncedListHeader header = syncedListsHeaders.get(position);
             viewHolder.tVName.setText(header.getName());
             viewHolder.tVSize.setText(header.getListSize());
+            viewHolder.imgBtnListMenu.setOnClickListener(v ->
+            {
+                listsActivity.showListMenu(v, header);
+            });
             viewHolder.view.setOnClickListener(v ->
             {
                 Intent intent = new Intent(listsActivity, ListActivity.class);
@@ -149,6 +156,12 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     
     @Override public int getItemViewType(int position)
     {
+        // Check if the list is small height
+        if (listsActivity.globalSharedPreferences.getBoolean(
+            "list_overview_instead_cards", false))
+        {
+            return R.layout.element_lists_small_height;
+        }
         return R.layout.element_lists;
     }
     
@@ -183,6 +196,7 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public final View view;
         public final TextView tVName;
         public final TextView tVSize;
+        public final ImageButton imgBtnListMenu;
         
         public ViewHolder(@NonNull View itemView)
         {
@@ -190,6 +204,7 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             view = itemView;
             tVName = itemView.findViewById(R.id.tVName);
             tVSize = itemView.findViewById(R.id.tVSize);
+            imgBtnListMenu = itemView.findViewById(R.id.imgBtnListMenu);
         }
     }
 }

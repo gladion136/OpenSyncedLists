@@ -19,8 +19,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:layout_margin="8dp"
+    android:layout_height="40dp"
+    android:layout_margin="6dp"
     app:cardCornerRadius="8dp"
     app:layout_constraintHorizontal_weight="1">
 
@@ -49,11 +49,11 @@
             android:id="@+id/imgBtnListMenu"
             android:layout_width="14dp"
             android:layout_height="17dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:adjustViewBounds="false"
             android:background="@null"
             android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/dot_menu_50" />
@@ -62,13 +62,15 @@
             android:id="@+id/tVSize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:layout_weight="0"
             android:text="0"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/imgBtnListMenu"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

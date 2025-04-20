@@ -20,6 +20,8 @@ import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAUL
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -34,7 +36,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import eu.schmidt.systems.opensyncedlists.BuildConfig;
 import eu.schmidt.systems.opensyncedlists.R;
 
 /**
@@ -52,6 +53,18 @@ public class AboutActivity extends AppCompatActivity
     @Override protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        String version = "UNKOWN";
+        try
+        {
+            PackageInfo pInfo = this.getPackageManager()
+                .getPackageInfo(this.getPackageName(), 0);
+            version = pInfo.versionName;
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            Log.e("AboutActivity", "Error getting version name");
+        }
+        
         setContentView(R.layout.activity_about);
         setTitle(getString(R.string.menu_about));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -64,7 +77,7 @@ public class AboutActivity extends AppCompatActivity
         tvOthers.setMovementMethod(LinkMovementMethod.getInstance());
         
         TextView tvVersion = findViewById(R.id.tVVersion);
-        tvVersion.setText("Version: " + BuildConfig.VERSION_NAME);
+        tvVersion.setText("Version: " + version);
     }
     
     /**
@@ -114,12 +127,15 @@ public class AboutActivity extends AppCompatActivity
                 intent.setData(Uri.parse("mailto:"));
                 intent.putExtra(Intent.EXTRA_EMAIL,
                     new String[]{getString(R.string.dev_mail_address)});
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.dev_mail_subject));
-                if (intent.resolveActivity(getPackageManager()) != null) {
+                intent.putExtra(Intent.EXTRA_SUBJECT,
+                    getString(R.string.dev_mail_subject));
+                if (intent.resolveActivity(getPackageManager()) != null)
+                {
                     startActivity(intent);
-                }else {
-                    Log.e(LOG_TITLE_DEFAULT,
-                        "No activity found to send mail");
+                }
+                else
+                {
+                    Log.e(LOG_TITLE_DEFAULT, "No activity found to send mail");
                     Toast.makeText(this,
                         getString(R.string.no_app_for_intent_installed),
                         Toast.LENGTH_SHORT).show();
