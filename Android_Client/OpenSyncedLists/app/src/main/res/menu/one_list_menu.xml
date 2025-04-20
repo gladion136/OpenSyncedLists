@@ -20,10 +20,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_search"
+        android:icon="@drawable/search"
         android:title="@string/search"
-        android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_overview"
+        android:icon="@drawable/drag"
+        android:title="@string/action_overview_title"
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/list_clear"
         android:title="@string/menu_list_clear" />

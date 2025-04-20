@@ -156,10 +156,7 @@ public class ListActivity extends AppCompatActivity
                         return true;
                     }
                 });
-            
-            
         }
-        
         
         return true;
     }
@@ -177,8 +174,22 @@ public class ListActivity extends AppCompatActivity
             case android.R.id.home:
                 // Back to ListsActivity
                 onBackPressed();
-                SearchView searchView =
-                    (SearchView) item.getActionView();
+                SearchView searchView = (SearchView) item.getActionView();
+                return true;
+            case R.id.action_overview:
+                boolean new_state = !syncedList.getHeader().isOverviewActive();
+                syncedList.getHeader().setOverviewActive(new_state);
+                try
+                {
+                    secureStorage.setList(syncedList);
+                }
+                catch (Exception e)
+                {
+                    Log.e("ListActivity",
+                        "Local storage write error: " + e);
+                }
+                this.recyclerView.post(
+                    () -> syncedListAdapter.notifyDataSetChanged());
                 return true;
             case R.id.export_md:
                 // Export the list as markdown/text and send it to another app.
@@ -461,8 +472,9 @@ public class ListActivity extends AppCompatActivity
         activateAutoSync();
         checkServerConnection();
     }
-        
-    public void activateAutoSync() {
+    
+    public void activateAutoSync()
+    {
         // Should autoSync?
         if (syncedList.getHeader().isAutoSync() && !syncedList.getHeader()
             .getHostname().equals(""))
@@ -481,7 +493,8 @@ public class ListActivity extends AppCompatActivity
         }
     }
     
-    public void disableAutoSync() {
+    public void disableAutoSync()
+    {
         // Stop auto sync
         if (autoSyncHandler != null)
         {

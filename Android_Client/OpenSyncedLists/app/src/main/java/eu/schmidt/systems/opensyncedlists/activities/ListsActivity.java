@@ -16,14 +16,18 @@
  */
 package eu.schmidt.systems.opensyncedlists.activities;
 
+import static com.google.gson.internal.$Gson$Types.arrayOf;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,6 +69,7 @@ import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
+import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
@@ -105,7 +110,28 @@ public class ListsActivity extends AppCompatActivity
                 if (result.getResultCode() == RESULT_OK)
                 {
                     Uri importFile = result.getData().getData();
-                    importFile(importFile);
+                    if (importFile == null)
+                    {
+                        return;
+                    }
+                    String fileType = this.getContentResolver().getType(importFile);
+                    if (fileType != null && fileType.equals("application/json"))
+                    {
+                        // Import json file
+                        importFile(importFile);
+                    }
+                    else if (fileType != null &&  fileType.equals("text/plain"))
+                    {
+                        // Import text file
+                        importTextFile(importFile);
+                    }
+                    else
+                    {
+                        // Unknown file type
+                        Toast.makeText(this,
+                            getString(R.string.unknown_file_type),
+                            Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         init();
@@ -119,11 +145,18 @@ public class ListsActivity extends AppCompatActivity
     @Override protected void onNewIntent(Intent intent)
     {
         if (intent.getType() != null && intent.getType()
-            .equals("application" + "/json"))
+            .equals("application/json"))
         {
             // Started to open a json file
             Uri receivedFile = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             importFile(receivedFile);
+        }
+        else if (intent.getType() != null && intent.getType()
+            .equals("text/plain")) {
+            
+            Uri receivedFile = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            
+            importTextFile(receivedFile);
         }
         else if (intent.getData() != null)
         {
@@ -207,7 +240,10 @@ public class ListsActivity extends AppCompatActivity
                 // Import list/s from file
                 Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                 chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
+                chooseFile.setType("*/*");
+                chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain"});
                 chooseFile.setType("application/json");
+                chooseFile.setType("plain/text");
                 Intent intent = Intent.createChooser(chooseFile,
                     getString(R.string.choose_file_to_import));
                 onImportLauncher.launch(intent);
@@ -381,6 +417,79 @@ public class ListsActivity extends AppCompatActivity
                     Log.e(LOG_TITLE_DEFAULT, "Cant import file: " + exception);
                 }
             }
+        }
+        catch (IOException ignored)
+        {
+            ignored.printStackTrace();
+        }
+    }
+    
+    public static String getFileNameFromUri(Context context, Uri uri) {
+        String fileName = null;
+        try (
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (displayNameIndex != -1) {
+                    String displayName = cursor.getString(displayNameIndex);
+                    int dotIndex = displayName.lastIndexOf(".");
+                    fileName = (dotIndex == -1) ? displayName : displayName.substring(0, dotIndex);
+                }
+            }
+        }
+        return fileName;
+    }
+    protected void importTextFile(Uri uri)
+    {
+        try
+        {
+            InputStream in = getContentResolver().openInputStream(uri);
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            StringBuilder total = new StringBuilder();
+            
+            
+            SyncedListHeader header =
+                new SyncedListHeader(getUniqueListId(), getFileNameFromUri(this, uri),
+                    globalSharedPreferences.getString("default_server",
+                        ""), Cryptography.stringToByteArray(
+                    Cryptography.generatingRandomString(50)),
+                    Cryptography.generateAESKey());
+            header.setCheckOption(
+                globalSharedPreferences.getBoolean("check_option",
+                    true));
+            header.setCheckedList(
+                globalSharedPreferences.getBoolean("checked_list",
+                    true));
+            header.setJumpButtons(
+                globalSharedPreferences.getBoolean("jump_buttons",
+                    false));
+            header.setInvertElement(
+                globalSharedPreferences.getBoolean("invert_element",
+                    false));
+            
+            // For each line in the file, create a new step (add element).
+            
+            SyncedList newList =
+                new SyncedList(header, new ArrayList<>());
+            
+            ArrayList<SyncedListStep> steps = new ArrayList<>();
+            for (String line; (line = r.readLine()) != null; )
+            {
+                String refactored =
+                    line.replace(" - ", "").replace(" -", "").replace("- ", "");
+                if (refactored.isEmpty())
+                {
+                    continue;
+                }
+                String id = newList.generateUniqueElementId();
+                SyncedListStep syncedListStep = new SyncedListStep(id, ACTION.ADD,
+                    new SyncedListElement(id, refactored,
+                        ""));
+                steps.add(syncedListStep);
+            }
+            newList.setElementSteps(steps);
+            addListAndHandleCallback(newList);
+          
         }
         catch (IOException ignored)
         {

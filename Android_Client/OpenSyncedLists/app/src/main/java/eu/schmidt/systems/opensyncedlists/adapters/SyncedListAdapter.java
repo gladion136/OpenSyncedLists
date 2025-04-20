@@ -66,6 +66,8 @@ public class SyncedListAdapter
     private final int jumpDistance;
     private boolean filterActive = false;
     
+    public Boolean overview = false;
+    
     private List<SyncedListElement> syncedListElementsFiltered;
     
     /**
@@ -170,6 +172,7 @@ public class SyncedListAdapter
         switch (viewType)
         {
             case R.layout.element_list_invert:
+            case R.layout.element_list_overview:
             case R.layout.element_list:
                 View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(viewType, viewGroup, false);
@@ -319,7 +322,9 @@ public class SyncedListAdapter
         }
         else
         {
-            
+            if (syncedList.getHeader().isOverviewActive()) {
+                return R.layout.element_list_overview;
+            }
             return syncedList.getHeader().isInvertElement()
                 ? R.layout.element_list_invert : R.layout.element_list;
         }

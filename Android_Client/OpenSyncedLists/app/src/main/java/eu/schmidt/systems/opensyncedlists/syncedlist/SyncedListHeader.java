@@ -34,6 +34,7 @@ public class SyncedListHeader
     private String name;
     private boolean checkOption;
     private boolean checkedList;
+    private boolean overviewActive;
     private boolean autoSync;
     private boolean invertElement;
     private boolean jumpButtons;
@@ -58,6 +59,7 @@ public class SyncedListHeader
         invertElement = jsonObject.getBoolean("invertElement");
         hostname = jsonObject.getString("hostname");
         listSize = jsonObject.getString("listSize");
+        ///  WARNING !! Add new properties only with checking for compatibility
         if (jsonObject.has("jumpButtons"))
         {
             jumpButtons = jsonObject.getBoolean("jumpButtons");
@@ -65,6 +67,14 @@ public class SyncedListHeader
         else
         {
             jumpButtons = true;
+        }
+        if (jsonObject.has("overviewActive"))
+        {
+            overviewActive = jsonObject.getBoolean("overviewActive");
+        }
+        else
+        {
+            overviewActive = false;
         }
         secret = Cryptography.stringToByteArray(jsonObject.getString("secret"));
         byte[] encodedKey =
@@ -91,6 +101,7 @@ public class SyncedListHeader
         this.localSecret = localSecret;
         this.checkOption = true;
         this.checkedList = true;
+        this.overviewActive = false;
         this.invertElement = false;
         this.autoSync = true;
         this.listSize = "0 / 0";
@@ -206,6 +217,16 @@ public class SyncedListHeader
         this.listSize = listSize;
     }
     
+    public boolean isOverviewActive()
+    {
+        return overviewActive;
+    }
+    
+    public void setOverviewActive(boolean overviewActive)
+    {
+        this.overviewActive = overviewActive;
+    }
+    
     /**
      * Get the SyncedListHeader as JSON
      *
@@ -219,6 +240,7 @@ public class SyncedListHeader
             jsonObject.put("id", id);
             jsonObject.put("name", name);
             jsonObject.put("hostname", hostname);
+            jsonObject.put("overviewActive", overviewActive);
             jsonObject.put("checkOption", checkOption);
             jsonObject.put("checkedList", checkedList);
             jsonObject.put("autoSync", autoSync);

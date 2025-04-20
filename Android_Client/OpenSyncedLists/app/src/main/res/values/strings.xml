@@ -107,4 +107,6 @@
     <string name="import_list_url_yes">Ok</string>
     <string name="import_list_url_cancel">Cancel</string>
     <string name="search">Search</string>
+    <string name="action_overview_title">Show overview</string>
+    <string name="unknown_file_type">Unknown file type</string>
 </resources>
