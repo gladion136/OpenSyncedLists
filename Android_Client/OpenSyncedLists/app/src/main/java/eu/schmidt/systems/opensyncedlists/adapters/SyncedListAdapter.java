@@ -322,7 +322,8 @@ public class SyncedListAdapter
         }
         else
         {
-            if (syncedList.getHeader().isOverviewActive()) {
+            if (syncedList.getHeader().isOverviewActive())
+            {
                 return R.layout.element_list_overview;
             }
             return syncedList.getHeader().isInvertElement()

@@ -46,7 +46,6 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     final ArrayList<SyncedListHeader> syncedListsHeaders;
     final ListsActivity listsActivity;
     
-    
     public ListsAdapter(ListsActivity listsActivity,
         ArrayList<SyncedListHeader> syncedListsHeaders,
         RecyclerView recyclerView)

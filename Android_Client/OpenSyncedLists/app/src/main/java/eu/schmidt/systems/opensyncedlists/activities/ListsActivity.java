@@ -114,13 +114,14 @@ public class ListsActivity extends AppCompatActivity
                     {
                         return;
                     }
-                    String fileType = this.getContentResolver().getType(importFile);
+                    String fileType =
+                        this.getContentResolver().getType(importFile);
                     if (fileType != null && fileType.equals("application/json"))
                     {
                         // Import json file
                         importFile(importFile);
                     }
-                    else if (fileType != null &&  fileType.equals("text/plain"))
+                    else if (fileType != null && fileType.equals("text/plain"))
                     {
                         // Import text file
                         importTextFile(importFile);
@@ -152,7 +153,8 @@ public class ListsActivity extends AppCompatActivity
             importFile(receivedFile);
         }
         else if (intent.getType() != null && intent.getType()
-            .equals("text/plain")) {
+            .equals("text/plain"))
+        {
             
             Uri receivedFile = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             
@@ -241,7 +243,8 @@ public class ListsActivity extends AppCompatActivity
                 Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                 chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
                 chooseFile.setType("*/*");
-                chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain"});
+                chooseFile.putExtra(Intent.EXTRA_MIME_TYPES,
+                    new String[]{"application/json", "text/plain"});
                 chooseFile.setType("application/json");
                 chooseFile.setType("plain/text");
                 Intent intent = Intent.createChooser(chooseFile,
@@ -424,21 +427,28 @@ public class ListsActivity extends AppCompatActivity
         }
     }
     
-    public static String getFileNameFromUri(Context context, Uri uri) {
+    public static String getFileNameFromUri(Context context, Uri uri)
+    {
         String fileName = null;
-        try (
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-                int displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                if (displayNameIndex != -1) {
+        try (Cursor cursor = context.getContentResolver()
+            .query(uri, null, null, null, null))
+        {
+            if (cursor != null && cursor.moveToFirst())
+            {
+                int displayNameIndex =
+                    cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (displayNameIndex != -1)
+                {
                     String displayName = cursor.getString(displayNameIndex);
                     int dotIndex = displayName.lastIndexOf(".");
-                    fileName = (dotIndex == -1) ? displayName : displayName.substring(0, dotIndex);
+                    fileName = (dotIndex == -1) ? displayName
+                        : displayName.substring(0, dotIndex);
                 }
             }
         }
         return fileName;
     }
+    
     protected void importTextFile(Uri uri)
     {
         try
@@ -447,30 +457,24 @@ public class ListsActivity extends AppCompatActivity
             BufferedReader r = new BufferedReader(new InputStreamReader(in));
             StringBuilder total = new StringBuilder();
             
-            
-            SyncedListHeader header =
-                new SyncedListHeader(getUniqueListId(), getFileNameFromUri(this, uri),
-                    globalSharedPreferences.getString("default_server",
-                        ""), Cryptography.stringToByteArray(
+            SyncedListHeader header = new SyncedListHeader(getUniqueListId(),
+                getFileNameFromUri(this, uri),
+                globalSharedPreferences.getString("default_server", ""),
+                Cryptography.stringToByteArray(
                     Cryptography.generatingRandomString(50)),
-                    Cryptography.generateAESKey());
+                Cryptography.generateAESKey());
             header.setCheckOption(
-                globalSharedPreferences.getBoolean("check_option",
-                    true));
+                globalSharedPreferences.getBoolean("check_option", true));
             header.setCheckedList(
-                globalSharedPreferences.getBoolean("checked_list",
-                    true));
+                globalSharedPreferences.getBoolean("checked_list", true));
             header.setJumpButtons(
-                globalSharedPreferences.getBoolean("jump_buttons",
-                    false));
+                globalSharedPreferences.getBoolean("jump_buttons", false));
             header.setInvertElement(
-                globalSharedPreferences.getBoolean("invert_element",
-                    false));
+                globalSharedPreferences.getBoolean("invert_element", false));
             
             // For each line in the file, create a new step (add element).
             
-            SyncedList newList =
-                new SyncedList(header, new ArrayList<>());
+            SyncedList newList = new SyncedList(header, new ArrayList<>());
             
             ArrayList<SyncedListStep> steps = new ArrayList<>();
             for (String line; (line = r.readLine()) != null; )
@@ -482,14 +486,13 @@ public class ListsActivity extends AppCompatActivity
                     continue;
                 }
                 String id = newList.generateUniqueElementId();
-                SyncedListStep syncedListStep = new SyncedListStep(id, ACTION.ADD,
-                    new SyncedListElement(id, refactored,
-                        ""));
+                SyncedListStep syncedListStep =
+                    new SyncedListStep(id, ACTION.ADD,
+                        new SyncedListElement(id, refactored, ""));
                 steps.add(syncedListStep);
             }
             newList.setElementSteps(steps);
             addListAndHandleCallback(newList);
-          
         }
         catch (IOException ignored)
         {
