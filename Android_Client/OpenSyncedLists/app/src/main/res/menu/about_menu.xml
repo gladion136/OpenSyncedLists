@@ -28,4 +28,7 @@
     <item
         android:id="@+id/showSourceCode"
         android:title="@string/menu_show_source"/>
+    <item
+        android:id="@+id/reviewOnPlayStore"
+        android:title="@string/menu_review_on_playstore"/>
 </menu>

@@ -74,6 +74,7 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
+import eu.schmidt.systems.opensyncedlists.utils.PlayStore;
 
 /**
  * Activity to displaying all lists stored on the device
@@ -285,6 +286,9 @@ public class ListsActivity extends AppCompatActivity
                 // Show about activity
                 Intent aboutIntent = new Intent(this, AboutActivity.class);
                 startActivity(aboutIntent);
+                return true;
+            case R.id.reviewOnPlayStore:
+                PlayStore.askForPlayStoreReview(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

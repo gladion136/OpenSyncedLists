@@ -109,4 +109,5 @@
     <string name="search">Search</string>
     <string name="action_overview_title">Show overview</string>
     <string name="unknown_file_type">Unknown file type</string>
+    <string name="menu_review_on_playstore">Rate in Play Store</string>
 </resources>

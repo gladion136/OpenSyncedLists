@@ -17,8 +17,10 @@
 package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
+import static eu.schmidt.systems.opensyncedlists.utils.PlayStore.askForPlayStoreReview;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -35,6 +37,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.play.core.review.ReviewException;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.review.model.ReviewErrorCode;
 
 import eu.schmidt.systems.opensyncedlists.R;
 
@@ -135,6 +144,7 @@ public class AboutActivity extends AppCompatActivity
                 }
                 else
                 {
+                    // Open play store feedback
                     Log.e(LOG_TITLE_DEFAULT, "No activity found to send mail");
                     Toast.makeText(this,
                         getString(R.string.no_app_for_intent_installed),
@@ -149,8 +159,12 @@ public class AboutActivity extends AppCompatActivity
                 startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse(getString(R.string.sourcecode_webpage))));
                 return true;
+            case R.id.reviewOnPlayStore:
+                askForPlayStoreReview(this);
+                return true;
         }
         // Item not handled.. pass to super
         return super.onOptionsItemSelected(item);
     }
 }
+

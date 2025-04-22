@@ -125,4 +125,5 @@
     <string name="import_list_url_yes">Ok</string>
     <string name="import_list_url_cancel">Abbrechen</string>
     <string name="search">Suchen</string>
+    <string name="menu_review_on_playstore">Im Play Store bewerten</string>
 </resources>
