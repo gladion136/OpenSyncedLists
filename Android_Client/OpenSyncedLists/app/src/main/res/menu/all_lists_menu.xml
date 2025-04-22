@@ -21,10 +21,11 @@
         android:title="@string/menu_new_list" />
     <item android:id="@+id/import_lists"
         android:title="@string/menu_import" />
+    <item
+        android:id="@+id/import_lists_url"
+        android:title="@string/menu_import_url" />
     <item android:id="@+id/export_lists"
         android:title="@string/menu_export"/>
-    <item android:id="@+id/import_lists_url"
-        android:title="@string/menu_import_url" />
     <item android:id="@+id/settings"
         android:title="@string/menu_settings" />
     <item android:id="@+id/about"

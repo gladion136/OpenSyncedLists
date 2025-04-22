@@ -173,6 +173,7 @@ public class SyncedListAdapter
         {
             case R.layout.element_list_invert:
             case R.layout.element_list_overview:
+            case R.layout.element_list_overview_invert:
             case R.layout.element_list:
                 View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(viewType, viewGroup, false);
@@ -324,7 +325,9 @@ public class SyncedListAdapter
         {
             if (syncedList.getHeader().isOverviewActive())
             {
-                return R.layout.element_list_overview;
+                return syncedList.getHeader().isInvertElement() ?
+                    R.layout.element_list_overview_invert :
+                    R.layout.element_list_overview;
             }
             return syncedList.getHeader().isInvertElement()
                 ? R.layout.element_list_invert : R.layout.element_list;
