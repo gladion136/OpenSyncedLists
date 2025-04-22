@@ -16,6 +16,7 @@
  */
 package eu.schmidt.systems.opensyncedlists.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -28,17 +29,28 @@ import com.google.android.play.core.review.model.ReviewErrorCode;
 
 public class PlayStore
 {
-    public static void askForPlayStoreReview(Context context) {
+    public static void askForPlayStoreReview(Activity context) {
         ReviewManager manager = ReviewManagerFactory.create(context);
         Task<ReviewInfo> request = manager.requestReviewFlow();
-        request.addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Log.d("AboutActivity",
+        request.addOnCompleteListener(task_info -> {
+            if (task_info.isSuccessful()) {
+                ReviewInfo reviewInfo = task_info.getResult();
+                Log.d("PlayStoreReview",
                     "ReviewInfo object created successfully");
+                
+                Task<Void> flow = manager.launchReviewFlow(context, reviewInfo);
+                flow.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("PlayStoreReview", "Review flow launched successfully");
+                    }
+                    else {
+                        Log.e("PlayStoreReview",
+                            "Error launching review flow: " + task.getException());
+                    }
+                });
             } else {
-                @ReviewErrorCode int reviewErrorCode = ((ReviewException) task.getException()).getErrorCode();
-                Log.e("AboutActivity",
-                    "Error requesting review flow (play store): " + reviewErrorCode);
+                Log.e("PlayStoreReview",
+                    "Error requesting review flow (play store) ");
             }
         });
     }
