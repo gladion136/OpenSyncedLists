@@ -16,7 +16,6 @@
  */
 package eu.schmidt.systems.opensyncedlists.activities;
 
-import static com.google.gson.internal.$Gson$Types.arrayOf;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
@@ -33,27 +32,32 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -63,11 +67,13 @@ import javax.crypto.spec.SecretKeySpec;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.adapters.ListsAdapter;
+import eu.schmidt.systems.opensyncedlists.adapters.TagsAdapter;
 import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ListTag;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
@@ -80,16 +86,21 @@ import eu.schmidt.systems.opensyncedlists.utils.PlayStore;
  * Activity to displaying all lists stored on the device
  */
 public class ListsActivity extends AppCompatActivity
+    implements NavigationView.OnNavigationItemSelectedListener
 {
     /** Result launcher for importing a list */
     private ActivityResultLauncher onImportLauncher;
     /** Stores the global settings */
     public SharedPreferences globalSharedPreferences;
-    private SecureStorage secureStorage;
+    public SecureStorage secureStorage;
     private ArrayList<SyncedListHeader> syncedListsHeaders;
     private FloatingActionButton fab;
     private RecyclerView recyclerView;
-    private ListsAdapter listsAdapter;
+    public ListsAdapter listsAdapter;
+    private TagsAdapter tagsAdapter;
+    private DrawerLayout drawerLayout;
+    
+    private NavigationView navigationView;
     
     /**
      * In onCreate the layout is set and the global Variables are initialised.
@@ -136,7 +147,92 @@ public class ListsActivity extends AppCompatActivity
                     }
                 }
             });
+        
+        drawerLayout = findViewById(R.id.drawerlayout);
+        navigationView = findViewById(R.id.navigation_view);
+        
+        navigationView.setNavigationItemSelectedListener(this);
+        
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+        {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
+        
+        ActionBarDrawerToggle drawerToggle =
+            new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
+        
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+        
         init();
+        updateNavigrationDrawer();
+    }
+    
+    private void updateNavigrationDrawer()
+    {
+        RecyclerView listView =
+            navigationView.getHeaderView(0).findViewById(R.id.listViewTags);
+        // TODO: Add on nav menu item clicked!
+        
+        if (listView == null)
+        {
+            Log.e("ListsActivity", "ListView is null");
+            return;
+        }
+        
+        ArrayList<ListTag> tagList = new ArrayList<>();
+        try
+        {
+            tagList = secureStorage.getAllTags();
+        }
+        catch (Exception e)
+        {
+            Log.e("ListsActivity", "Error getting tags: " + e);
+        }
+        tagsAdapter = new TagsAdapter(this, tagList, listView);
+        
+        listView.setLayoutManager(new LinearLayoutManager(this));
+        listView.setAdapter(tagsAdapter);
+        
+        ImageButton imgBtnAddTag =
+            navigationView.getHeaderView(0).findViewById(R.id.imgBtnAddTag);
+        imgBtnAddTag.setOnClickListener(v ->
+        {
+            Log.d("ListsActivity", "Clicked on add tag button");
+            DialogBuilder.editTextDialog(this,
+                getString(R.string.create_tag_title),
+                getString(R.string.create_tag_msg),
+                getString(R.string.create_tag_yes),
+                getString(R.string.create_tag_cancel), result ->
+                {
+                    if (result != null)
+                    {
+                        if (result.equals(""))
+                        {
+                            Toast.makeText(this,
+                                getString(R.string.no_name_entered),
+                                Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        ListTag newTag = new ListTag(result);
+                        try
+                        {
+                            tagsAdapter.addTag(newTag);
+                            secureStorage.saveAllTags(tagsAdapter.tagList,
+                                false);
+                        }
+                        catch (Exception e)
+                        {
+                            Toast.makeText(this,
+                                getString(R.string.toast_error_creating_tag),
+                                Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        });
+        navigationView.setNavigationItemSelectedListener(this);
     }
     
     /**
@@ -166,6 +262,17 @@ public class ListsActivity extends AppCompatActivity
             importListFromUrl(intent.getData());
         }
         super.onNewIntent(intent);
+    }
+    
+    @Override public boolean onNavigationItemSelected(@NonNull MenuItem item)
+    {
+        onOptionsItemSelected(item);
+        return true;
+    }
+    
+    @Override public void onPointerCaptureChanged(boolean hasCapture)
+    {
+        super.onPointerCaptureChanged(hasCapture);
     }
     
     /**
@@ -235,6 +342,16 @@ public class ListsActivity extends AppCompatActivity
     {
         switch (item.getItemId())
         {
+            case android.R.id.home:
+                if (drawerLayout.isDrawerOpen(GravityCompat.START))
+                {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                else
+                {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+                return true;
             case R.id.new_list:
                 // Create new list
                 showCreateListDialog();
@@ -425,8 +542,9 @@ public class ListsActivity extends AppCompatActivity
                 }
             }
         }
-        catch (IOException ignored)
+        catch (Exception ignored)
         {
+            Log.e("ListsActivity", "Error importing file: " + ignored);
             ignored.printStackTrace();
         }
     }
@@ -498,8 +616,9 @@ public class ListsActivity extends AppCompatActivity
             newList.setElementSteps(steps);
             addListAndHandleCallback(newList);
         }
-        catch (IOException ignored)
+        catch (Exception ignored)
         {
+            Log.e("ListsActivity", "Error importing file: " + ignored);
             ignored.printStackTrace();
         }
     }
@@ -521,6 +640,7 @@ public class ListsActivity extends AppCompatActivity
             }
             syncedListsHeaders = secureStorage.getListsHeaders();
             listsAdapter.updateItems(syncedListsHeaders, true);
+            tagsAdapter.updateItems(secureStorage.getAllTags(), true);
         }
         catch (Exception exception)
         {
@@ -575,20 +695,21 @@ public class ListsActivity extends AppCompatActivity
         checkPlayStoreReview();
     }
     
-    private void checkPlayStoreReview() {
+    private void checkPlayStoreReview()
+    {
         // Check Play Store rating (Last time is linked in global preference)
         // First time open no check, just save time. Ask after 3 days.
-        if (globalSharedPreferences.getInt("ask_for_review", 0) > 2) {
+        if (globalSharedPreferences.getInt("ask_for_review", 0) > 2)
+        {
             Log.d("PlayStoreReview", "Already asked for review");
             return;
         }
         
-        long lastTime = globalSharedPreferences.getLong(
-            "ask_for_review_last_time", 0);
+        long lastTime =
+            globalSharedPreferences.getLong("ask_for_review_last_time", 0);
         if (lastTime == 0)
         {
-            SharedPreferences.Editor editor =
-                globalSharedPreferences.edit();
+            SharedPreferences.Editor editor = globalSharedPreferences.edit();
             editor.putLong("ask_for_review_last_time",
                 System.currentTimeMillis());
             editor.apply();
@@ -604,7 +725,8 @@ public class ListsActivity extends AppCompatActivity
                     globalSharedPreferences.edit();
                 editor.putLong("ask_for_review_last_time", currentTime);
                 editor.putInt("ask_for_review",
-                    globalSharedPreferences.getInt("ask_for_review", 0) + 1);;
+                    globalSharedPreferences.getInt("ask_for_review", 0) + 1);
+                ;
                 editor.apply();
             }
         }
@@ -803,6 +925,18 @@ public class ListsActivity extends AppCompatActivity
                                 Toast.LENGTH_LONG).show();
                         }
                         return true;
+                    case R.id.assign_tag:
+                        // Assign a tag to the list
+                        try
+                        {
+                            openAssignTagToListPopUp(header);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.e("ListsActivity",
+                                "Error opening assign tag to list popup: " + e);
+                        }
+                        return true;
                 }
                 
                 return false;
@@ -811,4 +945,31 @@ public class ListsActivity extends AppCompatActivity
         
         popup.show();
     }
+    
+    public void openAssignTagToListPopUp(SyncedListHeader header)
+        throws Exception
+    {
+        SyncedList syncedList = secureStorage.getList(header.getId());
+        DialogBuilder.tagSelectionDialog(this, secureStorage.getAllTags(),
+            getString(R.string.assign_tag_to_list_title),
+            getString(R.string.assign_tag_to_list_msg), header, tags ->
+            {
+                
+                syncedList.getHeader().setTagList(tags);
+                header.setTagList(tags);
+                try
+                {
+                    secureStorage.setList(syncedList);
+                    listsAdapter.updateItems(syncedListsHeaders, true);
+                    this.recyclerView.post(
+                        () -> listsAdapter.notifyDataSetChanged());
+                }
+                catch (Exception e)
+                {
+                    Log.e(LOG_TITLE_STORAGE, "Error saving list header: " + e);
+                }
+            });
+    }
 }
+
+

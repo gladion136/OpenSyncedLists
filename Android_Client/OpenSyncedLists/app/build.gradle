@@ -37,6 +37,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.google.android.play:review:2.0.2'
+    implementation 'com.github.Dhaval2404:ColorPicker:2.3'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'

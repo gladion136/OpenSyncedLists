@@ -101,5 +101,27 @@
     <string name="import_list_url_yes">Ok</string>
     <string name="import_list_url_cancel">Cancel</string>
     <string name="search">Search</string>
+    <string name="unknown_file_type">Unknown file type</string>
     <string name="menu_review_on_playstore">Rate in Play Store</string>
+    <string name="create_tag_title">Create new tag</string>
+    <string name="create_tag_msg">Create a new tag to filter lists.</string>
+    <string name="create_tag_yes">Create</string>
+    <string name="create_tag_cancel">Abort</string>
+    <string name="menu_rename_tag">Rename tag</string>
+    <string name="menu_remove_tag">Remove tag</string>
+    <string name="menu_change_tag_color">Change color</string>
+    <string name="untagged">untagged</string>
+    <string name="menu_assign_tag">Assign tags</string>
+    <string name="assign_tag_to_list_title">Assign tags</string>
+    <string name="assign_tag_to_list_msg">Assign tags to the list</string>
+    <string name="rename_tag_dialog_title">Rename tag</string>
+    <string name="rename_tag_dialog_message">Enter a new name</string>
+    <string name="rename_tag_dialog_no_option">Abort</string>
+    <string name="rename_tag_dialog_yes_option">Submit</string>
+    <string name="default_tag_title_favorites">Favorites</string>
+    <string name="default_tag_title_shopping">Shopping</string>
+    <string name="default_tag_title_projects">Projects</string>
+    <string name="default_tag_title_work">Work</string>
+    <string name="change_tag_color_picker_title">Pick color</string>
+    <string name="menu_show_changelog">Show changelog</string>
 </resources>

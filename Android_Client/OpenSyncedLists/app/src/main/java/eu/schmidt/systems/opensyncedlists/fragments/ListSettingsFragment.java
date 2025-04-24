@@ -100,12 +100,12 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
         
         editTextPreference.setText(syncedList.getName());
-        editTextPreference
-            .setOnPreferenceChangeListener((preference, newValue) ->
+        editTextPreference.setOnPreferenceChangeListener(
+            (preference, newValue) ->
             {
                 String newName = (String) newValue;
-                if (!newName.equals("") && !newName
-                    .equals(syncedList.getName()))
+                if (!newName.equals("") && !newName.equals(
+                    syncedList.getName()))
                 {
                     syncedList.setName(newName);
                     save();
@@ -137,8 +137,8 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
             {
                 syncedList.getHeader().setCheckOption(newVal);
                 syncedList.getHeader().setCheckedList(newVal);
-                checkListPref
-                    .setChecked(syncedList.getHeader().isCheckedList());
+                checkListPref.setChecked(
+                    syncedList.getHeader().isCheckedList());
                 syncedList.recalculateBuffers();
                 save();
             }
@@ -159,8 +159,8 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         }));
         
         invertElementPref.setChecked(syncedList.getHeader().isInvertElement());
-        invertElementPref
-            .setOnPreferenceChangeListener(((preference, newValue) ->
+        invertElementPref.setOnPreferenceChangeListener(
+            ((preference, newValue) ->
             {
                 boolean newVal = (boolean) newValue;
                 if (newVal != syncedList.getHeader().isInvertElement())
@@ -182,9 +182,10 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
             }
             return true;
         }));
-    
+        
         jumpButtons.setChecked(syncedList.getHeader().isJumpButtons());
-        jumpButtons.setOnPreferenceChangeListener(((preference, newValue) -> {
+        jumpButtons.setOnPreferenceChangeListener(((preference, newValue) ->
+        {
             boolean newVal = (boolean) newValue;
             if (newVal != syncedList.getHeader().isJumpButtons())
             {

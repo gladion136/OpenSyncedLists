@@ -34,4 +34,8 @@
         android:id="@+id/list_settings"
         android:title="@string/menu_list_settings" />
 
+    <item
+        android:id="@+id/assign_tag"
+        android:title="@string/menu_assign_tag" />
+
 </menu>

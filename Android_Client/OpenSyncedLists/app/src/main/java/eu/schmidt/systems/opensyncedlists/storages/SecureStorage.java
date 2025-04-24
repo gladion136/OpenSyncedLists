@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ListTag;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
@@ -221,5 +222,129 @@ public class SecureStorage
         }
         setList(syncedList);
         return result;
+    }
+    
+    public ArrayList<ListTag> getAllTags() throws Exception
+    {
+        ArrayList<ListTag> allTags = new ArrayList<>();
+        ArrayList<SyncedListHeader> headers = getListsHeaders();
+        ListTag untaggedTag = new ListTag(context.getString(R.string.untagged));
+        untaggedTag.untagged = true;
+        untaggedTag.filterEnabled = false;
+        allTags.add(untaggedTag);
+        
+        String tagListJson = sharedPref.getString("allTags", "");
+        if (tagListJson.equals(""))
+        {
+            ListTag default_tag_favorites = new ListTag(
+                context.getString(R.string.default_tag_title_favorites));
+            default_tag_favorites.filterEnabled = false;
+            default_tag_favorites.colorHex = "#f06292";
+            allTags.add(default_tag_favorites);
+            ListTag default_tag_shopping = new ListTag(
+                context.getString(R.string.default_tag_title_shopping));
+            default_tag_shopping.filterEnabled = false;
+            default_tag_shopping.colorHex = "#ff8a65";
+            allTags.add(default_tag_shopping);
+            ListTag default_tag_ideas = new ListTag(
+                context.getString(R.string.default_tag_title_projects));
+            default_tag_ideas.filterEnabled = false;
+            default_tag_ideas.colorHex = "#4fc3f7";
+            allTags.add(default_tag_ideas);
+            ListTag default_tag_work =
+                new ListTag(context.getString(R.string.default_tag_title_work));
+            default_tag_work.filterEnabled = false;
+            default_tag_work.colorHex = "#dce775";
+            allTags.add(default_tag_work);
+        }
+        try
+        {
+            JSONArray tagsJsonArray = new JSONArray(tagListJson);
+            for (int i = 0; i < tagsJsonArray.length(); i++)
+            {
+                JSONObject tagJsonObject = tagsJsonArray.getJSONObject(i);
+                ListTag tag = new ListTag(tagJsonObject);
+                if (allTags.stream()
+                    .noneMatch(tag2 -> tag2.name.equals(tag.name)))
+                {
+                    allTags.add(tag);
+                }
+                else
+                {
+                    allTags.replaceAll(existingTag ->
+                    {
+                        if (existingTag.name.equals(tag.name))
+                        {
+                            return tag;
+                        }
+                        return existingTag;
+                    });
+                }
+            }
+        }
+        catch (JSONException e)
+        {
+            Log.e("SecureStorage", "Error parsing tags JSON: " + e);
+        }
+        
+        for (int i = 0; i < headers.size(); i++)
+        {
+            SyncedListHeader header = headers.get(i);
+            ArrayList<ListTag> headerTags = header.getTagList();
+            
+            if (headerTags != null)
+            {
+                for (int j = 0; j < headerTags.size(); j++)
+                {
+                    ListTag tag = headerTags.get(j);
+                    if (allTags.stream()
+                        .noneMatch(t -> t.name.equals(tag.name)))
+                    {
+                        allTags.add(tag);
+                    }
+                }
+            }
+        }
+        
+        for (ListTag tag : allTags)
+        {
+            Log.d("SecureStorage",
+                "Tag: " + tag.name + ", Color: " + tag.colorHex
+                    + ", FilterEnabled: " + tag.filterEnabled);
+        }
+        return allTags;
+    }
+    
+    public void saveAllTags(ArrayList<ListTag> list, boolean update_all_lists)
+        throws Exception
+    {
+        JSONArray jsonArray = new JSONArray();
+        for (ListTag tag : list)
+        {
+            jsonArray.put(tag.toJSON());
+        }
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("allTags", jsonArray.toString());
+        editor.apply();
+        
+        if (!update_all_lists)
+        {
+            return;
+        }
+        for (SyncedListHeader listHeader : getListsHeaders())
+        {
+            for (ListTag tag : list)
+            {
+                listHeader.getTagList().stream()
+                    .filter(t -> t.name.equals(tag.name)).forEach(t ->
+                    {
+                        t.colorHex = tag.colorHex;
+                        Log.d("SecureStorage",
+                            "Tag color updated: " + t.name + " from " + t.colorHex
+                                + " to " + tag.colorHex);
+                        t.filterEnabled = tag.filterEnabled;
+                    });
+            }
+        }
     }
 }

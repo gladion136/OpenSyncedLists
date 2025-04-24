@@ -26,6 +26,9 @@
         android:id="@+id/openWebpage"
         android:title="@string/menu_open_webpage"/>
     <item
+        android:id="@+id/showChangelog"
+        android:title="@string/menu_show_changelog"/>
+    <item
         android:id="@+id/showSourceCode"
         android:title="@string/menu_show_source"/>
     <item

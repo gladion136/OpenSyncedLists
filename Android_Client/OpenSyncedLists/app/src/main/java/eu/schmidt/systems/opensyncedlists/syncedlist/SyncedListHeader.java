@@ -16,8 +16,13 @@
  */
 package eu.schmidt.systems.opensyncedlists.syncedlist;
 
+import android.util.Log;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -43,6 +48,8 @@ public class SyncedListHeader
     private SecretKey localSecret;
     private String listSize;
     
+    private ArrayList<ListTag> tagList;
+    
     /**
      * Load a header from JSON.
      *
@@ -59,7 +66,22 @@ public class SyncedListHeader
         invertElement = jsonObject.getBoolean("invertElement");
         hostname = jsonObject.getString("hostname");
         listSize = jsonObject.getString("listSize");
+        tagList = new ArrayList<>();
+        
         ///  WARNING !! Add new properties only with checking for compatibility
+        if (jsonObject.has("tags"))
+        {
+            for (int i = 0; i < jsonObject.getJSONArray("tags").length(); i++)
+            {
+                ListTag new_tag = new ListTag(
+                    jsonObject.getJSONArray("tags").getJSONObject(i));
+                if (tagList.stream()
+                    .noneMatch(t -> t.name.equals(new_tag.name)))
+                {
+                    tagList.add(new_tag);
+                }
+            }
+        }
         if (jsonObject.has("jumpButtons"))
         {
             jumpButtons = jsonObject.getBoolean("jumpButtons");
@@ -105,6 +127,28 @@ public class SyncedListHeader
         this.invertElement = false;
         this.autoSync = true;
         this.listSize = "0 / 0";
+    }
+    
+    public ArrayList<ListTag> getTagList()
+    {
+        return tagList;
+    }
+    
+    public void setTagList(ArrayList<ListTag> tagList)
+    {
+        ArrayList<ListTag> uniqueTags = new ArrayList<>();
+        for (ListTag tag : tagList)
+        {
+            if (!uniqueTags.contains(tag))
+            {
+                uniqueTags.add(tag);
+            }
+            else
+            {
+                Log.e("SyncedListHeader", "Duplicate tag found: " + tag.name);
+            }
+        }
+        this.tagList = uniqueTags;
     }
     
     public String getId()
@@ -250,6 +294,13 @@ public class SyncedListHeader
             jsonObject.put("secret", Cryptography.byteArrayToString(secret));
             jsonObject.put("localSecret",
                 Cryptography.byteArrayToString(localSecret.getEncoded()));
+            
+            JSONArray tagArray = new JSONArray();
+            for (ListTag tag : tagList)
+            {
+                tagArray.put(tag.toJSON());
+            }
+            jsonObject.put("tags", tagArray);
         }
         catch (JSONException exception)
         {

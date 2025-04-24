@@ -17,24 +17,34 @@
 package eu.schmidt.systems.opensyncedlists.adapters;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.activities.ListActivity;
 import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
+import eu.schmidt.systems.opensyncedlists.syncedlist.ListTag;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 
@@ -42,8 +52,10 @@ import eu.schmidt.systems.opensyncedlists.utils.Constant;
  * ListView Adapter for ListsActivity.
  */
 public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+    implements Filterable
 {
     final ArrayList<SyncedListHeader> syncedListsHeaders;
+    final ArrayList<SyncedListHeader> syncedListsHeadersFiltered;
     final ListsActivity listsActivity;
     
     public ListsAdapter(ListsActivity listsActivity,
@@ -52,6 +64,7 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
         this.listsActivity = listsActivity;
         this.syncedListsHeaders = syncedListsHeaders;
+        this.syncedListsHeadersFiltered = new ArrayList<>();
         LayoutInflater.from(listsActivity);
         
         // Add ItemTouchHelper for drag and drop events
@@ -138,7 +151,10 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
         if (holder instanceof ViewHolder viewHolder)
         {
-            SyncedListHeader header = syncedListsHeaders.get(position);
+            SyncedListHeader header =
+                filterActive ? syncedListsHeadersFiltered.get(position)
+                    : syncedListsHeaders.get(position);
+            
             viewHolder.tVName.setText(header.getName());
             viewHolder.tVSize.setText(header.getListSize());
             viewHolder.imgBtnListMenu.setOnClickListener(v ->
@@ -151,7 +167,73 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 intent.putExtra("id", header.getId());
                 listsActivity.startActivity(intent);
             });
+            
+            viewHolder.chipGrpTags.removeAllViews();
+            
+            if (header.getTagList().isEmpty())
+            {
+                return;
+            }
+            ListTag firstTag = header.getTagList().get(0);
+            try
+            {
+                ListTag finalFirstTag = firstTag;
+                Optional<ListTag> firstTagFromGlobalStorage =
+                    listsActivity.secureStorage.getAllTags().stream()
+                        .filter(t -> finalFirstTag.name.equals(t.name))
+                        .findFirst();
+                if (firstTagFromGlobalStorage.isPresent())
+                {
+                    firstTag = firstTagFromGlobalStorage.get();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("TAG", "Error getting tags: " + e);
+            }
+            if (firstTag != null)
+            {
+                Chip chip = new Chip(listsActivity);
+                chip.setText(firstTag.name);
+                chip.setCloseIconVisible(false);
+                chip.setClickable(false);
+                chip.setCheckable(false);
+                chip.setChipBackgroundColor(getChipColor(firstTag.colorHex));
+                Log.d("TAG",
+                    "Tag '" + firstTag.name + "' color: " + firstTag.colorHex);
+                viewHolder.chipGrpTags.addView(chip);
+                
+                if (header.getTagList().size() > 1)
+                {
+                    Chip chip_placeholder = new Chip(listsActivity);
+                    chip_placeholder.setText("...");
+                    chip_placeholder.setCloseIconVisible(false);
+                    chip_placeholder.setClickable(false);
+                    chip_placeholder.setCheckable(false);
+                    viewHolder.chipGrpTags.addView(chip_placeholder);
+                }
+            }
         }
+    }
+    
+    public ColorStateList getChipColor(String colorHex)
+    {
+        int color = Color.parseColor(colorHex);
+        
+        // Hintergrundfarbe
+        int[][] states =
+            new int[][]{new int[]{android.R.attr.state_enabled}, // enabled
+                new int[]{-android.R.attr.state_enabled}, // disabled
+                new int[]{-android.R.attr.state_checked}, // unchecked
+                new int[]{android.R.attr.state_pressed}  // pressed
+            };
+        
+        int[] colors = new int[]{color,
+            ContextCompat.getColor(listsActivity, android.R.color.darker_gray),
+            //disabled color
+            color, color};
+        
+        return new ColorStateList(states, colors);
     }
     
     @Override public int getItemViewType(int position)
@@ -167,6 +249,10 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     
     @Override public int getItemCount()
     {
+        if (filterActive)
+        {
+            return syncedListsHeadersFiltered.size();
+        }
         return syncedListsHeaders.size();
     }
     
@@ -180,6 +266,7 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
         this.syncedListsHeaders.clear();
         this.syncedListsHeaders.addAll(listData);
+        getFilter().filter(null);
         Log.d(Constant.LOG_TITLE_DEFAULT,
             "Update Elements: " + syncedListsHeaders.size());
         if (notify)
@@ -197,6 +284,7 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public final TextView tVName;
         public final TextView tVSize;
         public final ImageButton imgBtnListMenu;
+        public final ChipGroup chipGrpTags;
         
         public ViewHolder(@NonNull View itemView)
         {
@@ -205,6 +293,116 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             tVName = itemView.findViewById(R.id.tVName);
             tVSize = itemView.findViewById(R.id.tVSize);
             imgBtnListMenu = itemView.findViewById(R.id.imgBtnListMenu);
+            chipGrpTags = itemView.findViewById(R.id.chipGrpTags);
         }
     }
+    
+    @Override public Filter getFilter()
+    {
+        return syncedListFilter;
+    }
+    
+    Boolean filterActive = false;
+    
+    private Filter syncedListFilter = new Filter()
+    {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            ArrayList<SyncedListHeader> filteredList = new ArrayList<>();
+            
+            ArrayList<ListTag> activeTags = new ArrayList<>();
+            try
+            {
+                for (ListTag tag : listsActivity.secureStorage.getAllTags())
+                {
+                    if (tag.filterEnabled)
+                    {
+                        activeTags.add(tag);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("TAG", "Error getting tags: " + e);
+            }
+            for (ListTag tag : activeTags)
+            {
+                Log.d("Filter active:", "Tag: " + tag.name);
+            }
+            if (activeTags.size() <= 0)
+            {
+                filteredList.addAll(syncedListsHeaders);
+                Log.d("Filter", "No filter");
+                filterActive = false;
+            }
+            else
+            {
+                filterActive = true;
+                
+                for (SyncedListHeader item : syncedListsHeaders)
+                {
+                    for (ListTag tag_s : activeTags)
+                    {
+                        ArrayList<ListTag> tag_list_of_item = item.getTagList();
+                        if (tag_list_of_item.isEmpty() && tag_s.untagged)
+                        {
+                            filteredList.add(item);
+                        }
+                        else if (tag_list_of_item.stream()
+                            .anyMatch(tag_m -> tag_m.name.equals(tag_s.name)))
+                        
+                        {
+                            filteredList.add(item);
+                        }
+                    }
+                }
+            }
+            
+            // Remove duplicated
+            ArrayList<SyncedListHeader> filteredListNoDuplicates =
+                new ArrayList<>();
+            for (SyncedListHeader item : filteredList)
+            {
+                if (filteredListNoDuplicates.stream()
+                    .noneMatch(item2 -> item2.getId().equals(item.getId())))
+                {
+                    filteredListNoDuplicates.add(item);
+                }
+            }
+            Log.d("Filter",
+                "Filtered list size: " + filteredListNoDuplicates.size());
+            Log.d("Filter", "Original list size: " + filteredList.size());
+            Log.d("Filter", "All list size: " + syncedListsHeaders.size());
+            FilterResults results = new FilterResults();
+            results.values = filteredListNoDuplicates;
+            results.count = filteredListNoDuplicates.size();
+            return results;
+        }
+        
+        @Override protected void publishResults(CharSequence constraint,
+            FilterResults results)
+        {
+            syncedListsHeadersFiltered.clear();
+            try
+            {
+                if (results.values instanceof ArrayList)
+                {
+                    syncedListsHeadersFiltered.addAll(
+                        (ArrayList) results.values);
+                }
+                else
+                {
+                    throw new Exception("Results are not an ArrayList");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Filter", "Error casting results: " + e);
+                syncedListsHeadersFiltered.addAll(syncedListsHeaders);
+            }
+            
+            notifyDataSetChanged();
+        }
+    };
 }

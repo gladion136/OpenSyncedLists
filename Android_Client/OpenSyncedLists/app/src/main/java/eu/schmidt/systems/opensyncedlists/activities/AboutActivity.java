@@ -20,7 +20,6 @@ import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAUL
 import static eu.schmidt.systems.opensyncedlists.utils.PlayStore.askForPlayStoreReview;
 
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -37,13 +36,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.tasks.Task;
-import com.google.android.play.core.review.ReviewException;
-import com.google.android.play.core.review.ReviewInfo;
-import com.google.android.play.core.review.ReviewManager;
-import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.review.model.ReviewErrorCode;
 
 import eu.schmidt.systems.opensyncedlists.R;
 
@@ -158,6 +150,10 @@ public class AboutActivity extends AppCompatActivity
             case R.id.showSourceCode:
                 startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse(getString(R.string.sourcecode_webpage))));
+                return true;
+            case R.id.showChangelog:
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(getString(R.string.changelog_webpage))));
                 return true;
             case R.id.reviewOnPlayStore:
                 askForPlayStoreReview(this);

@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -185,8 +184,7 @@ public class ListActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
-                    Log.e("ListActivity",
-                        "Local storage write error: " + e);
+                    Log.e("ListActivity", "Local storage write error: " + e);
                 }
                 this.recyclerView.post(
                     () -> syncedListAdapter.notifyDataSetChanged());

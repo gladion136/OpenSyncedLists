@@ -125,5 +125,27 @@
     <string name="import_list_url_yes">Ok</string>
     <string name="import_list_url_cancel">Abbrechen</string>
     <string name="search">Suchen</string>
+    <string name="unknown_file_type">Unbekanntes Dateiformat</string>
     <string name="menu_review_on_playstore">Im Play Store bewerten</string>
+    <string name="create_tag_title">Neuen Tag erstellen</string>
+    <string name="create_tag_msg">Erstelle einen neuen Tag, um deine Listen damit zu soriteren.</string>
+    <string name="create_tag_yes">Erstellen</string>
+    <string name="create_tag_cancel">Abbrechen</string>
+    <string name="menu_rename_tag">Tag umbenennen</string>
+    <string name="menu_remove_tag">Tag löschen</string>
+    <string name="menu_change_tag_color">Farbe ändern</string>
+    <string name="untagged">Ohne Tag</string>
+    <string name="menu_assign_tag">Tags zuweisen</string>
+    <string name="assign_tag_to_list_title">Tags zuweisen</string>
+    <string name="assign_tag_to_list_msg">Füge Tags zu der Liste hinzu.</string>
+    <string name="rename_tag_dialog_title">Tag umbenennen</string>
+    <string name="rename_tag_dialog_message">Wähle einen neuen Namen für den Tag</string>
+    <string name="rename_tag_dialog_no_option">Abbrechen</string>
+    <string name="rename_tag_dialog_yes_option">Bestätigen</string>
+    <string name="default_tag_title_favorites">Favoriten</string>
+    <string name="default_tag_title_shopping">Shopping</string>
+    <string name="default_tag_title_projects">Projekte</string>
+    <string name="default_tag_title_work">Arbeit</string>
+    <string name="change_tag_color_picker_title">Wähle eine Farbe</string>
+    <string name="menu_show_changelog">Öffne den Changelog</string>
 </resources>
