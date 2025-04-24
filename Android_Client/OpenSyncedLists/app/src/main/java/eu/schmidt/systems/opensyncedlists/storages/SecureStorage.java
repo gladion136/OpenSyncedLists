@@ -264,6 +264,10 @@ public class SecureStorage
             {
                 JSONObject tagJsonObject = tagsJsonArray.getJSONObject(i);
                 ListTag tag = new ListTag(tagJsonObject);
+                if (tag.untagged)
+                {
+                    continue;
+                }
                 if (allTags.stream()
                     .noneMatch(tag2 -> tag2.name.equals(tag.name)))
                 {
