@@ -20,6 +20,7 @@ import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAUL
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,10 +33,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -43,7 +47,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -493,6 +500,8 @@ public class ListsActivity extends AppCompatActivity
                             false));
                     SyncedList newList =
                         new SyncedList(header, new ArrayList<>());
+                    Log.d("ListsActivity",
+                        "Creating new list: " + newList.getName());
                     addListAndHandleCallback(newList);
                 }
             });
@@ -630,6 +639,8 @@ public class ListsActivity extends AppCompatActivity
      */
     protected void addListAndHandleCallback(SyncedList syncedList)
     {
+        Log.d("ListsActivity",
+            "Adding list to local storage: " + syncedList.getName());
         String result;
         try
         {
@@ -641,9 +652,13 @@ public class ListsActivity extends AppCompatActivity
             syncedListsHeaders = secureStorage.getListsHeaders();
             listsAdapter.updateItems(syncedListsHeaders, true);
             tagsAdapter.updateItems(secureStorage.getAllTags(), true);
+            Log.d("ListsActivity",
+                "Added list to local storage: " + syncedList.getName());
         }
         catch (Exception exception)
         {
+            Log.e("ListsActivity",
+                "Error adding list to local storage: " + exception);
             exception.printStackTrace();
         }
     }
@@ -686,10 +701,12 @@ public class ListsActivity extends AppCompatActivity
         }
         
         listsAdapter = new ListsAdapter(this,
-            (ArrayList<SyncedListHeader>) syncedListsHeaders.clone(),
+            (ArrayList<SyncedListHeader>) syncedListsHeaders,
             recyclerView);
         updateListSettings();
         recyclerView.setAdapter(listsAdapter);
+        
+        // here is your color
         
         checkServerConnection();
         checkPlayStoreReview();

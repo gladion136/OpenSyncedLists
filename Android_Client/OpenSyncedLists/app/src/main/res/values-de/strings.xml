@@ -148,4 +148,6 @@
     <string name="default_tag_title_work">Arbeit</string>
     <string name="change_tag_color_picker_title">Wähle eine Farbe</string>
     <string name="menu_show_changelog">Öffne den Changelog</string>
+    <string name="pref_list_overview_instead_cards_summary">Listen Übersicht: Darstellung als Liste anstatt Karten.</string>
+    <string name="pref_list_overview_instead_cards_title">Listen Übersicht: Liste anstatt Karten</string>
 </resources>

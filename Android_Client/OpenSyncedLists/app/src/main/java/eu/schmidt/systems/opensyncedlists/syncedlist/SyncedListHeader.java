@@ -127,6 +127,7 @@ public class SyncedListHeader
         this.invertElement = false;
         this.autoSync = true;
         this.listSize = "0 / 0";
+        this.tagList = new ArrayList<>();
     }
     
     public ArrayList<ListTag> getTagList()
@@ -300,7 +301,12 @@ public class SyncedListHeader
             {
                 tagArray.put(tag.toJSON());
             }
-            jsonObject.put("tags", tagArray);
+            if (tagList.size() == 0)
+            {
+                jsonObject.put("tags", new JSONArray());
+            } else {
+                jsonObject.put("tags", tagArray);
+            }
         }
         catch (JSONException exception)
         {

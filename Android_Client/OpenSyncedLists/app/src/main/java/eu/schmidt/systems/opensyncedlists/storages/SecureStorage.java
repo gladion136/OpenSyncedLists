@@ -49,6 +49,8 @@ public class SecureStorage
         sharedPref = context.getSharedPreferences(
             context.getString(R.string.preference_file_key),
             Context.MODE_PRIVATE);
+        
+        Log.i("SecureStorage", "SecureStorage initialized");
     }
     
     /**
@@ -103,6 +105,11 @@ public class SecureStorage
         for (String id : ids)
         {
             String data = sharedPref.getString("HEADER_" + id, "");
+            if (data.equals(""))
+            {
+                continue;
+            }
+            Log.i("SecureStorage", "Header: " + data);
             result.add(new SyncedListHeader(new JSONObject(data)));
         }
         Log.d(Constant.LOG_TITLE_STORAGE, "Load Lists Headers");
