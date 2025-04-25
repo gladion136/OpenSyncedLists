@@ -1,5 +1,15 @@
 # Changelog of OpenSyncedLists
 
+## 1.1.0 (25.04.2025)
+
+- feat: add tags to filter lists
+- feat: display lists as cards
+- feat: list overview (compact view)
+- feat: text file import
+- update: increase button touch fields
+- update: translations
+- update: android target sdk
+
 ## 1.0.11 (19.11.2024)
 
 - feat: search support

@@ -1,0 +1,7 @@
+- feat: add tags to filter lists
+- feat: display lists as cards
+- feat: list overview (compact view)
+- feat: text file import
+- update: increase button touch fields
+- update: translations
+- update: android target sdk
