@@ -1,0 +1,22 @@
+[application]
+name = "opensyncedlists"
+
+[web.app]
+title = "OpenSyncedLists"
+
+[web.watcher]
+watch_path = ["src"]
+
+[web.resource.dev]
+
+[web.build]
+features = ["web"]
+
+[desktop.app]
+title = "OpenSyncedLists"
+
+[desktop.watcher]
+watch_path = ["src"]
+
+[desktop.build]
+features = ["desktop"]

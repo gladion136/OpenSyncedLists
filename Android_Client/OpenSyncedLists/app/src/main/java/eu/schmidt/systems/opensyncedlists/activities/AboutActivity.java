@@ -33,127 +33,154 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import eu.schmidt.systems.opensyncedlists.BuildConfig;
 import eu.schmidt.systems.opensyncedlists.R;
 
 /**
  * Activity for showing things about the app like author, licence, version.
  */
-public class AboutActivity extends AppCompatActivity
-{
-    
+public class AboutActivity extends AppCompatActivity {
+
     /**
      * In onCreate the layout is set and the associated textViews got filled
      * with content.
      *
      * @param savedInstanceState In this case just used for the super call.
      */
-    @Override protected void onCreate(Bundle savedInstanceState)
-    {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String version = "UNKOWN";
-        try
-        {
-            PackageInfo pInfo = this.getPackageManager()
-                .getPackageInfo(this.getPackageName(), 0);
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(
+                this.getPackageName(),
+                0
+            );
             version = pInfo.versionName;
-        }
-        catch (PackageManager.NameNotFoundException e)
-        {
+        } catch (PackageManager.NameNotFoundException e) {
             Log.e("AboutActivity", "Error getting version name");
         }
-        
+
         setContentView(R.layout.activity_about);
         setTitle(getString(R.string.menu_about));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView tv = findViewById(R.id.tVAbout);
         tv.setText(Html.fromHtml(getString(R.string.text_about)));
         tv.setMovementMethod(LinkMovementMethod.getInstance());
-        
+
         TextView tvOthers = findViewById(R.id.tVOthers);
         tvOthers.setText(Html.fromHtml(getString(R.string.text_about_others)));
         tvOthers.setMovementMethod(LinkMovementMethod.getInstance());
-        
+
         TextView tvVersion = findViewById(R.id.tVVersion);
         tvVersion.setText("Version: " + version);
+
+        TextView tvBuildVariant = findViewById(R.id.tVBuildVariant);
+        String buildVariant = BuildConfig.ENABLE_PLAY_REVIEW
+            ? "Play Store"
+            : "F-Droid";
+        tvBuildVariant.setText("Build: " + buildVariant);
     }
-    
+
     /**
      * In onCreateOptionsMenu the menu from the ActionBar is inflated.
      *
      * @param menu Menu to inflate
      * @return true
      */
-    @Override public boolean onCreateOptionsMenu(Menu menu)
-    {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.about_menu, menu);
         return true;
     }
-    
+
     /**
      * onOptionsItemSelected handles the events from the ActionBar.
      *
      * @param item selected item
      * @return action handled?
      */
-    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 // Back to ListsActivity
                 onBackPressed();
                 return true;
             case R.id.openInPlayStore:
-                try
-                {
-                    Intent rateIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(String.format("%s?id=%s", "market://",
-                            getPackageName())));
+                try {
+                    Intent rateIntent = new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(
+                            String.format(
+                                "%s?id=%s",
+                                "market://",
+                                getPackageName()
+                            )
+                        )
+                    );
                     startActivity(rateIntent);
-                }
-                catch (ActivityNotFoundException e)
-                {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(
-                        "http://play.google.com/store/apps/details?id="
-                            + getPackageName())));
+                } catch (ActivityNotFoundException e) {
+                    startActivity(
+                        new Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(
+                                "http://play.google.com/store/apps/details?id=" +
+                                    getPackageName()
+                            )
+                        )
+                    );
                 }
                 return true;
             case R.id.contact_developer:
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
                 intent.setData(Uri.parse("mailto:"));
-                intent.putExtra(Intent.EXTRA_EMAIL,
-                    new String[]{getString(R.string.dev_mail_address)});
-                intent.putExtra(Intent.EXTRA_SUBJECT,
-                    getString(R.string.dev_mail_subject));
-                if (intent.resolveActivity(getPackageManager()) != null)
-                {
+                intent.putExtra(
+                    Intent.EXTRA_EMAIL,
+                    new String[] { getString(R.string.dev_mail_address) }
+                );
+                intent.putExtra(
+                    Intent.EXTRA_SUBJECT,
+                    getString(R.string.dev_mail_subject)
+                );
+                if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
-                }
-                else
-                {
+                } else {
                     // Open play store feedback
                     Log.e(LOG_TITLE_DEFAULT, "No activity found to send mail");
-                    Toast.makeText(this,
+                    Toast.makeText(
+                        this,
                         getString(R.string.no_app_for_intent_installed),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT
+                    ).show();
                 }
                 return true;
             case R.id.openWebpage:
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(getString(R.string.app_webpage))));
+                startActivity(
+                    new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(getString(R.string.app_webpage))
+                    )
+                );
                 return true;
             case R.id.showSourceCode:
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(getString(R.string.sourcecode_webpage))));
+                startActivity(
+                    new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(getString(R.string.sourcecode_webpage))
+                    )
+                );
                 return true;
             case R.id.showChangelog:
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(getString(R.string.changelog_webpage))));
+                startActivity(
+                    new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(getString(R.string.changelog_webpage))
+                    )
+                );
                 return true;
             case R.id.reviewOnPlayStore:
                 askForPlayStoreReview(this);
@@ -163,4 +190,3 @@ public class AboutActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 }
-

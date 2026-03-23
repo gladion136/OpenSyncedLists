@@ -1,0 +1,18 @@
+[workspace]
+members = ["opensyncedlists-crossplattform"]
+
+authors = ["Etienne Schmidt <eschmidt@schmidt-ti.eu>"]
+license = "GPL-3.0-or-later"
+edition = "2021"
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"

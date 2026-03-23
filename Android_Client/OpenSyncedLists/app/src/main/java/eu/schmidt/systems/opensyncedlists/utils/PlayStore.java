@@ -19,38 +19,68 @@ package eu.schmidt.systems.opensyncedlists.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import eu.schmidt.systems.opensyncedlists.BuildConfig;
 
-import com.google.android.gms.tasks.Task;
-import com.google.android.play.core.review.ReviewException;
-import com.google.android.play.core.review.ReviewInfo;
-import com.google.android.play.core.review.ReviewManager;
-import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.review.model.ReviewErrorCode;
+public class PlayStore {
 
-public class PlayStore
-{
     public static void askForPlayStoreReview(Activity context) {
-        ReviewManager manager = ReviewManagerFactory.create(context);
-        Task<ReviewInfo> request = manager.requestReviewFlow();
+        if (!BuildConfig.ENABLE_PLAY_REVIEW) {
+            Log.d(
+                "PlayStoreReview",
+                "Play Store review disabled in this build variant"
+            );
+            return;
+        }
+
+        try {
+            Class.forName(
+                "com.google.android.play.core.review.ReviewManagerFactory"
+            );
+        } catch (ClassNotFoundException e) {
+            Log.e(
+                "PlayStoreReview",
+                "Play Core library not available in this build variant"
+            );
+            return;
+        }
+
+        com.google.android.play.core.review.ReviewManager manager =
+            com.google.android.play.core.review.ReviewManagerFactory.create(
+                context
+            );
+        com.google.android.gms.tasks.Task<
+            com.google.android.play.core.review.ReviewInfo
+        > request = manager.requestReviewFlow();
         request.addOnCompleteListener(task_info -> {
             if (task_info.isSuccessful()) {
-                ReviewInfo reviewInfo = task_info.getResult();
-                Log.d("PlayStoreReview",
-                    "ReviewInfo object created successfully");
-                
-                Task<Void> flow = manager.launchReviewFlow(context, reviewInfo);
+                com.google.android.play.core.review.ReviewInfo reviewInfo =
+                    task_info.getResult();
+                Log.d(
+                    "PlayStoreReview",
+                    "ReviewInfo object created successfully"
+                );
+
+                com.google.android.gms.tasks.Task<Void> flow =
+                    manager.launchReviewFlow(context, reviewInfo);
                 flow.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("PlayStoreReview", "Review flow launched successfully");
-                    }
-                    else {
-                        Log.e("PlayStoreReview",
-                            "Error launching review flow: " + task.getException());
+                        Log.d(
+                            "PlayStoreReview",
+                            "Review flow launched successfully"
+                        );
+                    } else {
+                        Log.e(
+                            "PlayStoreReview",
+                            "Error launching review flow: " +
+                                task.getException()
+                        );
                     }
                 });
             } else {
-                Log.e("PlayStoreReview",
-                    "Error requesting review flow (play store) ");
+                Log.e(
+                    "PlayStoreReview",
+                    "Error requesting review flow (play store) "
+                );
             }
         });
     }

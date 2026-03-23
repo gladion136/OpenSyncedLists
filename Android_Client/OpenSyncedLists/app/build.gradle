@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdk 35
-    
+
     defaultConfig {
         applicationId "eu.schmidt.systems.opensyncedlists"
         minSdkVersion 24
@@ -13,6 +13,22 @@ android {
         versionName "1.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    flavorDimensions "version"
+    productFlavors {
+        fdroid {
+            dimension "version"
+            buildConfigField "boolean", "ENABLE_PLAY_REVIEW", "false"
+        }
+        playstore {
+            dimension "version"
+            buildConfigField "boolean", "ENABLE_PLAY_REVIEW", "true"
+        }
     }
 
     buildTypes {
@@ -36,7 +52,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'com.google.android.play:review:2.0.2'
+    playstoreImplementation 'com.google.android.play:review:2.0.2'
     implementation 'com.github.Dhaval2404:ColorPicker:2.3'
 
     testImplementation 'junit:junit:4.13.2'
