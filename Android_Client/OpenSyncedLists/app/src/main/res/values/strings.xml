@@ -109,7 +109,6 @@
     <string name="search">Search</string>
     <string name="action_overview_title" translatable="false">Show overview</string>
     <string name="unknown_file_type">Unknown file type</string>
-    <string name="menu_review_on_playstore">Rate in Play Store</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="create_tag_title">Create new tag</string>

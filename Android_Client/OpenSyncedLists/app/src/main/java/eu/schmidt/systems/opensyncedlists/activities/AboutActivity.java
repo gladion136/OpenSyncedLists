@@ -17,7 +17,6 @@
 package eu.schmidt.systems.opensyncedlists.activities;
 
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
-import static eu.schmidt.systems.opensyncedlists.utils.PlayStore.askForPlayStoreReview;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -154,9 +153,6 @@ public class AboutActivity extends AppCompatActivity
             case R.id.showChangelog:
                 startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse(getString(R.string.changelog_webpage))));
-                return true;
-            case R.id.reviewOnPlayStore:
-                askForPlayStoreReview(this);
                 return true;
         }
         // Item not handled.. pass to super

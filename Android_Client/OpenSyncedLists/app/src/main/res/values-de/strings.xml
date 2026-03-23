@@ -126,7 +126,6 @@
     <string name="import_list_url_cancel">Abbrechen</string>
     <string name="search">Suchen</string>
     <string name="unknown_file_type">Unbekanntes Dateiformat</string>
-    <string name="menu_review_on_playstore">Im Play Store bewerten</string>
     <string name="create_tag_title">Neuen Tag erstellen</string>
     <string name="create_tag_msg">Erstelle einen neuen Tag, um deine Listen damit zu soriteren.</string>
     <string name="create_tag_yes">Erstellen</string>

@@ -102,7 +102,6 @@
     <string name="import_list_url_cancel">Cancel</string>
     <string name="search">Search</string>
     <string name="unknown_file_type">Unknown file type</string>
-    <string name="menu_review_on_playstore">Rate in Play Store</string>
     <string name="create_tag_title">Create new tag</string>
     <string name="create_tag_msg">Create a new tag to filter lists.</string>
     <string name="create_tag_yes">Create</string>

@@ -87,7 +87,6 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
-import eu.schmidt.systems.opensyncedlists.utils.PlayStore;
 
 /**
  * Activity to displaying all lists stored on the device
@@ -411,9 +410,6 @@ public class ListsActivity extends AppCompatActivity
                 Intent aboutIntent = new Intent(this, AboutActivity.class);
                 startActivity(aboutIntent);
                 return true;
-            case R.id.reviewOnPlayStore:
-                PlayStore.askForPlayStoreReview(this);
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -709,46 +705,8 @@ public class ListsActivity extends AppCompatActivity
         // here is your color
         
         checkServerConnection();
-        checkPlayStoreReview();
     }
-    
-    private void checkPlayStoreReview()
-    {
-        // Check Play Store rating (Last time is linked in global preference)
-        // First time open no check, just save time. Ask after 3 days.
-        if (globalSharedPreferences.getInt("ask_for_review", 0) > 2)
-        {
-            Log.d("PlayStoreReview", "Already asked for review");
-            return;
-        }
-        
-        long lastTime =
-            globalSharedPreferences.getLong("ask_for_review_last_time", 0);
-        if (lastTime == 0)
-        {
-            SharedPreferences.Editor editor = globalSharedPreferences.edit();
-            editor.putLong("ask_for_review_last_time",
-                System.currentTimeMillis());
-            editor.apply();
-        }
-        else
-        {
-            // Only ask one time and never again
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastTime > 3 * 24 * 60 * 60 * 1000)
-            {
-                PlayStore.askForPlayStoreReview(this);
-                SharedPreferences.Editor editor =
-                    globalSharedPreferences.edit();
-                editor.putLong("ask_for_review_last_time", currentTime);
-                editor.putInt("ask_for_review",
-                    globalSharedPreferences.getInt("ask_for_review", 0) + 1);
-                ;
-                editor.apply();
-            }
-        }
-    }
-    
+
     private void updateListSettings()
     {
         if (globalSharedPreferences.getBoolean("list_overview_instead_cards",
