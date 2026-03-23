@@ -16,270 +16,519 @@
  */
 package eu.schmidt.systems.opensyncedlists.syncedlist;
 
-import junit.framework.TestCase;
-
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import eu.schmidt.systems.opensyncedlists.syncedlist.ACTION;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListHeader;
-import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
-
+/**
+ * Tests for basic SyncedList operations (ADD, REMOVE, UPDATE, MOVE, SWAP, CLEAR).
+ * For sync tests see SyncedListSyncTest.
+ * For optimization tests see SyncedListOptimizationTest.
+ */
 @RunWith(RobolectricTestRunner.class)
 public class SyncedListTest
 {
     private SyncedList list;
-    private SyncedList list2;
-    
-    public SyncedList create_test_list(String name)
+
+    private SyncedList createTestList(String name)
     {
-        byte[] aesKey = new byte[32]; // 256 bits are 32 bytes
+        byte[] aesKey = new byte[32];
         for (int i = 0; i < aesKey.length; i++)
         {
-            aesKey[i] = (byte) i; // Simple pattern for example purposes
+            aesKey[i] = (byte) i;
         }
         SecretKeySpec localSecret = new SecretKeySpec(aesKey, "AES");
-        
-        // Create SyncedListHeader with direct parameters
         SyncedListHeader header =
             new SyncedListHeader(name, "Test List", "localhost", aesKey,
                 localSecret);
-        
-        // Initialize SyncedList with the header
         return new SyncedList(header, new ArrayList<>());
     }
-    
-    @Before public void setUp() throws Exception
+
+    @Before
+    public void setUp()
     {
-        list = create_test_list("list");
-        list2 = create_test_list("list2");
+        list = createTestList("list");
     }
-    
-    @Test public void testRemoveElement() throws JSONException
-    {
-        String id = list.generateUniqueElementId();
-        SyncedListElement testObj = new SyncedListElement(id, "Test 1", "");
-        SyncedListStep addStep = new SyncedListStep(id, ACTION.ADD, testObj);
-        list.addElementStep(addStep);
-        
-        SyncedListStep removeStep =
-            new SyncedListStep(testObj.getId(), ACTION.REMOVE);
-        list.addElementStep(removeStep);
-        
-        Assert.assertTrue("List should be empty after removing the element.",
-            list.getReformatElements().isEmpty());
-    }
-    
-    @Test public void testSyncListsNoConflicts() throws JSONException
-    {
-        SyncedListElement elementToAdd =
-            new SyncedListElement("item2", "Item 2", "Description 2");
-        SyncedListStep addStep2 =
-            new SyncedListStep("item2", ACTION.ADD, elementToAdd);
-        list2.addElementStep(addStep2);
-        list.addElementStep(addStep2);
-        
-        list.sync(list2);
-        
-        Assert.assertEquals(
-            "List should have one element after sync, because of "
-                + "the same ids " + "syncing.", 1, list.getElements().size());
-    }
-    
-    @Test public void testSyncListsNoConflicts2() throws JSONException
-    {
-        SyncedListElement elementToAdd =
-            new SyncedListElement("item2", "Item 2", "Description 2");
-        SyncedListStep addStep2 =
-            new SyncedListStep("item2", ACTION.ADD, elementToAdd);
-        
-        SyncedListStep removeStep = new SyncedListStep("item2", ACTION.REMOVE);
-        
-        SyncedListStep editStep = new SyncedListStep("item2", ACTION.UPDATE,
-            new SyncedListElement("item2", "Item 2", "Description 3"));
-        
-        list2.addElementStep(addStep2);
-        list.addElementStep(addStep2);
-        list.addElementStep(removeStep);
-        list2.addElementStep(editStep);
-        
-        list.sync(list2);
-        
-        Assert.assertEquals(
-            "List should have one element after sync, because of "
-                + "the same ids " + "syncing.", 1, list.getElements().size());
-    }
-    
-    @Test public void testAddAndRemoveElements() throws JSONException
-    {
-        // Initial state check
-        Assert.assertTrue("List should be initially empty.",
-            list.getElements().isEmpty());
-        
-        // Add elements
-        SyncedListElement element1 =
-            new SyncedListElement("item1", "Item 1", "Description 1");
-        SyncedListStep addStep1 =
-            new SyncedListStep("item1", ACTION.ADD, element1);
-        list.addElementStep(addStep1);
-        
-        SyncedListElement element2 =
-            new SyncedListElement("item2", "Item 2", "Description 2");
-        SyncedListStep addStep2 =
-            new SyncedListStep("item2", ACTION.ADD, element2);
-        list.addElementStep(addStep2);
-        
-        // Check after adding
-        Assert.assertEquals("List should have two elements after adding.", 2,
-            list.getElements().size());
-        Assert.assertNotNull("Element 'item1' should exist in the list.",
-            list.getElements().stream().filter(e -> e.getId().equals("item1"))
-                .findFirst().orElse(null));
-        Assert.assertNotNull("Element 'item2' should exist in the list.",
-            list.getElements().stream().filter(e -> e.getId().equals("item2"))
-                .findFirst().orElse(null));
-        
-        // Remove one element
-        SyncedListStep removeStep1 = new SyncedListStep("item1", ACTION.REMOVE);
-        list.addElementStep(removeStep1);
-        
-        // Check after removing
-        Assert.assertEquals("List should have one element after removing.", 1,
-            list.getElements().size());
-        Assert.assertNull("Element 'item1' should not exist in the list.",
-            list.getElements().stream().filter(e -> e.getId().equals("item1"))
-                .findFirst().orElse(null));
-        Assert.assertNotNull("Element 'item2' should still exist in the list.",
-            list.getElements().stream().filter(e -> e.getId().equals("item2"))
-                .findFirst().orElse(null));
-    }
-    
-    @Test public void testAddingElements() throws JSONException
+
+    // ========== ADD Tests ==========
+
+    @Test
+    public void testAddingElements() throws JSONException
     {
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
             new SyncedListElement("item2", "Item 2", "Description 2")));
+
         Assert.assertEquals(2, list.getElements().size());
     }
-    
-    @Test public void testRemovingElements() throws JSONException
+
+    @Test
+    public void testAddingElementsWithUniqueIDs() throws JSONException
+    {
+        String uniqueId1 = list.generateUniqueElementId();
+        String uniqueId2 = list.generateUniqueElementId();
+
+        list.addElementStep(new SyncedListStep(uniqueId1, ACTION.ADD,
+            new SyncedListElement(uniqueId1, "Item Unique 1", "Description 1")));
+        list.addElementStep(new SyncedListStep(uniqueId2, ACTION.ADD,
+            new SyncedListElement(uniqueId2, "Item Unique 2", "Description 2")));
+
+        Assert.assertEquals(2, list.getElements().size());
+        Assert.assertNotEquals(uniqueId1, uniqueId2);
+    }
+
+    // ========== REMOVE Tests ==========
+
+    @Test
+    public void testRemoveElement() throws JSONException
+    {
+        String id = list.generateUniqueElementId();
+        SyncedListElement testObj = new SyncedListElement(id, "Test 1", "");
+        list.addElementStep(new SyncedListStep(id, ACTION.ADD, testObj));
+        list.addElementStep(new SyncedListStep(id, ACTION.REMOVE));
+
+        Assert.assertTrue("List should be empty after removing the element.",
+            list.getReformatElements().isEmpty());
+    }
+
+    @Test
+    public void testRemovingElements() throws JSONException
     {
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
             new SyncedListElement("item2", "Item 2", "Description 2")));
         list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
+
         Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("item2", list.getElements().get(0).getId());
     }
-    
-    @Test public void testUpdatingElements() throws JSONException
+
+    @Test
+    public void testAddAndRemoveElements() throws JSONException
+    {
+        Assert.assertTrue("List should be initially empty.",
+            list.getElements().isEmpty());
+
+        // Add elements
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+
+        Assert.assertEquals("List should have two elements after adding.", 2,
+            list.getElements().size());
+        Assert.assertNotNull("Element 'item1' should exist.",
+            list.getElements().stream().filter(e -> e.getId().equals("item1"))
+                .findFirst().orElse(null));
+
+        // Remove one element
+        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
+
+        Assert.assertEquals("List should have one element after removing.", 1,
+            list.getElements().size());
+        Assert.assertNull("Element 'item1' should not exist.",
+            list.getElements().stream().filter(e -> e.getId().equals("item1"))
+                .findFirst().orElse(null));
+        Assert.assertNotNull("Element 'item2' should still exist.",
+            list.getElements().stream().filter(e -> e.getId().equals("item2"))
+                .findFirst().orElse(null));
+    }
+
+    // ========== UPDATE Tests ==========
+
+    @Test
+    public void testUpdatingElements() throws JSONException
     {
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item1", ACTION.UPDATE,
-            new SyncedListElement("item1", "Item 1 Updated",
-                "Description 1 Updated")));
+            new SyncedListElement("item1", "Item 1 Updated", "Description Updated")));
+
         Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("Item 1 Updated", list.getElements().get(0).getName());
+        Assert.assertEquals("Description Updated", list.getElements().get(0).getDescription());
     }
-    
-    @Test public void testClearingList() throws JSONException
+
+    @Test
+    public void testCheckingElements() throws JSONException
+    {
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+
+        Assert.assertFalse(list.getElements().get(0).getChecked());
+
+        SyncedListElement checkedElement = list.getElements().get(0).clone();
+        checkedElement.setChecked(true);
+        list.addElementStep(new SyncedListStep("item1", ACTION.UPDATE, checkedElement));
+
+        Assert.assertTrue(list.getElements().get(0).getChecked());
+    }
+
+    @Test
+    public void testUncheckingElements() throws JSONException
+    {
+        SyncedListElement checkedElement = new SyncedListElement("item1", "Item 1", "Description 1");
+        checkedElement.setChecked(true);
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD, checkedElement));
+
+        Assert.assertTrue(list.getElements().get(0).getChecked());
+
+        SyncedListElement uncheckedElement = list.getElements().get(0).clone();
+        uncheckedElement.setChecked(false);
+        list.addElementStep(new SyncedListStep("item1", ACTION.UPDATE, uncheckedElement));
+
+        Assert.assertFalse(list.getElements().get(0).getChecked());
+    }
+
+    // ========== MOVE Tests ==========
+
+    @Test
+    public void testMovingElement() throws JSONException
+    {
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+        list.addElementStep(new SyncedListStep("item3", ACTION.ADD,
+            new SyncedListElement("item3", "Item 3", "Description 3")));
+
+        // Initial order: item1, item2, item3
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+        Assert.assertEquals("item2", list.getElements().get(1).getId());
+        Assert.assertEquals("item3", list.getElements().get(2).getId());
+
+        // Move item1 to position 2
+        list.addElementStep(new SyncedListStep("item1", ACTION.MOVE, 2));
+
+        // New order: item2, item3, item1
+        Assert.assertEquals("item2", list.getElements().get(0).getId());
+        Assert.assertEquals("item3", list.getElements().get(1).getId());
+        Assert.assertEquals("item1", list.getElements().get(2).getId());
+    }
+
+    @Test
+    public void testMovingElementToStart() throws JSONException
+    {
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+        list.addElementStep(new SyncedListStep("item3", ACTION.ADD,
+            new SyncedListElement("item3", "Item 3", "Description 3")));
+
+        // Move item3 to position 0
+        list.addElementStep(new SyncedListStep("item3", ACTION.MOVE, 0));
+
+        // New order: item3, item1, item2
+        Assert.assertEquals("item3", list.getElements().get(0).getId());
+        Assert.assertEquals("item1", list.getElements().get(1).getId());
+        Assert.assertEquals("item2", list.getElements().get(2).getId());
+    }
+
+    // ========== SWAP Tests ==========
+
+    @Test
+    public void testSwappingElements() throws JSONException
+    {
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+        list.addElementStep(new SyncedListStep("item3", ACTION.ADD,
+            new SyncedListElement("item3", "Item 3", "Description 3")));
+
+        // Initial order: item1, item2, item3
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+
+        // Swap item1 with item3
+        list.addElementStep(new SyncedListStep("item1", ACTION.SWAP, "item3"));
+
+        // New order: item3, item2, item1
+        Assert.assertEquals("item3", list.getElements().get(0).getId());
+        Assert.assertEquals("item2", list.getElements().get(1).getId());
+        Assert.assertEquals("item1", list.getElements().get(2).getId());
+    }
+
+    @Test
+    public void testSwappingAdjacentElements() throws JSONException
+    {
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+
+        // Swap adjacent elements
+        list.addElementStep(new SyncedListStep("item1", ACTION.SWAP, "item2"));
+
+        Assert.assertEquals("item2", list.getElements().get(0).getId());
+        Assert.assertEquals("item1", list.getElements().get(1).getId());
+    }
+
+    // ========== CLEAR Tests ==========
+
+    @Test
+    public void testClearingList() throws JSONException
+    {
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+
+        Assert.assertEquals(2, list.getElements().size());
+
+        list.addElementStep(new SyncedListStep("", ACTION.CLEAR));
+
+        Assert.assertTrue("List should be empty after clearing",
+            list.getElements().isEmpty());
+    }
+
+    @Test
+    public void testClearThenAdd() throws JSONException
     {
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("", ACTION.CLEAR));
-        Assert.assertTrue("List should be empty after clearing",
-            list.getElements().isEmpty());
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+
+        Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("item2", list.getElements().get(0).getId());
     }
-    
-    @Test public void testMovingElement() throws JSONException
+
+    // ========== Helper Method Tests ==========
+
+    @Test
+    public void testGenerateUniqueElementId()
     {
-        // This test will depend on the implementation of the move operation
+        String id1 = list.generateUniqueElementId();
+        String id2 = list.generateUniqueElementId();
+
+        Assert.assertNotNull(id1);
+        Assert.assertNotNull(id2);
+        Assert.assertNotEquals(id1, id2);
+        Assert.assertEquals(50, id1.length());
     }
-    
-    @Test public void testSwappingElements() throws JSONException
+
+    @Test
+    public void testGettersAndSetters()
     {
-        // This test will depend on the implementation of the swap operation
+        Assert.assertEquals("list", list.getId());
+        Assert.assertEquals("Test List", list.getName());
+
+        list.setName("New Name");
+        Assert.assertEquals("New Name", list.getName());
+
+        list.setId("newId");
+        Assert.assertEquals("newId", list.getId());
     }
-    
-    @Test public void testAddingAndCheckingElements() throws JSONException
+
+    // ========== Edge Case Tests ==========
+
+    @Test
+    public void testUpdateNonExistentElementAddsIt() throws JSONException
     {
-        // This test will depend on the implementation of checking elements
+        // UPDATE on non-existent element should add it (implementation behavior)
+        list.addElementStep(new SyncedListStep("item1", ACTION.UPDATE,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+
+        Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("Item 1", list.getElements().get(0).getName());
     }
-    
-    @Test public void testUncheckingElements() throws JSONException
+
+    @Test
+    public void testRemoveNonExistentElement() throws JSONException
     {
-        // This test will depend on the implementation of unchecking elements
+        // REMOVE on non-existent element should not crash
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("nonexistent", ACTION.REMOVE));
+
+        Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
     }
-    
-    @Test public void testAddingElementsWithUniqueIDs() throws JSONException
+
+    @Test
+    public void testMoveToInvalidPosition() throws JSONException
     {
-        String uniqueId1 = list.generateUniqueElementId();
-        String uniqueId2 = list.generateUniqueElementId();
-        list.addElementStep(new SyncedListStep(uniqueId1, ACTION.ADD,
-            new SyncedListElement(uniqueId1, "Item Unique 1",
-                "Description Unique 1")));
-        list.addElementStep(new SyncedListStep(uniqueId2, ACTION.ADD,
-            new SyncedListElement(uniqueId2, "Item Unique 2",
-                "Description Unique 2")));
-        
+        // MOVE to position >= size should be ignored
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+
+        // Move to position 10 (invalid)
+        list.addElementStep(new SyncedListStep("item1", ACTION.MOVE, 10));
+
+        // List should remain unchanged
+        Assert.assertEquals(2, list.getElements().size());
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+    }
+
+    @Test
+    public void testSwapWithNonExistentElement() throws JSONException
+    {
+        // SWAP with non-existent element should not crash
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
+            new SyncedListElement("item2", "Item 2", "Description 2")));
+
+        // Swap with non-existent element
+        list.addElementStep(new SyncedListStep("item1", ACTION.SWAP, "nonexistent"));
+
+        // List should remain unchanged
+        Assert.assertEquals(2, list.getElements().size());
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+        Assert.assertEquals("item2", list.getElements().get(1).getId());
+    }
+
+    @Test
+    public void testDoubleAddSameId() throws JSONException
+    {
+        // Adding same ID twice creates duplicates (current behavior)
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1 First", "First")));
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1 Second", "Second")));
+
+        // Both elements exist (duplicates allowed)
         Assert.assertEquals(2, list.getElements().size());
     }
-    
-    @Test public void testOptimization() throws Exception
+
+    @Test
+    public void testReAddAfterRemove() throws JSONException
     {
+        // Re-adding an element after removal should work
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1 Restored", "Restored")));
+
+        Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("Item 1 Restored", list.getElements().get(0).getName());
+    }
+
+    @Test
+    public void testSwapWithSelf() throws JSONException
+    {
+        // SWAP with self should not crash and list should remain unchanged
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
             new SyncedListElement("item2", "Item 2", "Description 2")));
-        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
-        list.addElementStep(new SyncedListStep("item2", ACTION.REMOVE));
+
+        list.addElementStep(new SyncedListStep("item1", ACTION.SWAP, "item1"));
+
+        Assert.assertEquals(2, list.getElements().size());
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+        Assert.assertEquals("item2", list.getElements().get(1).getId());
+    }
+
+    @Test
+    public void testMoveToSamePosition() throws JSONException
+    {
+        // MOVE to same position should be no-op
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
             new SyncedListElement("item2", "Item 2", "Description 2")));
-        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
-        list.addElementStep(new SyncedListStep("item2", ACTION.REMOVE));
+        list.addElementStep(new SyncedListStep("item3", ACTION.ADD,
+            new SyncedListElement("item3", "Item 3", "Description 3")));
+
+        // Move item2 to position 1 (where it already is)
+        list.addElementStep(new SyncedListStep("item2", ACTION.MOVE, 1));
+
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+        Assert.assertEquals("item2", list.getElements().get(1).getId());
+        Assert.assertEquals("item3", list.getElements().get(2).getId());
+    }
+
+    @Test
+    public void testEmptyNameAndDescription() throws JSONException
+    {
+        // Empty strings should work
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "", "")));
+
+        Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals("", list.getElements().get(0).getName());
+        Assert.assertEquals("", list.getElements().get(0).getDescription());
+    }
+
+    @Test
+    public void testSpecialCharactersInElementData() throws JSONException
+    {
+        // Special characters and unicode should work
+        String specialName = "Test äöü ß 日本語 emoji: 🎉";
+        String specialDesc = "<script>alert('xss')</script> & \"quotes\"";
+
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", specialName, specialDesc)));
+
+        Assert.assertEquals(1, list.getElements().size());
+        Assert.assertEquals(specialName, list.getElements().get(0).getName());
+        Assert.assertEquals(specialDesc, list.getElements().get(0).getDescription());
+    }
+
+    @Test
+    public void testMoveNonExistentElement() throws JSONException
+    {
+        // MOVE non-existent element should not crash
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
             new SyncedListElement("item2", "Item 2", "Description 2")));
-        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
-        list.addElementStep(new SyncedListStep("item2", ACTION.REMOVE));
+
+        list.addElementStep(new SyncedListStep("nonexistent", ACTION.MOVE, 0));
+
+        // List should remain unchanged
+        Assert.assertEquals(2, list.getElements().size());
+        Assert.assertEquals("item1", list.getElements().get(0).getId());
+    }
+
+    @Test
+    public void testMultipleClearOperations() throws JSONException
+    {
+        // Multiple CLEARs should work
+        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
+            new SyncedListElement("item1", "Item 1", "Description 1")));
+        list.addElementStep(new SyncedListStep("", ACTION.CLEAR));
+        list.addElementStep(new SyncedListStep("", ACTION.CLEAR));
+
+        Assert.assertTrue(list.getElements().isEmpty());
+        Assert.assertEquals(1, list.getElementSteps().size()); // Only last CLEAR
+    }
+
+    @Test
+    public void testMoveToNegativePosition() throws JSONException
+    {
+        // MOVE to negative position - behavior depends on implementation
         list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
             new SyncedListElement("item1", "Item 1", "Description 1")));
         list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
             new SyncedListElement("item2", "Item 2", "Description 2")));
-        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
-        list.addElementStep(new SyncedListStep("item2", ACTION.REMOVE));
-        list.addElementStep(new SyncedListStep("item1", ACTION.ADD,
-            new SyncedListElement("item1", "Item 1", "Description 1")));
-        list.addElementStep(new SyncedListStep("item2", ACTION.ADD,
-            new SyncedListElement("item2", "Item 2", "Description 2")));
-        list.addElementStep(new SyncedListStep("item1", ACTION.REMOVE));
-        list.addElementStep(new SyncedListStep("item2", ACTION.REMOVE));
-        
-        // Assert
-        Assert.assertEquals(0, list.getElements().size());
-        
-        // Assert the number of element steps
-        Assert.assertEquals(10, list.getElementSteps().size());
+
+        // This may throw or be ignored - verify it doesn't corrupt the list
+        try
+        {
+            list.addElementStep(new SyncedListStep("item1", ACTION.MOVE, -1));
+        }
+        catch (Exception e)
+        {
+            // Expected for invalid index
+        }
+
+        // List should have 2 elements regardless
+        Assert.assertEquals(2, list.getElements().size());
     }
 }
