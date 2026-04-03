@@ -8,7 +8,61 @@ export ANDROID_HOME="$HOME/Programme/android-studio/Sdk"
 export JAVA_HOME="$HOME/Programme/android-studio/jbr"
 export PATH="$JAVA_HOME/bin:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH"
 
+UNIT_RESULT_DIR="app/build/test-results/testDebugUnitTest"
+UI_RESULT_DIR="app/build/outputs/androidTest-results/connected"
+
 cd "$PROJECT_DIR"
+
+# ---- Helpers ----------------------------------------------------------------
+
+# Run gradlew and filter output to key lines only.
+run_gradle() {
+    ./gradlew "$@" --info 2>&1 | grep -E "(> Task|PASSED|FAILED|Test |tests completed|SUCCESS|FAILURE)"
+}
+
+# Print a table row for each XML file matching the given glob.
+# Usage: print_xml_rows <glob> <class_name_sed> <col_width>
+print_xml_rows() {
+    local glob="$1" name_sed="$2" col_width="$3"
+    for xml in $glob; do
+        [ -f "$xml" ] || continue
+        local CLASS TESTS FAILURES ERRORS TIME STATUS
+        CLASS=$(basename "$xml" .xml)
+        [ -n "$name_sed" ] && CLASS=$(echo "$CLASS" | sed "$name_sed")
+        TESTS=$(grep -oP 'tests="\K[0-9]+'    "$xml" 2>/dev/null || echo "0")
+        FAILURES=$(grep -oP 'failures="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
+        ERRORS=$(grep -oP 'errors="\K[0-9]+'   "$xml" 2>/dev/null || echo "0")
+        TIME=$(grep -oP 'time="\K[0-9.]+'      "$xml" 2>/dev/null | head -1 || echo "0")
+        if [ "$FAILURES" = "0" ] && [ "$ERRORS" = "0" ]; then STATUS="✓"; else STATUS="✗"; fi
+        LC_NUMERIC=C printf "  %s %-${col_width}s %s tests (%.2fs)\n" \
+            "$STATUS" "$CLASS" "$TESTS" "$TIME"
+    done
+}
+
+# Print "Label: N tests, M failures" by summing all XMLs under <dir>.
+print_totals() {
+    local dir="$1" label="$2"
+    local TOTAL FAILURES
+    TOTAL=$(find "$dir" -name "*.xml" -exec grep -oP 'tests="\K[0-9]+'    {} \; 2>/dev/null \
+        | awk '{s+=$1} END {print s+0}')
+    FAILURES=$(find "$dir" -name "*.xml" -exec grep -oP 'failures="\K[0-9]+' {} \; 2>/dev/null \
+        | awk '{s+=$1} END {print s+0}')
+    echo "${label}: ${TOTAL} tests, ${FAILURES} failures"
+}
+
+# Print the unit-test result table.
+show_unit_results() {
+    local col_width="${1:-50}"
+    print_xml_rows "$UNIT_RESULT_DIR/*.xml" "" "$col_width"
+}
+
+# Print the UI-test result table.
+show_ui_results() {
+    local col_width="${1:-60}"
+    print_xml_rows "$UI_RESULT_DIR/**/*.xml $UI_RESULT_DIR/*.xml" "s/TEST-//" "$col_width"
+}
+
+# ---- Commands ---------------------------------------------------------------
 
 case "${1:-build}" in
     build)
@@ -21,44 +75,19 @@ case "${1:-build}" in
         ;;
     test)
         echo "Running unit tests..."
-        ./gradlew test --info 2>&1 | grep -E "(> Task|PASSED|FAILED|Test |tests completed|SUCCESS|FAILURE)"
+        run_gradle test
 
         echo ""
         echo "=========================================="
         echo "Test Report Summary"
         echo "=========================================="
 
-        REPORT_DIR="app/build/reports/tests/testDebugUnitTest"
-        if [ -d "$REPORT_DIR" ]; then
-            # Parse HTML report for summary
-            if [ -f "$REPORT_DIR/index.html" ]; then
-                echo "Full HTML report: $PROJECT_DIR/$REPORT_DIR/index.html"
-            fi
-
-            # Show test results from XML files
-            for xml in app/build/test-results/testDebugUnitTest/*.xml; do
-                if [ -f "$xml" ]; then
-                    CLASS=$(basename "$xml" .xml)
-                    TESTS=$(grep -oP 'tests="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
-                    FAILURES=$(grep -oP 'failures="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
-                    ERRORS=$(grep -oP 'errors="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
-                    TIME=$(grep -oP 'time="\K[0-9.]+' "$xml" 2>/dev/null | head -1 || echo "0")
-
-                    if [ "$FAILURES" = "0" ] && [ "$ERRORS" = "0" ]; then
-                        STATUS="✓"
-                    else
-                        STATUS="✗"
-                    fi
-                    # Use LC_NUMERIC=C for consistent decimal separator
-                    LC_NUMERIC=C printf "  %s %-50s %s tests (%.2fs)\n" "$STATUS" "$CLASS" "$TESTS" "$TIME"
-                fi
-            done
-
+        if [ -d "$UNIT_RESULT_DIR" ]; then
+            [ -f "app/build/reports/tests/testDebugUnitTest/index.html" ] && \
+                echo "Full HTML report: $PROJECT_DIR/app/build/reports/tests/testDebugUnitTest/index.html"
+            show_unit_results 50
             echo ""
-            # Total summary
-            TOTAL_TESTS=$(find app/build/test-results -name "*.xml" -exec grep -oP 'tests="\K[0-9]+' {} \; 2>/dev/null | awk '{s+=$1} END {print s}')
-            TOTAL_FAILURES=$(find app/build/test-results -name "*.xml" -exec grep -oP 'failures="\K[0-9]+' {} \; 2>/dev/null | awk '{s+=$1} END {print s}')
-            echo "Total: $TOTAL_TESTS tests, $TOTAL_FAILURES failures"
+            print_totals "$UNIT_RESULT_DIR" "Total"
         fi
         ;;
     test-verbose)
@@ -70,25 +99,20 @@ case "${1:-build}" in
         echo "Detailed Test Results"
         echo "=========================================="
 
-        for xml in app/build/test-results/testDebugUnitTest/*.xml; do
-            if [ -f "$xml" ]; then
-                CLASS=$(basename "$xml" .xml | sed 's/TEST-eu.schmidt.systems.opensyncedlists.syncedlist.//')
-                TESTS=$(grep -oP 'tests="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
-                FAILURES=$(grep -oP 'failures="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
-
-                if [ "$FAILURES" = "0" ]; then
-                    echo ""
-                    echo "✓ $CLASS ($TESTS tests)"
-                else
-                    echo ""
-                    echo "✗ $CLASS ($TESTS tests, $FAILURES failed)"
-                fi
-
-                # Show individual test results
-                grep -oP '<testcase name="\K[^"]+' "$xml" 2>/dev/null | while read testname; do
-                    echo "    ✓ $testname"
-                done
+        for xml in "$UNIT_RESULT_DIR"/*.xml; do
+            [ -f "$xml" ] || continue
+            CLASS=$(basename "$xml" .xml | sed 's/TEST-eu.schmidt.systems.opensyncedlists.syncedlist.//')
+            TESTS=$(grep -oP 'tests="\K[0-9]+'    "$xml" 2>/dev/null || echo "0")
+            FAILURES=$(grep -oP 'failures="\K[0-9]+' "$xml" 2>/dev/null || echo "0")
+            echo ""
+            if [ "$FAILURES" = "0" ]; then
+                echo "✓ $CLASS ($TESTS tests)"
+            else
+                echo "✗ $CLASS ($TESTS tests, $FAILURES failed)"
             fi
+            grep -oP '<testcase name="\K[^"]+' "$xml" 2>/dev/null | while read -r testname; do
+                echo "    ✓ $testname"
+            done
         done
         ;;
     test-class)
@@ -97,7 +121,57 @@ case "${1:-build}" in
             exit 1
         fi
         echo "Running tests for $2..."
-        ./gradlew :app:testDebugUnitTest --tests "*$2*" --info 2>&1 | grep -E "(> Task|PASSED|FAILED|Test |tests completed|SUCCESS|FAILURE|$2)"
+        ./gradlew :app:testDebugUnitTest --tests "*$2*" --info 2>&1 \
+            | grep -E "(> Task|PASSED|FAILED|Test |tests completed|SUCCESS|FAILURE|$2)"
+        ;;
+    test-ui)
+        echo "Running UI / instrumented tests (requires connected device or emulator)..."
+        run_gradle connectedAndroidTest
+
+        echo ""
+        echo "=========================================="
+        echo "UI Test Report Summary"
+        echo "=========================================="
+
+        if [ -d "$UI_RESULT_DIR" ]; then
+            [ -f "app/build/reports/androidTests/connected/index.html" ] && \
+                echo "Full HTML report: $PROJECT_DIR/app/build/reports/androidTests/connected/index.html"
+            show_ui_results 60
+            echo ""
+            print_totals "$UI_RESULT_DIR" "Total"
+        else
+            echo "No UI test results found. Make sure a device/emulator is connected."
+        fi
+        ;;
+    test-all)
+        echo "Running all tests: unit tests + UI / instrumented tests..."
+        echo ""
+
+        echo "--- Unit Tests ---"
+        run_gradle test
+
+        echo ""
+        echo "--- UI Tests (requires connected device or emulator) ---"
+        run_gradle connectedAndroidTest
+
+        echo ""
+        echo "=========================================="
+        echo "Combined Test Report Summary"
+        echo "=========================================="
+
+        echo ""
+        echo "Unit Tests:"
+        show_unit_results 60
+        print_totals "$UNIT_RESULT_DIR" "Unit"
+
+        echo ""
+        echo "UI Tests:"
+        if [ -d "$UI_RESULT_DIR" ]; then
+            show_ui_results 60
+            print_totals "$UI_RESULT_DIR" "UI"
+        else
+            echo "  (no UI test results – device/emulator not connected)"
+        fi
         ;;
     clean)
         echo "Cleaning build..."
@@ -108,7 +182,7 @@ case "${1:-build}" in
         ./gradlew lint
         ;;
     *)
-        echo "Usage: $0 {build|release|test|test-verbose|test-class <ClassName>|clean|lint}"
+        echo "Usage: $0 {build|release|test|test-verbose|test-class <ClassName>|test-ui|test-all|clean|lint}"
         echo ""
         echo "Commands:"
         echo "  build        - Build debug APK"
@@ -116,6 +190,8 @@ case "${1:-build}" in
         echo "  test         - Run unit tests with summary"
         echo "  test-verbose - Run unit tests with full output"
         echo "  test-class   - Run tests for specific class"
+        echo "  test-ui      - Run UI / instrumented tests (needs device or emulator)"
+        echo "  test-all     - Run unit tests + UI tests"
         echo "  clean        - Clean build artifacts"
         echo "  lint         - Run lint checks"
         exit 1
