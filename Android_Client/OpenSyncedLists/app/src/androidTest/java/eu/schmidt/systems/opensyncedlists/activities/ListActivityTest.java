@@ -373,7 +373,9 @@ public class ListActivityTest {
                 .respondWith(new android.app.Instrumentation.ActivityResult(
                         android.app.Activity.RESULT_OK, null));
 
+        // Export items are inside the "Export…" sub-menu → open it first.
         openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_export_group)).perform(click());
         onView(withText(R.string.menu_export_share_md)).perform(click());
 
         // The app calls startActivity(Intent.createChooser(sendIntent, ...))

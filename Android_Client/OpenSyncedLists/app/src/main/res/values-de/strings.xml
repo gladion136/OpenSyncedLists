@@ -30,6 +30,11 @@
 
     <string name="menu_list_settings">Einstellungen für diese Liste</string>
     <string name="menu_list_clear">Liste leeren</string>
+    <string name="menu_check_all">Alle abhaken</string>
+    <string name="menu_uncheck_all">Alle Erledigten abhaken</string>
+    <string name="menu_delete_checked">Alle Erledigten löschen</string>
+    <string name="menu_toggle_all">Alle umkehren</string>
+    <string name="menu_export_group">Exportieren…</string>
     <string name="menu_export_share">Als Url/Link teilen</string>
     <string name="menu_export_share_md">Als Markdown/Text teilen</string>
     <string name="menu_export_list_json">Liste exportieren</string>

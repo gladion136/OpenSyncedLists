@@ -40,6 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,6 +50,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter;
@@ -142,7 +144,8 @@ public class ListActivity extends AppCompatActivity
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.one_list_menu, menu);
-        
+        MenuCompat.setGroupDividerEnabled(menu, true);
+
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         
@@ -196,6 +199,52 @@ public class ListActivity extends AppCompatActivity
                 this.recyclerView.post(
                     () -> syncedListAdapter.notifyDataSetChanged());
                 return true;
+            case R.id.check_all: {
+                List<SyncedListElement> unchecked =
+                    new ArrayList<>(syncedList.getUncheckedElements());
+                List<SyncedListStep> steps = new ArrayList<>();
+                for (SyncedListElement el : unchecked) {
+                    SyncedListElement updated = el.clone();
+                    updated.setChecked(true);
+                    steps.add(new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
+                }
+                addElementStepsAndSave(steps);
+                return true;
+            }
+            case R.id.uncheck_all: {
+                List<SyncedListElement> checked =
+                    new ArrayList<>(syncedList.getCheckedElements());
+                List<SyncedListStep> steps = new ArrayList<>();
+                for (SyncedListElement el : checked) {
+                    SyncedListElement updated = el.clone();
+                    updated.setChecked(false);
+                    steps.add(new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
+                }
+                addElementStepsAndSave(steps);
+                return true;
+            }
+            case R.id.delete_checked: {
+                List<SyncedListElement> checked =
+                    new ArrayList<>(syncedList.getCheckedElements());
+                List<SyncedListStep> steps = new ArrayList<>();
+                for (SyncedListElement el : checked) {
+                    steps.add(new SyncedListStep(el.getId(), ACTION.REMOVE));
+                }
+                addElementStepsAndSave(steps);
+                return true;
+            }
+            case R.id.toggle_all: {
+                List<SyncedListElement> all =
+                    new ArrayList<>(syncedList.getReformatElements());
+                List<SyncedListStep> steps = new ArrayList<>();
+                for (SyncedListElement el : all) {
+                    SyncedListElement updated = el.clone();
+                    updated.setChecked(!el.getChecked());
+                    steps.add(new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
+                }
+                addElementStepsAndSave(steps);
+                return true;
+            }
             case R.id.import_text:
                 // Import text and add to current list
                 showImportTextDialog();
@@ -322,6 +371,29 @@ public class ListActivity extends AppCompatActivity
         }
     }
     
+    /**
+     * Applies a batch of steps to the list, saves once, and refreshes the view.
+     * Use this instead of calling addElementStepAndSave() in a loop to avoid
+     * redundant storage writes for bulk operations.
+     */
+    private void addElementStepsAndSave(List<SyncedListStep> steps)
+    {
+        if (steps.isEmpty()) return;
+        for (SyncedListStep step : steps)
+        {
+            syncedList.addElementStep(step);
+        }
+        this.recyclerView.post(() -> syncedListAdapter.notifyDataSetChanged());
+        try
+        {
+            secureStorage.setList(syncedList);
+        }
+        catch (IOException | JSONException e)
+        {
+            Log.e(LOG_TITLE_DEFAULT, "Local storage write error: " + e);
+        }
+    }
+
     /**
      * Start synchronizing with the connected server of the list.
      */
