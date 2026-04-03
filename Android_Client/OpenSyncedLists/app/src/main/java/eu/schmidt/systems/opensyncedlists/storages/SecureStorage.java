@@ -51,6 +51,59 @@ public class SecureStorage
             Context.MODE_PRIVATE);
         
         Log.i("SecureStorage", "SecureStorage initialized");
+        migrateBase64Newlines();
+    }
+
+    /**
+     * Migration: Base64 strings stored with DEFAULT (line-wrapped) must be
+     * re-saved without newlines (NO_WRAP) so they are valid in URLs and JSON.
+     * Runs once; a flag in SharedPreferences prevents repeated runs.
+     */
+    private void migrateBase64Newlines()
+    {
+        if (sharedPref.getBoolean("migration_base64_no_wrap_done", false))
+        {
+            return;
+        }
+        Log.i("SecureStorage", "Running migration: base64 NO_WRAP");
+        try
+        {
+            ArrayList<String> ids = getListsIds();
+            SharedPreferences.Editor editor = sharedPref.edit();
+            for (String id : ids)
+            {
+                // Migrate HEADER
+                String headerJson = sharedPref.getString("HEADER_" + id, "");
+                if (!headerJson.isEmpty())
+                {
+                    JSONObject header = new JSONObject(headerJson);
+                    if (header.has("secret"))
+                    {
+                        header.put("secret",
+                            header.getString("secret").replace("\n", "")
+                                .trim());
+                    }
+                    if (header.has("localSecret"))
+                    {
+                        header.put("localSecret",
+                            header.getString("localSecret").replace("\n", "")
+                                .trim());
+                    }
+                    editor.putString("HEADER_" + id, header.toString());
+                }
+                // Migrate LIST (steps contain no secrets, but header is
+                // embedded in the full-list JSON stored on server side only;
+                // local LIST_ key stores only steps, so no action needed)
+            }
+            editor.putBoolean("migration_base64_no_wrap_done", true);
+            editor.apply();
+            Log.i("SecureStorage", "Migration base64 NO_WRAP done for "
+                + ids.size() + " lists");
+        }
+        catch (Exception e)
+        {
+            Log.e("SecureStorage", "Migration base64 NO_WRAP failed: " + e);
+        }
     }
     
     /**
@@ -266,6 +319,7 @@ public class SecureStorage
         }
         try
         {
+            if (tagListJson.equals("")) return allTags;
             JSONArray tagsJsonArray = new JSONArray(tagListJson);
             for (int i = 0; i < tagsJsonArray.length(); i++)
             {

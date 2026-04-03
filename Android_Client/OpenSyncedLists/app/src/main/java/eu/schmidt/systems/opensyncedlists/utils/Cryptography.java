@@ -117,7 +117,7 @@ public class Cryptography
      */
     public static String byteArrayToString(byte[] bytes)
     {
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
+        return Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
     
     /**
