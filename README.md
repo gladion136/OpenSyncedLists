@@ -12,6 +12,10 @@ Create easy to sort lists and synchronize it with your own server.
 - Different servers for synchronization per list is possible
 - Server can/must be self-hosted (we don't collect data!)
 
+## Data privacy
+
+We don't collect data. Your lists are only synced with your own server instance. Also the lists are stored encrypted on the server instances. The private key to decrypt the lists is only stored offline on your local device.
+
 ## Install Android-Client
 
 [<img src="https://f-droid.org/badge/get-it-on.png"
