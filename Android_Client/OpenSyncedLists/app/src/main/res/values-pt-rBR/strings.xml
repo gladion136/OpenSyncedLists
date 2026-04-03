@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="apply_changes">Aceitar alterações</string>
+    <string name="delete">Excluir</string>
+    <string name="menu_new_list">Criar nova lista</string>
+    <string name="menu_export">Exportar listas</string>
+    <string name="menu_import">Importar lista(s)</string>
+    <string name="menu_settings">Configurações</string>
+    <string name="menu_list_settings">Configurações desta lista</string>
+    <string name="menu_list_clear">Limpar lista</string>
+    <string name="menu_check_all">Marcar todos</string>
+    <string name="menu_uncheck_all">Desmarcar todos os concluídos</string>
+    <string name="menu_delete_checked">Excluir todos marcados</string>
+    <string name="menu_toggle_all">Alternar todos</string>
+    <string name="menu_export_group">Exportar…</string>
+    <string name="menu_export_share">Compartilhar como link</string>
+    <string name="menu_export_share_md">Compartilhar como Markdown/Texto</string>
+    <string name="menu_export_list_json">Exportar lista</string>
+    <string name="menu_manual_sync">Sincronizar</string>
+    <string name="menu_about">Sobre</string>
+    <string name="edit_element_title">Editar elemento</string>
+    <string name="edit_element_name">Nome</string>
+    <string name="edit_element_description">Descrição</string>
+    <string name="title_checked_list">Elementos marcados:</string>
+    <string name="eT_new_element">Novo elemento</string>
+    <string name="list_element_isolator_tV">Elementos marcados:</string>
+    <string name="share_before_name">Importe a lista \"</string>
+    <string name="share_after_name">\" no OpenSyncedLists com o seguinte link: \n\n</string>
+    <string name="share_after_link">\n\n Por favor, abra o link com o aplicativo OpenSyncedLists.</string>
+    <string name="text_about">Criado por Etienne Schmidt.<![CDATA[<br/><br/>]]>
+        Página do aplicativo <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">em Schmidt-Systems.eu</a><br/><br/>]]>Licenciado sob <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
+    <string name="title_activity_settings">Configurações</string>
+    <string name="general_header">Geral</string>
+    <string name="sync_header">Sincronização</string>
+    <string name="design_mode_title">Design</string>
+    <string name="pref_design_system">Sistema</string>
+    <string name="pref_design_light">Claro</string>
+    <string name="pref_design_dark">Escuro</string>
+    <string name="jump_range_title">Alcance de salto</string>
+    <string name="jump_range_description">Os elementos saltam assim ao clicar nos botões \"Cima\"/\"Baixo\".</string>
+    <string name="sync_title">Sincronização automática</string>
+    <string name="default_server_title">Nome do host do servidor com protocolo</string>
+    <string name="list_settings_title">Configurações da lista</string>
+    <string name="list_pref_sync_summary">As configurações da lista não são sincronizadas</string>
+    <string name="list_pref_check_option_title">Caixa de seleção para cada elemento</string>
+    <string name="list_pref_name_title">Nome da lista</string>
+    <string name="list_pref_server_name">Nome do host do servidor com protocolo</string>
+    <string name="list_pref_sync_title">Sincronização automática</string>
+    <string name="list_pref_sync_on">Ativado</string>
+    <string name="list_pref_sync_off">Desativado</string>
+    <string name="list_pref_checked_list_title">Lista de elementos marcados</string>
+    <string name="list_pref_checked_list_summary">Lista extra para elementos marcados na parte inferior.</string>
+    <string name="list_pref_invert_element_title">Botões à esquerda (Inverter)</string>
+    <string name="list_pref_invert_element_summary">Exibir os botões à esquerda e a caixa de seleção à direita. Inverte a visualização do elemento.</string>
+    <string name="list_pref_delete_btn_title">Excluir lista</string>
+    <string name="list_pref_delete_btn_summary">Atenção! A lista será excluída apenas localmente!</string>
+    <string name="list_pref_delete_online_btn_title">Excluir lista online e localmente</string>
+    <string name="list_pref_delete_online_btn_summary">Atenção! A lista será excluída tanto local quanto online. Se outros dispositivos também tiverem acesso, ainda poderão enviá-la.</string>
+    <string name="scroll_list_title">Rolar lista</string>
+    <string name="scroll_list_summary">Rolar lista após editar elemento</string>
+    <string name="unexpected_error">Erro: Algo deu errado… Por favor, tente novamente.</string>
+    <string name="no_connection">Sem conexão com o servidor!</string>
+    <string name="no_app_for_intent_installed">Você não tem nenhum aplicativo instalado para este evento…</string>
+    <string name="list_with_id_got_overridden">Uma lista com o mesmo ID já existe e foi substituída!</string>
+    <string name="no_server_selected">Nenhum servidor selecionado!</string>
+    <string name="cant_import_list">Não é possível importar a lista!</string>
+    <string name="not_found">Não encontrado!</string>
+    <string name="choose_file_to_import">Escolha um arquivo para importar</string>
+    <string name="create_list_title">Criar lista</string>
+    <string name="create_list_msg">Digite um nome:</string>
+    <string name="create_list_yes">Criar lista</string>
+    <string name="create_list_cancel">Cancelar</string>
+    <string name="no_name_entered">Por favor, insira um nome primeiro.</string>
+    <string name="cant_import_file">Não é possível importar o arquivo!</string>
+    <string name="pref_sync_interval">Intervalo de sincronização</string>
+    <string name="pref_sync_interval_summary">Intervalo de sincronização em segundos</string>
+    <string name="text_about_others">Ícones feitos por <![CDATA[<div><a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>]]> foram usados e modificados.</string>
+    <string name="menu_open_in_playstore">Abrir na Play Store</string>
+    <string name="menu_contact_developer">Contatar o desenvolvedor</string>
+    <string name="menu_open_webpage">Abrir página web</string>
+    <string name="menu_show_source">Ver código-fonte</string>
+    <string name="defaults_list">Configurações padrão da lista</string>
+    <string name="defaults_list_summary">Serão aplicadas ao criar uma nova lista</string>
+    <string name="list_pref_jump_buttons_title">Botões de salto</string>
+    <string name="list_pref_jump_buttons_summary">Exibir botões de salto; definir alcance nas configurações globais</string>
+    <string name="menu_import_url">Importar lista por link</string>
+    <string name="import_list_url_title">Importar lista</string>
+    <string name="import_list_url_msg">Importe uma lista via link.</string>
+    <string name="import_list_url_yes">Ok</string>
+    <string name="import_list_url_cancel">Cancelar</string>
+    <string name="search">Pesquisar</string>
+    <string name="unknown_file_type">Tipo de arquivo desconhecido</string>
+    <string name="create_tag_title">Criar nova etiqueta</string>
+    <string name="create_tag_msg">Crie uma nova etiqueta para filtrar listas.</string>
+    <string name="create_tag_yes">Criar</string>
+    <string name="create_tag_cancel">Cancelar</string>
+    <string name="menu_rename_tag">Renomear etiqueta</string>
+    <string name="menu_remove_tag">Remover etiqueta</string>
+    <string name="menu_change_tag_color">Alterar cor</string>
+    <string name="untagged">sem etiqueta</string>
+    <string name="menu_assign_tag">Atribuir etiquetas</string>
+    <string name="assign_tag_to_list_title">Atribuir etiquetas</string>
+    <string name="assign_tag_to_list_msg">Atribuir etiquetas à lista</string>
+    <string name="rename_tag_dialog_title">Renomear etiqueta</string>
+    <string name="rename_tag_dialog_message">Digite um novo nome</string>
+    <string name="rename_tag_dialog_no_option">Cancelar</string>
+    <string name="rename_tag_dialog_yes_option">Confirmar</string>
+    <string name="default_tag_title_favorites">Favoritos</string>
+    <string name="default_tag_title_shopping">Compras</string>
+    <string name="default_tag_title_projects">Projetos</string>
+    <string name="default_tag_title_work">Trabalho</string>
+    <string name="change_tag_color_picker_title">Escolher cor</string>
+    <string name="menu_show_changelog">Mostrar novidades</string>
+    <string name="changelog_dialog_title">O que há de novo</string>
+    <string name="changelog_whats_new">O que há de novo nesta versão:</string>
+    <string name="changelog_thank_you">Obrigado por usar o OpenSyncedLists! ❤️\nSe você curtir o app, uma avaliação ajuda muito.</string>
+    <string name="changelog_rate_playstore">⭐ Avaliar no Google Play</string>
+    <string name="changelog_rate_fdroid">⭐ Avaliar no F-Droid</string>
+    <string name="changelog_close">Fechar</string>
+    <string name="pref_list_overview_instead_cards_summary">Exibir todas as listas em uma visualização de lista em vez de uma grade de cartões</string>
+    <string name="pref_list_overview_instead_cards_title">Visão geral como lista em vez de cartões</string>
+    <string name="menu_import_text">Importar lista de texto</string>
+    <string name="import_text_title">Importar lista de texto</string>
+    <string name="import_text_msg">Cole ou digite os itens da sua lista. Suporta:\n\n• Marcadores: - Item ou * Item\n• Separados por vírgula: Item1, Item2, Item3\n• Descrições com recuo (4 espaços ou tabulação após o item)</string>
+    <string name="import_text_hint">- Maçã\n- Banana\n    Fruta amarela</string>
+    <string name="import_text_to_list_msg">Adicionar itens à lista existente?</string>
+    <string name="import_text_yes">Importar</string>
+    <string name="import_text_cancel">Cancelar</string>
+    <string name="import_text_empty">Nenhum item para importar. Verifique o formato do texto.</string>
+    <string name="import_text_success">%d itens importados com sucesso</string>
+    <string name="import_text_help_title">Formatos de lista de texto</string>
+    <string name="import_text_help_content">Formatos suportados:\n\n<b>Marcadores:</b>\n- Item 1\n- Item 2\n* Item 1\n* Item 2\n\n<b>Separados por vírgula:</b>\nItem 1, Item 2, Item 3\n\n<b>Com descrições:</b>\n- Item 1\n    Descrição do item 1\n- Item 2\n    Descrição do item 2\n\nAs descrições exigem recuo (4 espaços ou tabulação).\n\nLinhas e itens vazios são filtrados.</string>
+</resources>
