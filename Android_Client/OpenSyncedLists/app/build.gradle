@@ -14,7 +14,7 @@ preBuild.dependsOn copyChangelog
 
 android {
     compileSdk 35
-    
+
     defaultConfig {
         applicationId "eu.schmidt.systems.opensyncedlists"
         minSdkVersion 24

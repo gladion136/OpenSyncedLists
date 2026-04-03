@@ -304,7 +304,9 @@ public class SyncedListHeader
             if (tagList.size() == 0)
             {
                 jsonObject.put("tags", new JSONArray());
-            } else {
+            }
+            else
+            {
                 jsonObject.put("tags", tagArray);
             }
         }

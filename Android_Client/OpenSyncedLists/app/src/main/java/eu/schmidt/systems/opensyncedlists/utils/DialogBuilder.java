@@ -73,7 +73,8 @@ public class DialogBuilder
         params.setMargins(margin_in_px, margin_in_px, margin_in_px,
             margin_in_px);
         editText.setLayoutParams(params);
-        editText.setPadding(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
+        editText.setPadding(margin_in_px, margin_in_px, margin_in_px,
+            margin_in_px);
         
         alert.setTitle(title);
         alert.setMessage(message);
@@ -98,7 +99,7 @@ public class DialogBuilder
         });
         dialog.show();
     }
-
+    
     /**
      * Create a multi-line text input dialog for text import.
      *
@@ -116,24 +117,27 @@ public class DialogBuilder
     {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
         final EditText editText = new EditText(context);
-
-        editText.setInputType(InputType.TYPE_CLASS_TEXT |
-            InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        
+        editText.setInputType(
+            InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         editText.setMinLines(5);
         editText.setMaxLines(10);
-        editText.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
+        editText.setGravity(
+            android.view.Gravity.TOP | android.view.Gravity.START);
         editText.setHint(hint);
-
+        
         LinearLayout.LayoutParams params =
             new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         int margin_in_dp = 10;
         int margin_in_px = (int) (margin_in_dp * context.getResources()
             .getDisplayMetrics().density);
-        params.setMargins(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
+        params.setMargins(margin_in_px, margin_in_px, margin_in_px,
+            margin_in_px);
         editText.setLayoutParams(params);
-        editText.setPadding(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
-
+        editText.setPadding(margin_in_px, margin_in_px, margin_in_px,
+            margin_in_px);
+        
         alert.setTitle(title);
         alert.setMessage(message);
         alert.setView(editText);
@@ -142,10 +146,10 @@ public class DialogBuilder
                 editText.getText().toString()));
         alert.setNegativeButton(noOption,
             (dialog, whichButton) -> callback.callback(null));
-
+        
         alert.create().show();
     }
-
+    
     public static void tagSelectionDialog(Context context,
         ArrayList<ListTag> tags, String title, String descrp,
         SyncedListHeader listHeader, TagCallback callback)
@@ -181,7 +185,8 @@ public class DialogBuilder
         params.setMargins(margin_in_px, margin_in_px, margin_in_px,
             margin_in_px);
         linearLayout.setLayoutParams(params);
-        linearLayout.setPadding(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
+        linearLayout.setPadding(margin_in_px, margin_in_px, margin_in_px,
+            margin_in_px);
         
         alert.setTitle(title);
         alert.setMessage(descrp);
@@ -206,7 +211,7 @@ public class DialogBuilder
         
         dialog.show();
     }
-
+    
     /**
      * Create a help dialog showing supported text formats.
      *
@@ -217,14 +222,16 @@ public class DialogBuilder
     public static void helpDialog(Context context, String title, String content)
     {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
-
+        
         alert.setTitle(title);
-        alert.setMessage(android.text.Html.fromHtml(content, android.text.Html.FROM_HTML_MODE_LEGACY));
-        alert.setPositiveButton("OK", (dialog, whichButton) -> dialog.dismiss());
-
+        alert.setMessage(android.text.Html.fromHtml(content,
+            android.text.Html.FROM_HTML_MODE_LEGACY));
+        alert.setPositiveButton("OK",
+            (dialog, whichButton) -> dialog.dismiss());
+        
         alert.create().show();
     }
-
+    
     /**
      * Simple Callback interface
      */

@@ -18,11 +18,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/rename_tag"
-        android:title="@string/menu_rename_tag"/>
+        android:title="@string/menu_rename_tag" />
     <item
         android:id="@+id/change_color"
-        android:title="@string/menu_change_tag_color"/>
+        android:title="@string/menu_change_tag_color" />
     <item
         android:id="@+id/remove_tag"
-        android:title="@string/menu_remove_tag"/>
+        android:title="@string/menu_remove_tag" />
 </menu>

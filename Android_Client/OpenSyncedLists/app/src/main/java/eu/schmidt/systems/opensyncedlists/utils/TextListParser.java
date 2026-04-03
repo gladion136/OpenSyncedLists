@@ -56,8 +56,8 @@ import java.util.List;
 public class TextListParser
 {
     /**
-     * Parse text input and return list of elements.
-     * Auto-detects format based on content.
+     * Parse text input and return list of elements. Auto-detects format based
+     * on content.
      *
      * @param input the text to parse
      * @return list of parsed elements (never null)
@@ -68,17 +68,18 @@ public class TextListParser
         {
             return new ArrayList<>();
         }
-
+        
         String[] lines = input.split("\n");
-
-        // Detect format: if first non-empty line starts with bullet, use bullet mode
+        
+        // Detect format: if first non-empty line starts with bullet, use
+        // bullet mode
         // Otherwise check for commas (comma-separated mode)
         String firstLine = findFirstNonEmptyLine(lines);
         if (firstLine == null)
         {
             return new ArrayList<>();
         }
-
+        
         if (isBulletLine(firstLine))
         {
             return parseBulletFormat(lines);
@@ -93,10 +94,11 @@ public class TextListParser
             return parsePlainLines(lines);
         }
     }
-
+    
     /**
-     * Parse bullet-formatted text (lines starting with - or *).
-     * Supports indented descriptions after bullet items.
+     * Parse bullet-formatted text (lines starting with - or *). Supports
+     * indented descriptions after bullet items, and markdown checkbox syntax:
+     * "- [x] Item" (checked) / "- [ ] Item" (unchecked).
      *
      * @param lines array of text lines
      * @return list of parsed elements
@@ -106,25 +108,30 @@ public class TextListParser
         List<ParsedElement> result = new ArrayList<>();
         String currentName = null;
         StringBuilder currentDescription = new StringBuilder();
-
+        boolean currentChecked = false;
+        
         for (String line : lines)
         {
             if (line.trim().isEmpty())
             {
                 continue;
             }
-
+            
             if (isBulletLine(line))
             {
                 // Save previous element if exists
                 if (currentName != null)
                 {
                     result.add(new ParsedElement(currentName,
-                        currentDescription.toString().trim()));
+                        currentDescription.toString().trim(), currentChecked));
                 }
-                // Start new element
-                currentName = stripBulletPrefix(line).trim();
-                currentDescription = new StringBuilder();
+                // Detect checkbox state, then extract name (and optional
+                // inline description)
+                currentChecked = isCheckedBullet(line);
+                String afterBullet = stripBulletPrefix(line).trim();
+                String[] nameParts = splitNameAndInlineDescription(afterBullet);
+                currentName = nameParts[0];
+                currentDescription = new StringBuilder(nameParts[1]);
             }
             else if (isIndentedLine(line) && currentName != null)
             {
@@ -141,23 +148,65 @@ public class TextListParser
                 if (currentName != null)
                 {
                     result.add(new ParsedElement(currentName,
-                        currentDescription.toString().trim()));
+                        currentDescription.toString().trim(), currentChecked));
                 }
                 currentName = line.trim();
                 currentDescription = new StringBuilder();
+                currentChecked = false;
             }
         }
-
+        
         // Don't forget the last element
         if (currentName != null && !currentName.isEmpty())
         {
             result.add(new ParsedElement(currentName,
-                currentDescription.toString().trim()));
+                currentDescription.toString().trim(), currentChecked));
         }
-
+        
         return result;
     }
-
+    
+    /**
+     * Check if a bullet line has a checked checkbox prefix: "- [x] " or "- [X]
+     * ".
+     */
+    private static boolean isCheckedBullet(String line)
+    {
+        String afterBullet = stripBulletPrefix(line).trim();
+        return afterBullet.startsWith("[x] ") || afterBullet.startsWith("[X] ")
+            || afterBullet.equals("[x]") || afterBullet.equals("[X]");
+    }
+    
+    /**
+     * Split "Name - Description" inline form (markdown export format). Returns
+     * a two-element array: [name, description]. If no inline description is
+     * present, description is "".
+     */
+    private static String[] splitNameAndInlineDescription(String afterBullet)
+    {
+        // Strip checkbox prefix if present: "[x] " or "[ ] "
+        String content = afterBullet;
+        if (content.startsWith("[x] ") || content.startsWith("[X] ")
+            || content.startsWith("[ ] "))
+        {
+            content = content.substring(4).trim();
+        }
+        else if (content.equals("[x]") || content.equals("[X]")
+            || content.equals("[ ]"))
+        {
+            return new String[]{"", ""};
+        }
+        
+        // Split on " - " to extract inline description (markdown export format)
+        int sepIdx = content.indexOf(" - ");
+        if (sepIdx >= 0)
+        {
+            return new String[]{content.substring(0, sepIdx).trim(),
+                content.substring(sepIdx + 3).trim()};
+        }
+        return new String[]{content, ""};
+    }
+    
     /**
      * Parse comma-separated text.
      *
@@ -178,7 +227,7 @@ public class TextListParser
         }
         return result;
     }
-
+    
     /**
      * Parse plain lines (no bullets, no commas).
      *
@@ -198,28 +247,28 @@ public class TextListParser
         }
         return result;
     }
-
+    
     /**
      * Check if line starts with a bullet marker (- or *).
      */
     private static boolean isBulletLine(String line)
     {
         String trimmed = line.trim();
-        return trimmed.startsWith("- ") || trimmed.startsWith("* ") ||
-            trimmed.startsWith("-\t") || trimmed.startsWith("*\t") ||
-            trimmed.equals("-") || trimmed.equals("*");
+        return trimmed.startsWith("- ") || trimmed.startsWith("* ")
+            || trimmed.startsWith("-\t") || trimmed.startsWith("*\t")
+            || trimmed.equals("-") || trimmed.equals("*");
     }
-
+    
     /**
-     * Check if line is indented (starts with spaces or tab).
-     * Used to detect description lines.
+     * Check if line is indented (starts with spaces or tab). Used to detect
+     * description lines.
      */
     private static boolean isIndentedLine(String line)
     {
-        return line.startsWith("    ") || line.startsWith("\t") ||
-            line.startsWith("   ");
+        return line.startsWith("    ") || line.startsWith("\t")
+            || line.startsWith("   ");
     }
-
+    
     /**
      * Remove bullet prefix from line.
      */
@@ -240,7 +289,7 @@ public class TextListParser
         }
         return trimmed;
     }
-
+    
     /**
      * Find first non-empty line in array.
      */
@@ -255,7 +304,7 @@ public class TextListParser
         }
         return null;
     }
-
+    
     /**
      * Check if input is a single line with commas (comma-separated format).
      */

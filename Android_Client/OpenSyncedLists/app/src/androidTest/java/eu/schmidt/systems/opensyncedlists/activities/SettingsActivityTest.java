@@ -40,64 +40,51 @@ import eu.schmidt.systems.opensyncedlists.helpers.TestHelper;
 /**
  * UI integration tests for SettingsActivity.
  *
- * Navigates from ListsActivity → overflow menu → Settings and then verifies
- * the contents of the settings screen.
+ * All settings checks are consolidated into one test to avoid repeated app
+ * restarts.
  *
- * Run on a connected device or emulator:
- *   ./gradlew connectedAndroidTest \
- *     -Pandroid.testInstrumentationRunnerArguments.class=\
- *     eu.schmidt.systems.opensyncedlists.activities.SettingsActivityTest
+ * Run on a connected device or emulator: ./gradlew connectedAndroidTest \
+ * -Pandroid.testInstrumentationRunnerArguments.class=\
+ * eu.schmidt.systems.opensyncedlists.activities.SettingsActivityTest
  */
 @RunWith(AndroidJUnit4.class)
-public class SettingsActivityTest {
-
+public class SettingsActivityTest
+{
+    
     @Rule
     public ActivityScenarioRule<ListsActivity> activityRule =
-            new ActivityScenarioRule<>(ListsActivity.class);
-
+        new ActivityScenarioRule<>(ListsActivity.class);
+    
     private Context ctx;
-
-    @Before
-    public void setUp() {
+    
+    @Before public void setUp()
+    {
         ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
         TestHelper.clearAll(ctx);
         activityRule.getScenario().recreate();
     }
-
-    /** Opens the Settings screen via the overflow menu. */
-    private void openSettings() {
+    
+    /**
+     * Navigating to Settings shows the title, the "Design" preference category,
+     * and all three theme options (Light / Dark / System).
+     */
+    @Test public void testSettingsScreen()
+    {
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_settings)).perform(click());
-    }
-
-    /** Navigating to Settings from the overflow menu opens SettingsActivity. */
-    @Test
-    public void testOpenSettings() {
-        openSettings();
-        onView(withText(R.string.title_activity_settings)).check(matches(isDisplayed()));
-    }
-
-    /**
-     * The Settings screen contains the "Design" preference category, which
-     * lets the user choose Light / Dark / System theme.
-     */
-    @Test
-    public void testThemePreferenceIsVisible() {
-        openSettings();
-        onView(withText(R.string.design_mode_title)).check(matches(isDisplayed()));
-    }
-
-    /**
-     * All three theme options (Light, Dark, System) are present in the
-     * settings screen.
-     */
-    @Test
-    public void testThemeOptionsArePresent() {
-        openSettings();
+        
+        onView(withText(R.string.title_activity_settings)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.design_mode_title)).check(
+            matches(isDisplayed()));
+        
+        // Tap the Design preference to open the choice dialog
         onView(withText(R.string.design_mode_title)).perform(click());
-
-        onView(withText(R.string.pref_design_light)).check(matches(isDisplayed()));
-        onView(withText(R.string.pref_design_dark)).check(matches(isDisplayed()));
-        onView(withText(R.string.pref_design_system)).check(matches(isDisplayed()));
+        onView(withText(R.string.pref_design_light)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.pref_design_dark)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.pref_design_system)).check(
+            matches(isDisplayed()));
     }
 }

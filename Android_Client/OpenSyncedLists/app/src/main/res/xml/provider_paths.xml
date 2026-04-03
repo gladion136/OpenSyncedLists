@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2022  Etienne Schmidt (eschmidt@schmidt-ti.eu)
   ~
   ~     This program is free software: you can redistribute it and/or modify
@@ -16,6 +15,8 @@
   ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<Paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <files-path name="exported_files" path="."/>
+<Paths>
+    <files-path
+        name="exported_files"
+        path="." />
 </Paths>

@@ -17,49 +17,45 @@
 package eu.schmidt.systems.opensyncedlists.utils;
 
 /**
- * Represents a parsed element from text import with name and optional description.
- * Used by TextListParser to return parsed results.
+ * Represents a parsed element from text import with name and optional
+ * description. Used by TextListParser to return parsed results.
  */
 public class ParsedElement
 {
     private final String name;
     private final String description;
-
-    /**
-     * Create a parsed element with name and description.
-     *
-     * @param name        the element name (required)
-     * @param description the element description (can be null or empty)
-     */
-    public ParsedElement(String name, String description)
+    private final boolean checked;
+    
+    public ParsedElement(String name, String description, boolean checked)
     {
         this.name = name;
         this.description = description != null ? description : "";
+        this.checked = checked;
     }
-
-    /**
-     * Get the element name.
-     *
-     * @return the name
-     */
+    
+    public ParsedElement(String name, String description)
+    {
+        this(name, description, false);
+    }
+    
+    @Override public String toString()
+    {
+        return "ParsedElement{name='" + name + "', description='" + description
+            + "', checked=" + checked + "}";
+    }
+    
     public String getName()
     {
         return name;
     }
-
-    /**
-     * Get the element description.
-     *
-     * @return the description (never null, may be empty)
-     */
+    
     public String getDescription()
     {
         return description;
     }
-
-    @Override
-    public String toString()
+    
+    public boolean isChecked()
     {
-        return "ParsedElement{name='" + name + "', description='" + description + "'}";
+        return checked;
     }
 }

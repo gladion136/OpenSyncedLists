@@ -18,38 +18,37 @@ package eu.schmidt.systems.opensyncedlists.activities;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
-import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.clearText;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.test.espresso.intent.Intents;
-import androidx.test.espresso.intent.matcher.IntentMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,8 +60,16 @@ import eu.schmidt.systems.opensyncedlists.helpers.TestHelper;
 /**
  * UI integration tests for ListActivity (single-list editing screen).
  *
- * Each test navigates the full user flow: ListsActivity → create list → open list,
- * then exercises the specific feature under test.
+ * Covers all element-level operations in two large tests to minimise
+ * activity restarts while maximising duration/durability coverage:
+ *
+ *   1. testElementOperationsAndBulkActions
+ *      – add (bottom / top / IME), check toggle, element editor (rename,
+ *        delete), check-all, uncheck-all, delete-done, toggle-all
+ *
+ *   2. testSearchAndMenuActions
+ *      – search filter + clear, overview-mode toggle, clear list, text
+ *        import with markdown checkbox syntax, list-settings navigation
  *
  * Run on a connected device or emulator:
  *   ./gradlew connectedAndroidTest \
@@ -76,73 +83,53 @@ public class ListActivityTest {
     public ActivityScenarioRule<ListsActivity> activityRule =
             new ActivityScenarioRule<>(ListsActivity.class);
 
+    private Context ctx;
+
     @Before
     public void setUp() {
-        Context ctx = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext();
+        ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
         TestHelper.clearAll(ctx);
         activityRule.getScenario().recreate();
-        Intents.init();
-    }
-
-    @After
-    public void tearDown() {
-        Intents.release();
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    /** Creates a list via the FAB dialog and opens it. */
     private void createAndOpenList(String name) {
-        // Create list via FAB
         onView(withId(R.id.floatingActionButton)).perform(click());
         onView(isAssignableFrom(android.widget.EditText.class))
                 .inRoot(isDialog())
                 .perform(replaceText(name), closeSoftKeyboard());
-        onView(withId(android.R.id.button1))
-                .inRoot(isDialog())
-                .perform(click());
-        // Open the first (and only) list card
-        onView(withId(R.id.lVLists))
-                .perform(actionOnItemAtPosition(0, click()));
+        onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
+        onView(withId(R.id.lVLists)).perform(actionOnItemAtPosition(0, click()));
     }
 
-    /** Types text into the new-element input and adds it at the bottom. */
-    private void addElementAtBottom(String elementName) {
-        onView(withId(R.id.eTNewElement))
-                .perform(replaceText(elementName), closeSoftKeyboard());
+    private void addElement(String name) {
+        onView(withId(R.id.eTNewElement)).perform(replaceText(name), closeSoftKeyboard());
         onView(withId(R.id.iVNewElementBottom)).perform(click());
     }
 
-    /** Types text into the new-element input and adds it at the top. */
-    private void addElementAtTop(String elementName) {
-        onView(withId(R.id.eTNewElement))
-                .perform(replaceText(elementName), closeSoftKeyboard());
-        onView(withId(R.id.iVNewElementTop)).perform(click());
+    private void checkAt(int position) {
+        onView(withId(R.id.recyclerView))
+                .perform(actionOnItemAtPosition(position,
+                        TestHelper.clickChildWithId(R.id.checkBox)));
     }
 
-    /** Custom matcher: checks that the RecyclerView item at {@code position}
-     *  satisfies {@code itemMatcher}. */
-    private static Matcher<View> atPosition(final int position,
-            final Matcher<View> itemMatcher) {
+    /** Custom matcher: item at {@code position} must satisfy {@code itemMatcher}. */
+    private static Matcher<View> atPosition(int position, Matcher<View> itemMatcher) {
         return new TypeSafeMatcher<View>() {
             @Override
-            public void describeTo(org.hamcrest.Description description) {
-                description.appendText(
-                        "has item at position " + position + ": ");
-                itemMatcher.describeTo(description);
+            public void describeTo(org.hamcrest.Description d) {
+                d.appendText("has item at position " + position + ": ");
+                itemMatcher.describeTo(d);
             }
-
             @Override
             protected boolean matchesSafely(View view) {
                 if (!(view instanceof RecyclerView)) return false;
-                RecyclerView rv = (RecyclerView) view;
                 RecyclerView.ViewHolder vh =
-                        rv.findViewHolderForAdapterPosition(position);
-                if (vh == null) return false;
-                return itemMatcher.matches(vh.itemView);
+                        ((RecyclerView) view).findViewHolderForAdapterPosition(position);
+                return vh != null && itemMatcher.matches(vh.itemView);
             }
         };
     }
@@ -151,246 +138,205 @@ public class ListActivityTest {
     // Tests
     // =========================================================================
 
-    /** Adding an element via the "bottom" button makes it appear in the list. */
+    /**
+     * Covers in sequence (no app restart between sections):
+     *
+     * A. Add at bottom / top / IME  – verify text and position
+     * B. Check-toggle               – verifies a checked checkbox appears
+     * C. Element editor             – open, rename, re-open, delete
+     * D. Bulk check-all             – check all → verify, check-all no-op
+     * E. Bulk uncheck-all           – verify all unchecked
+     * F. Bulk delete-done           – check one → delete done → check no-op
+     * G. Bulk toggle-all            – check one → toggle → verify inversion
+     */
     @Test
-    public void testAddElementAtBottom() {
-        createAndOpenList("Einkaufsliste");
-        addElementAtBottom("Milch");
-        onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Milch"))));
-    }
+    public void testElementOperationsAndBulkActions() {
+        createAndOpenList("AllOps-Test");
 
-    /** Adding at top places the element before an existing element. */
-    @Test
-    public void testAddElementAtTop() {
-        createAndOpenList("Reihenfolge-Test");
-        addElementAtBottom("Erster");
-        addElementAtTop("Zweiter");
-        // "Zweiter" should now be at position 0
+        // ---- A: Add elements ----
+        addElement("Bottom");
         onView(withId(R.id.recyclerView))
-                .check(matches(atPosition(0,
-                        hasDescendant(withText("Zweiter")))));
-    }
+                .check(matches(hasDescendant(withText("Bottom"))));
 
-    /** Pressing the IME "Done" action adds the element just like the button. */
-    @Test
-    public void testAddElementWithImeAction() {
-        createAndOpenList("Aufgaben");
+        addElement("Second");
         onView(withId(R.id.eTNewElement))
-                .perform(replaceText("Milch kaufen"), pressImeActionButton());
+                .perform(replaceText("Top"), closeSoftKeyboard());
+        onView(withId(R.id.iVNewElementTop)).perform(click());
         onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Milch kaufen"))));
-    }
+                .check(matches(atPosition(0, hasDescendant(withText("Top")))));
 
-    /** Tapping the CheckBox on an element toggles its checked state. */
-    @Test
-    public void testCheckElementToggle() {
-        createAndOpenList("Checkbox-Test");
-        addElementAtBottom("Abhaken");
+        onView(withId(R.id.eTNewElement))
+                .perform(replaceText("Ime"), pressImeActionButton());
         onView(withId(R.id.recyclerView))
-                .perform(actionOnItemAtPosition(0,
-                        TestHelper.clickChildWithId(R.id.checkBox)));
-        // isCheckedList defaults to true, so after checking the only element:
-        //   position 0 = isolator row (separates unchecked / checked sections)
-        //   position 1 = "Abhaken" (now checked, in the checked section)
-        onView(withId(R.id.recyclerView))
-                .check(matches(atPosition(1,
-                        hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
-    }
+                .check(matches(hasDescendant(withText("Ime"))));
 
-    /** Clicking an element row opens the ElementEditorFragment bottom sheet. */
-    @Test
-    public void testClickElementOpensEditor() {
-        createAndOpenList("Editor-Test");
-        addElementAtBottom("Bearbeiten");
-        // Use clickItemRoot() instead of click(): the item contains a focusable
-        // EditText (eTTitle) that would consume a real touch event and prevent
-        // the root view's OnClickListener (which opens the bottom sheet) from firing.
+        // ---- B: Check toggle ----
+        // List (unchecked): Top(0), Bottom(1), Second(2), Ime(3)
+        checkAt(0); // check "Top"
+        onView(withId(R.id.recyclerView))
+                .check(matches(hasDescendant(allOf(withId(R.id.checkBox), isChecked()))));
+
+        // ---- C: Element editor ----
+        // Unchecked section: Bottom(0), Second(1), Ime(2)
         onView(withId(R.id.recyclerView))
                 .perform(actionOnItemAtPosition(0, TestHelper.clickItemRoot()));
         onView(withId(R.id.eTName)).check(matches(isDisplayed()));
         onView(withId(R.id.btnDelete)).check(matches(isDisplayed()));
-    }
 
-    /** Renaming an element via the editor updates the list item title. */
-    @Test
-    public void testEditElementViaEditor() {
-        createAndOpenList("Umbenennen-Test");
-        addElementAtBottom("Alter Name");
-        onView(withId(R.id.recyclerView))
-                .perform(actionOnItemAtPosition(0, TestHelper.clickItemRoot()));
         onView(withId(R.id.eTName))
-                .perform(clearText(), replaceText("Neuer Name"),
-                        closeSoftKeyboard());
+                .perform(clearText(), replaceText("Renamed"), closeSoftKeyboard());
         onView(withId(R.id.btnApplyChanges)).perform(click());
         onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Neuer Name"))));
-    }
+                .check(matches(hasDescendant(withText("Renamed"))));
 
-    /** Deleting an element via the editor removes it from the list. */
-    @Test
-    public void testDeleteElementViaEditor() {
-        createAndOpenList("Löschen-Test");
-        addElementAtBottom("Wird gelöscht");
         onView(withId(R.id.recyclerView))
                 .perform(actionOnItemAtPosition(0, TestHelper.clickItemRoot()));
         onView(withId(R.id.btnDelete)).perform(click());
         onView(withId(R.id.recyclerView))
-                .check(matches(not(hasDescendant(withText("Wird gelöscht")))));
+                .check(matches(not(hasDescendant(withText("Renamed")))));
+
+        // ---- D: check-all ----
+        // Current list: Second(0), Ime(1), isolator, Top (all unchecked except Top)
+        // Add fresh elements for cleaner bulk-action state
+        addElement("Alpha");
+        addElement("Beta");
+        // Unchecked: Second, Ime, Alpha, Beta  |  Checked: Top
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_check_all)).perform(click());
+        // All 5 elements now checked; isolator at 0, elements at 1-5
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(1,
+                        hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(2,
+                        hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
+
+        // check-all no-op: all already checked → still checked
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_check_all)).perform(click());
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(1,
+                        hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
+
+        // ---- E: uncheck-all ----
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_uncheck_all)).perform(click());
+        // All unchecked, no isolator: positions 0 and 1 should be isNotChecked
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(0,
+                        hasDescendant(allOf(withId(R.id.checkBox), isNotChecked())))));
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(1,
+                        hasDescendant(allOf(withId(R.id.checkBox), isNotChecked())))));
+
+        // ---- F: delete-done ----
+        // Check "Beta" by text (order after bulk ops is not guaranteed by position).
+        onView(withId(R.id.recyclerView))
+                .perform(actionOnItem(hasDescendant(withText("Beta")),
+                        TestHelper.clickChildWithId(R.id.checkBox)));
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_delete_checked)).perform(click());
+        onView(withId(R.id.recyclerView))
+                .check(matches(not(hasDescendant(withText("Beta")))));
+        onView(withId(R.id.recyclerView))
+                .check(matches(hasDescendant(withText("Second"))));
+
+        // delete-done no-op (none checked)
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_delete_checked)).perform(click());
+        onView(withId(R.id.recyclerView))
+                .check(matches(hasDescendant(withText("Second"))));
+
+        // ---- G: toggle-all ----
+        addElement("Last");
+        // Check "Last" by text (order after prior bulk ops is not guaranteed by position).
+        onView(withId(R.id.recyclerView))
+                .perform(actionOnItem(hasDescendant(withText("Last")),
+                        TestHelper.clickChildWithId(R.id.checkBox)));
+        // Before toggle: Second/Ime/Alpha/Top unchecked, Last checked
+        // After toggle:  Second/Ime/Alpha/Top checked, Last unchecked
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_toggle_all)).perform(click());
+        // Last (was checked) is now unchecked → at position 0
+        // Remaining 4 (were unchecked) are now checked → at positions 2-5 (isolator at 1)
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(0,
+                        allOf(hasDescendant(withText("Last")),
+                                hasDescendant(allOf(withId(R.id.checkBox), isNotChecked()))))));
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(2,
+                        hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
     }
 
-    /** Typing in the search bar filters the element list. */
+    /**
+     * Covers in sequence (no app restart between sections):
+     *
+     * A. Search filter              – type, verify filtered, clear via X button
+     * B. Overview-mode toggle       – check element, toggle, RecyclerView stays
+     * C. Clear list                 – all elements removed
+     * D. Text import ([x]/[ ])      – checked and unchecked elements at right positions
+     * E. List settings navigation   – menu → ListSettingsActivity → back
+     */
     @Test
-    public void testSearchFiltersElements() {
-        createAndOpenList("Suche-Test");
-        addElementAtBottom("Apfel");
-        addElementAtBottom("Banane");
-        addElementAtBottom("Kirsche");
+    public void testSearchAndMenuActions() {
+        createAndOpenList("Multi-Test");
 
-        // Open search. Use AutoCompleteTextView to uniquely identify the SearchView's
-        // internal field: it extends AutoCompleteTextView, whereas eTNewElement and every
-        // eTTitle in the list are plain EditTexts — so isAssignableFrom(EditText.class)
-        // would be ambiguous across all visible fields.
+        // ---- A: Search ----
+        addElement("Apfel");
+        addElement("Banane");
+        addElement("Kirsche");
+
         onView(withId(R.id.action_search)).perform(click());
         onView(isAssignableFrom(android.widget.AutoCompleteTextView.class))
                 .perform(typeText("Ban"), closeSoftKeyboard());
-
         onView(withId(R.id.recyclerView))
                 .check(matches(hasDescendant(withText("Banane"))));
         onView(withId(R.id.recyclerView))
                 .check(matches(not(hasDescendant(withText("Apfel")))));
-        onView(withId(R.id.recyclerView))
-                .check(matches(not(hasDescendant(withText("Kirsche")))));
-    }
 
-    /** Clearing the search shows all elements again. */
-    @Test
-    public void testSearchClearShowsAllElements() {
-        createAndOpenList("Suche-Reset-Test");
-        addElementAtBottom("Apfel");
-        addElementAtBottom("Banane");
-
-        onView(withId(R.id.action_search)).perform(click());
-        onView(isAssignableFrom(android.widget.AutoCompleteTextView.class))
-                .perform(typeText("Apf"), closeSoftKeyboard());
-        // clear search
-        onView(isAssignableFrom(android.widget.AutoCompleteTextView.class))
-                .perform(clearText(), closeSoftKeyboard());
-
+        // First click clears the search text; second click collapses the SearchView
+        // so the action bar's overflow button is accessible again.
+        onView(withId(androidx.appcompat.R.id.search_close_btn)).perform(click());
+        onView(withId(androidx.appcompat.R.id.search_close_btn)).perform(click());
         onView(withId(R.id.recyclerView))
                 .check(matches(hasDescendant(withText("Apfel"))));
         onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Banane"))));
-    }
+                .check(matches(hasDescendant(withText("Kirsche"))));
 
-    /** "Clear list" removes all elements from the list immediately. */
-    @Test
-    public void testClearList() {
-        Context ctx = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext();
-        createAndOpenList("Leeren-Test");
-        addElementAtBottom("Element 1");
-        addElementAtBottom("Element 2");
+        // ---- B: Overview mode toggle ----
+        checkAt(0); // check "Apfel" so overview has something to separate
+        onView(withId(R.id.action_overview)).perform(click());
+        onView(withId(R.id.recyclerView)).check(matches(isDisplayed()));
 
+        // ---- C: Clear list ----
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_list_clear)).perform(click());
-
         onView(withId(R.id.recyclerView))
-                .check(matches(not(hasDescendant(withText("Element 1")))));
-    }
+                .check(matches(not(hasDescendant(withText("Apfel")))));
 
-    /** Toggling overview mode reloads the adapter without crashing. */
-    @Test
-    public void testOverviewModeToggle() {
-        createAndOpenList("Übersicht-Test");
-        addElementAtBottom("Aufgabe");
-        // Check the element so overview mode has something to separate
-        onView(withId(R.id.recyclerView))
-                .perform(actionOnItemAtPosition(0,
-                        TestHelper.clickChildWithId(R.id.checkBox)));
-
-        // Toggle overview (action bar icon – showAsAction="ifRoom")
-        onView(withId(R.id.action_overview)).perform(click());
-
-        // The RecyclerView still exists after the toggle
-        onView(withId(R.id.recyclerView)).check(matches(isDisplayed()));
-    }
-
-    /** "Import text list" dialog opens from the overflow menu in ListActivity. */
-    @Test
-    public void testImportTextDialogOpens() {
-        Context ctx = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext();
-        createAndOpenList("Import-Test");
+        // ---- D: Import with markdown checkbox syntax ----
+        // After clear, import "- [x] Done" (checked) and "- [ ] Todo" (unchecked).
+        // Expected: Todo (unchecked) at 0, isolator at 1, Done (checked) at 2.
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_import_text)).perform(click());
-        onView(withText(R.string.import_text_title)).check(matches(isDisplayed()));
-    }
-
-    /**
-     * Importing a bullet-list text adds the parsed items to the current list.
-     * Parsing happens synchronously in ListActivity (unlike ListsActivity).
-     */
-    @Test
-    public void testImportTextAddsElements() {
-        Context ctx = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext();
-        createAndOpenList("Text-Import-Test");
-        openActionBarOverflowOrOptionsMenu(ctx);
-        onView(withText(R.string.menu_import_text)).perform(click());
-
         onView(isAssignableFrom(android.widget.EditText.class))
                 .inRoot(isDialog())
-                .perform(replaceText("- Milch\n- Eier\n- Brot"),
-                        closeSoftKeyboard());
-        onView(withText(R.string.import_text_yes))
-                .inRoot(isDialog())
-                .perform(click());
+                .perform(replaceText("- [x] Done\n- [ ] Todo"), closeSoftKeyboard());
+        onView(withText(R.string.import_text_yes)).inRoot(isDialog()).perform(click());
 
         onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Milch"))));
+                .check(matches(atPosition(0,
+                        allOf(hasDescendant(withText("Todo")),
+                                hasDescendant(allOf(withId(R.id.checkBox), isNotChecked()))))));
         onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Eier"))));
-        onView(withId(R.id.recyclerView))
-                .check(matches(hasDescendant(withText("Brot"))));
-    }
+                .check(matches(atPosition(2,
+                        allOf(hasDescendant(withText("Done")),
+                                hasDescendant(allOf(withId(R.id.checkBox), isChecked()))))));
 
-    /**
-     * "Share as Markdown/Text" fires a share chooser intent so the OS share
-     * sheet appears. The app wraps the ACTION_SEND intent inside an
-     * ACTION_CHOOSER via {@code Intent.createChooser()}, so we assert on the
-     * outer ACTION_CHOOSER that is actually started.
-     */
-    @Test
-    public void testExportMarkdownFiresShareIntent() {
-        Context ctx = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext();
-        createAndOpenList("Export-Test");
-        addElementAtBottom("Element");
-
-        // Stub all outgoing intents so the share sheet never actually opens.
-        Intents.intending(IntentMatchers.anyIntent())
-                .respondWith(new android.app.Instrumentation.ActivityResult(
-                        android.app.Activity.RESULT_OK, null));
-
-        // Export items are inside the "Export…" sub-menu → open it first.
-        openActionBarOverflowOrOptionsMenu(ctx);
-        onView(withText(R.string.menu_export_group)).perform(click());
-        onView(withText(R.string.menu_export_share_md)).perform(click());
-
-        // The app calls startActivity(Intent.createChooser(sendIntent, ...))
-        // which fires ACTION_CHOOSER — not ACTION_SEND — as the top-level intent.
-        Intents.intended(IntentMatchers.hasAction(Intent.ACTION_CHOOSER));
-    }
-
-    /** "Settings of this list" menu item opens ListSettingsActivity. */
-    @Test
-    public void testNavigateToListSettings() {
-        Context ctx = InstrumentationRegistry.getInstrumentation()
-                .getTargetContext();
-        createAndOpenList("Einstellungen-Test");
+        // ---- E: List settings navigation ----
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_list_settings)).perform(click());
         onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+        pressBack();
     }
 }

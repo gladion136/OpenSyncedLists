@@ -30,7 +30,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -64,7 +63,6 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
-import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 import eu.schmidt.systems.opensyncedlists.utils.ParsedElement;
 import eu.schmidt.systems.opensyncedlists.utils.TextListParser;
 
@@ -125,6 +123,12 @@ public class ListActivity extends AppCompatActivity
         super.onPause();
     }
     
+    @Override protected void onResume()
+    {
+        super.onResume();
+        activateAutoSync();
+    }
+    
     /**
      * onDestroy clears all handlers.
      */
@@ -145,7 +149,7 @@ public class ListActivity extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.one_list_menu, menu);
         MenuCompat.setGroupDividerEnabled(menu, true);
-
+        
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         
@@ -199,48 +203,59 @@ public class ListActivity extends AppCompatActivity
                 this.recyclerView.post(
                     () -> syncedListAdapter.notifyDataSetChanged());
                 return true;
-            case R.id.check_all: {
+            case R.id.check_all:
+            {
                 List<SyncedListElement> unchecked =
                     new ArrayList<>(syncedList.getUncheckedElements());
                 List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : unchecked) {
+                for (SyncedListElement el : unchecked)
+                {
                     SyncedListElement updated = el.clone();
                     updated.setChecked(true);
-                    steps.add(new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
+                    steps.add(
+                        new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
                 }
                 addElementStepsAndSave(steps);
                 return true;
             }
-            case R.id.uncheck_all: {
+            case R.id.uncheck_all:
+            {
                 List<SyncedListElement> checked =
                     new ArrayList<>(syncedList.getCheckedElements());
                 List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : checked) {
+                for (SyncedListElement el : checked)
+                {
                     SyncedListElement updated = el.clone();
                     updated.setChecked(false);
-                    steps.add(new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
+                    steps.add(
+                        new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
                 }
                 addElementStepsAndSave(steps);
                 return true;
             }
-            case R.id.delete_checked: {
+            case R.id.delete_checked:
+            {
                 List<SyncedListElement> checked =
                     new ArrayList<>(syncedList.getCheckedElements());
                 List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : checked) {
+                for (SyncedListElement el : checked)
+                {
                     steps.add(new SyncedListStep(el.getId(), ACTION.REMOVE));
                 }
                 addElementStepsAndSave(steps);
                 return true;
             }
-            case R.id.toggle_all: {
+            case R.id.toggle_all:
+            {
                 List<SyncedListElement> all =
                     new ArrayList<>(syncedList.getReformatElements());
                 List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : all) {
+                for (SyncedListElement el : all)
+                {
                     SyncedListElement updated = el.clone();
                     updated.setChecked(!el.getChecked());
-                    steps.add(new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
+                    steps.add(
+                        new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
                 }
                 addElementStepsAndSave(steps);
                 return true;
@@ -372,29 +387,6 @@ public class ListActivity extends AppCompatActivity
     }
     
     /**
-     * Applies a batch of steps to the list, saves once, and refreshes the view.
-     * Use this instead of calling addElementStepAndSave() in a loop to avoid
-     * redundant storage writes for bulk operations.
-     */
-    private void addElementStepsAndSave(List<SyncedListStep> steps)
-    {
-        if (steps.isEmpty()) return;
-        for (SyncedListStep step : steps)
-        {
-            syncedList.addElementStep(step);
-        }
-        this.recyclerView.post(() -> syncedListAdapter.notifyDataSetChanged());
-        try
-        {
-            secureStorage.setList(syncedList);
-        }
-        catch (IOException | JSONException e)
-        {
-            Log.e(LOG_TITLE_DEFAULT, "Local storage write error: " + e);
-        }
-    }
-
-    /**
      * Start synchronizing with the connected server of the list.
      */
     public void syncWithHost()
@@ -450,6 +442,35 @@ public class ListActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             });
+    }
+    
+    public void activateAutoSync()
+    {
+        // Should autoSync?
+        if (syncedList.getHeader().isAutoSync() && !syncedList.getHeader()
+            .getHostname().equals(""))
+        {
+            // Auto synchronize every 10 seconds
+            autoSyncHandler = new Handler();
+            autoSyncRunnable = () ->
+            {
+                syncWithHost();
+                int sync_interval = Integer.parseInt(
+                    globalSharedPreferences.getString("sync_interval", "10"))
+                    * 1000;
+                autoSyncHandler.postDelayed(autoSyncRunnable, sync_interval);
+            };
+            autoSyncHandler.post(autoSyncRunnable);
+        }
+    }
+    
+    public void disableAutoSync()
+    {
+        // Stop auto sync
+        if (autoSyncHandler != null)
+        {
+            autoSyncHandler.removeCallbacks(autoSyncRunnable);
+        }
     }
     
     /**
@@ -515,10 +536,30 @@ public class ListActivity extends AppCompatActivity
         });
     }
     
-    @Override protected void onResume()
+    /**
+     * Applies a batch of steps to the list, saves once, and refreshes the view.
+     * Use this instead of calling addElementStepAndSave() in a loop to avoid
+     * redundant storage writes for bulk operations.
+     */
+    private void addElementStepsAndSave(List<SyncedListStep> steps)
     {
-        super.onResume();
-        activateAutoSync();
+        if (steps.isEmpty())
+        {
+            return;
+        }
+        for (SyncedListStep step : steps)
+        {
+            syncedList.addElementStep(step);
+        }
+        this.recyclerView.post(() -> syncedListAdapter.notifyDataSetChanged());
+        try
+        {
+            secureStorage.setList(syncedList);
+        }
+        catch (IOException | JSONException e)
+        {
+            Log.e(LOG_TITLE_DEFAULT, "Local storage write error: " + e);
+        }
     }
     
     /**
@@ -552,35 +593,6 @@ public class ListActivity extends AppCompatActivity
         
         activateAutoSync();
         checkServerConnection();
-    }
-    
-    public void activateAutoSync()
-    {
-        // Should autoSync?
-        if (syncedList.getHeader().isAutoSync() && !syncedList.getHeader()
-            .getHostname().equals(""))
-        {
-            // Auto synchronize every 10 seconds
-            autoSyncHandler = new Handler();
-            autoSyncRunnable = () ->
-            {
-                syncWithHost();
-                int sync_interval = Integer.parseInt(
-                    globalSharedPreferences.getString("sync_interval", "10"))
-                    * 1000;
-                autoSyncHandler.postDelayed(autoSyncRunnable, sync_interval);
-            };
-            autoSyncHandler.post(autoSyncRunnable);
-        }
-    }
-    
-    public void disableAutoSync()
-    {
-        // Stop auto sync
-        if (autoSyncHandler != null)
-        {
-            autoSyncHandler.removeCallbacks(autoSyncRunnable);
-        }
     }
     
     /**
@@ -658,7 +670,7 @@ public class ListActivity extends AppCompatActivity
                 });
         }
     }
-
+    
     /**
      * Shows the import text dialog and adds parsed elements to current list.
      */
@@ -666,25 +678,28 @@ public class ListActivity extends AppCompatActivity
     {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         final EditText editText = new EditText(this);
-
-        editText.setInputType(InputType.TYPE_CLASS_TEXT |
-            InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        
+        editText.setInputType(
+            InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         editText.setMinLines(5);
         editText.setMaxLines(10);
-        editText.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
+        editText.setGravity(
+            android.view.Gravity.TOP | android.view.Gravity.START);
         editText.setHint(getString(R.string.import_text_hint));
-
+        
         android.widget.LinearLayout.LayoutParams params =
             new android.widget.LinearLayout.LayoutParams(
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
         int margin_in_dp = 10;
-        int margin_in_px = (int) (margin_in_dp * getResources()
-            .getDisplayMetrics().density);
-        params.setMargins(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
+        int margin_in_px =
+            (int) (margin_in_dp * getResources().getDisplayMetrics().density);
+        params.setMargins(margin_in_px, margin_in_px, margin_in_px,
+            margin_in_px);
         editText.setLayoutParams(params);
-        editText.setPadding(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
-
+        editText.setPadding(margin_in_px, margin_in_px, margin_in_px,
+            margin_in_px);
+        
         alert.setTitle(getString(R.string.import_text_title));
         alert.setMessage(getString(R.string.import_text_msg));
         alert.setView(editText);
@@ -697,7 +712,7 @@ public class ListActivity extends AppCompatActivity
                     TextListParser parser = new TextListParser();
                     ArrayList<ParsedElement> elements =
                         new ArrayList<>(parser.parse(result));
-
+                    
                     if (elements.isEmpty())
                     {
                         Toast.makeText(this,
@@ -705,16 +720,16 @@ public class ListActivity extends AppCompatActivity
                             Toast.LENGTH_SHORT).show();
                         return;
                     }
-
+                    
                     addParsedElementsToList(elements);
                 }
             });
         alert.setNegativeButton(getString(R.string.import_text_cancel),
             (dialog, whichButton) -> dialog.cancel());
-
+        
         alert.create().show();
     }
-
+    
     /**
      * Adds parsed elements to the current list.
      *
@@ -725,21 +740,22 @@ public class ListActivity extends AppCompatActivity
         for (ParsedElement element : elements)
         {
             String id = syncedList.generateUniqueElementId();
-            SyncedListStep step = new SyncedListStep(id, ACTION.ADD,
+            SyncedListElement listElement =
                 new SyncedListElement(id, element.getName(),
-                    element.getDescription()));
+                    element.getDescription());
+            listElement.setChecked(element.isChecked());
+            SyncedListStep step =
+                new SyncedListStep(id, ACTION.ADD, listElement);
             addElementStepAndSave(step, false);
         }
-
+        
         // Refresh the view
-        this.recyclerView.post(
-            () -> syncedListAdapter.notifyDataSetChanged());
-
+        this.recyclerView.post(() -> syncedListAdapter.notifyDataSetChanged());
+        
         Toast.makeText(this,
             String.format(getString(R.string.import_text_success),
                 elements.size()), Toast.LENGTH_SHORT).show();
-
-        Log.d("ListActivity",
-            "Added " + elements.size() + " elements to list");
+        
+        Log.d("ListActivity", "Added " + elements.size() + " elements to list");
     }
 }

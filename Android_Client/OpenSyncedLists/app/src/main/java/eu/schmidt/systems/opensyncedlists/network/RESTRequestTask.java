@@ -93,8 +93,8 @@ class RESTRequestTask
             
             if (param.length > 2)
             {
-                urlConnection
-                    .setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Content-Type",
+                    "application/json");
                 urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setDoOutput(true);
                 

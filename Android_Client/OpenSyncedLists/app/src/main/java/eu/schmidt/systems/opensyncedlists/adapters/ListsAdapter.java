@@ -57,6 +57,108 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     final ArrayList<SyncedListHeader> syncedListsHeaders;
     final ArrayList<SyncedListHeader> syncedListsHeadersFiltered;
     final ListsActivity listsActivity;
+    Boolean filterActive = false;
+    private Filter syncedListFilter = new Filter()
+    {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            ArrayList<SyncedListHeader> filteredList = new ArrayList<>();
+            
+            ArrayList<ListTag> activeTags = new ArrayList<>();
+            try
+            {
+                for (ListTag tag : listsActivity.secureStorage.getAllTags())
+                {
+                    if (tag.filterEnabled)
+                    {
+                        activeTags.add(tag);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("TAG", "Error getting tags: " + e);
+            }
+            for (ListTag tag : activeTags)
+            {
+                Log.d("Filter active:", "Tag: " + tag.name);
+            }
+            if (activeTags.size() <= 0)
+            {
+                filteredList.addAll(syncedListsHeaders);
+                Log.d("Filter", "No filter");
+                filterActive = false;
+            }
+            else
+            {
+                filterActive = true;
+                
+                for (SyncedListHeader item : syncedListsHeaders)
+                {
+                    for (ListTag tag_s : activeTags)
+                    {
+                        ArrayList<ListTag> tag_list_of_item = item.getTagList();
+                        if (tag_list_of_item.isEmpty() && tag_s.untagged)
+                        {
+                            filteredList.add(item);
+                        }
+                        else if (tag_list_of_item.stream()
+                            .anyMatch(tag_m -> tag_m.name.equals(tag_s.name)))
+                        
+                        {
+                            filteredList.add(item);
+                        }
+                    }
+                }
+            }
+            
+            // Remove duplicated
+            ArrayList<SyncedListHeader> filteredListNoDuplicates =
+                new ArrayList<>();
+            for (SyncedListHeader item : filteredList)
+            {
+                if (filteredListNoDuplicates.stream()
+                    .noneMatch(item2 -> item2.getId().equals(item.getId())))
+                {
+                    filteredListNoDuplicates.add(item);
+                }
+            }
+            Log.d("Filter",
+                "Filtered list size: " + filteredListNoDuplicates.size());
+            Log.d("Filter", "Original list size: " + filteredList.size());
+            Log.d("Filter", "All list size: " + syncedListsHeaders.size());
+            FilterResults results = new FilterResults();
+            results.values = filteredListNoDuplicates;
+            results.count = filteredListNoDuplicates.size();
+            return results;
+        }
+        
+        @Override protected void publishResults(CharSequence constraint,
+            FilterResults results)
+        {
+            syncedListsHeadersFiltered.clear();
+            try
+            {
+                if (results.values instanceof ArrayList)
+                {
+                    syncedListsHeadersFiltered.addAll(
+                        (ArrayList) results.values);
+                }
+                else
+                {
+                    throw new Exception("Results are not an ArrayList");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e("Filter", "Error casting results: " + e);
+                syncedListsHeadersFiltered.addAll(syncedListsHeaders);
+            }
+            
+            notifyDataSetChanged();
+        }
+    };
     
     public ListsAdapter(ListsActivity listsActivity,
         ArrayList<SyncedListHeader> syncedListsHeaders,
@@ -216,26 +318,6 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
     
-    public ColorStateList getChipColor(String colorHex)
-    {
-        int color = Color.parseColor(colorHex);
-        
-        // Hintergrundfarbe
-        int[][] states =
-            new int[][]{new int[]{android.R.attr.state_enabled}, // enabled
-                new int[]{-android.R.attr.state_enabled}, // disabled
-                new int[]{-android.R.attr.state_checked}, // unchecked
-                new int[]{android.R.attr.state_pressed}  // pressed
-            };
-        
-        int[] colors = new int[]{color,
-            ContextCompat.getColor(listsActivity, android.R.color.darker_gray),
-            //disabled color
-            color, color};
-        
-        return new ColorStateList(states, colors);
-    }
-    
     @Override public int getItemViewType(int position)
     {
         // Check if the list is small height
@@ -254,6 +336,31 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return syncedListsHeadersFiltered.size();
         }
         return syncedListsHeaders.size();
+    }
+    
+    @Override public Filter getFilter()
+    {
+        return syncedListFilter;
+    }
+    
+    public ColorStateList getChipColor(String colorHex)
+    {
+        int color = Color.parseColor(colorHex);
+        
+        // Hintergrundfarbe
+        int[][] states =
+            new int[][]{new int[]{android.R.attr.state_enabled}, // enabled
+                new int[]{-android.R.attr.state_enabled}, // disabled
+                new int[]{-android.R.attr.state_checked}, // unchecked
+                new int[]{android.R.attr.state_pressed}  // pressed
+            };
+        
+        int[] colors = new int[]{color,
+            ContextCompat.getColor(listsActivity, android.R.color.darker_gray),
+            //disabled color
+            color, color};
+        
+        return new ColorStateList(states, colors);
     }
     
     /**
@@ -296,113 +403,4 @@ public class ListsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             chipGrpTags = itemView.findViewById(R.id.chipGrpTags);
         }
     }
-    
-    @Override public Filter getFilter()
-    {
-        return syncedListFilter;
-    }
-    
-    Boolean filterActive = false;
-    
-    private Filter syncedListFilter = new Filter()
-    {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint)
-        {
-            ArrayList<SyncedListHeader> filteredList = new ArrayList<>();
-            
-            ArrayList<ListTag> activeTags = new ArrayList<>();
-            try
-            {
-                for (ListTag tag : listsActivity.secureStorage.getAllTags())
-                {
-                    if (tag.filterEnabled)
-                    {
-                        activeTags.add(tag);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.e("TAG", "Error getting tags: " + e);
-            }
-            for (ListTag tag : activeTags)
-            {
-                Log.d("Filter active:", "Tag: " + tag.name);
-            }
-            if (activeTags.size() <= 0)
-            {
-                filteredList.addAll(syncedListsHeaders);
-                Log.d("Filter", "No filter");
-                filterActive = false;
-            }
-            else
-            {
-                filterActive = true;
-                
-                for (SyncedListHeader item : syncedListsHeaders)
-                {
-                    for (ListTag tag_s : activeTags)
-                    {
-                        ArrayList<ListTag> tag_list_of_item = item.getTagList();
-                        if (tag_list_of_item.isEmpty() && tag_s.untagged)
-                        {
-                            filteredList.add(item);
-                        }
-                        else if (tag_list_of_item.stream()
-                            .anyMatch(tag_m -> tag_m.name.equals(tag_s.name)))
-                        
-                        {
-                            filteredList.add(item);
-                        }
-                    }
-                }
-            }
-            
-            // Remove duplicated
-            ArrayList<SyncedListHeader> filteredListNoDuplicates =
-                new ArrayList<>();
-            for (SyncedListHeader item : filteredList)
-            {
-                if (filteredListNoDuplicates.stream()
-                    .noneMatch(item2 -> item2.getId().equals(item.getId())))
-                {
-                    filteredListNoDuplicates.add(item);
-                }
-            }
-            Log.d("Filter",
-                "Filtered list size: " + filteredListNoDuplicates.size());
-            Log.d("Filter", "Original list size: " + filteredList.size());
-            Log.d("Filter", "All list size: " + syncedListsHeaders.size());
-            FilterResults results = new FilterResults();
-            results.values = filteredListNoDuplicates;
-            results.count = filteredListNoDuplicates.size();
-            return results;
-        }
-        
-        @Override protected void publishResults(CharSequence constraint,
-            FilterResults results)
-        {
-            syncedListsHeadersFiltered.clear();
-            try
-            {
-                if (results.values instanceof ArrayList)
-                {
-                    syncedListsHeadersFiltered.addAll(
-                        (ArrayList) results.values);
-                }
-                else
-                {
-                    throw new Exception("Results are not an ArrayList");
-                }
-            }
-            catch (Exception e)
-            {
-                Log.e("Filter", "Error casting results: " + e);
-                syncedListsHeadersFiltered.addAll(syncedListsHeaders);
-            }
-            
-            notifyDataSetChanged();
-        }
-    };
 }

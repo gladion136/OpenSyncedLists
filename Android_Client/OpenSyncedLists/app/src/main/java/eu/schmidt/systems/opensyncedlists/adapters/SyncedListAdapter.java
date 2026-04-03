@@ -59,16 +59,58 @@ public class SyncedListAdapter
     extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     implements View.OnClickListener, Filterable
 {
+    public Boolean overview = false;
     private final ListActivity listActivity;
     private final SyncedList syncedList;
     private final RecyclerView recyclerView;
     private final boolean scrollListTopBottom;
     private final int jumpDistance;
     private boolean filterActive = false;
-    
-    public Boolean overview = false;
-    
     private List<SyncedListElement> syncedListElementsFiltered;
+    private Filter syncedListFilter = new Filter()
+    {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            List<SyncedListElement> filteredList = new ArrayList<>();
+            
+            if (constraint == null || constraint.length() == 0)
+            {
+                filteredList.addAll(syncedList.getReformatElements());
+                Log.d("Filter", "No filter");
+                filterActive = false;
+            }
+            else
+            {
+                String filterPattern =
+                    constraint.toString().toLowerCase().trim();
+                Log.d("Filter", "Filter: " + filterPattern);
+                filterActive = true;
+                
+                for (SyncedListElement item : syncedList.getElements())
+                {
+                    if (item.getName().toLowerCase().contains(filterPattern)
+                        || item.getDescription().toLowerCase()
+                        .contains(filterPattern))
+                    {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+        
+        @Override protected void publishResults(CharSequence constraint,
+            FilterResults results)
+        {
+            syncedListElementsFiltered.clear();
+            syncedListElementsFiltered.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
     
     /**
      * Initialize the recyclerview
@@ -374,6 +416,11 @@ public class SyncedListAdapter
             bottomSheetDialogFragment.getTag());
     }
     
+    @Override public Filter getFilter()
+    {
+        return syncedListFilter;
+    }
+    
     /**
      * Get element by position inside recyclerview.
      *
@@ -524,56 +571,6 @@ public class SyncedListAdapter
         listActivity.addElementStepAndSave(newStep, true);
         recyclerView.scrollToPosition(getPositionOfElement(syncedListElement));
     }
-    
-    @Override public Filter getFilter()
-    {
-        return syncedListFilter;
-    }
-    
-    private Filter syncedListFilter = new Filter()
-    {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint)
-        {
-            List<SyncedListElement> filteredList = new ArrayList<>();
-            
-            if (constraint == null || constraint.length() == 0)
-            {
-                filteredList.addAll(syncedList.getReformatElements());
-                Log.d("Filter", "No filter");
-                filterActive = false;
-            }
-            else
-            {
-                String filterPattern =
-                    constraint.toString().toLowerCase().trim();
-                Log.d("Filter", "Filter: " + filterPattern);
-                filterActive = true;
-                
-                for (SyncedListElement item : syncedList.getElements())
-                {
-                    if (item.getName().toLowerCase().contains(filterPattern)
-                        || item.getDescription().toLowerCase()
-                        .contains(filterPattern))
-                    {
-                        filteredList.add(item);
-                    }
-                }
-            }
-            
-            FilterResults results = new FilterResults();
-            results.values = filteredList;
-            return results;
-        }
-        
-        @Override protected void publishResults(CharSequence constraint,
-            FilterResults results)
-        {
-            syncedListElementsFiltered.clear();
-            syncedListElementsFiltered.addAll((List) results.values);
-            notifyDataSetChanged();
-        }
-    };
     
     /**
      * ViewHolder for one element.
