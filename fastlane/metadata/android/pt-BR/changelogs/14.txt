@@ -1,0 +1,6 @@
+- novo: importação de listas de texto com suporte a caixas de seleção Markdown (- [x] / - [ ])
+- novo: ações em massa – marcar todos, desmarcar todos, excluir concluídos, inverter todos
+- novo: a última lista visualizada é aberta automaticamente ao iniciar o app
+- correção: voltar das configurações da lista retorna à lista, não à visão geral
+- ui: menus de opções agrupados na visão geral das listas e na visualização individual
+- traduções: português brasileiro, espanhol, francês

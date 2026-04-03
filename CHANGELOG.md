@@ -1,5 +1,14 @@
 # Changelog of OpenSyncedLists
 
+## 1.2.0 (03.04.2026)
+
+- feat: import text list with markdown checkbox support (- [x] / - [ ])
+- feat: bulk actions – check all, uncheck all, delete done, toggle all
+- feat: open last viewed list automatically on app start
+- fix: multiple bugs fixed
+- ui: grouped overflow menus in list overview and single-list view
+- translations: Brazilian Portuguese, Spanish, French
+
 ## 1.1.0 (25.04.2025)
 
 - feat: add tags to filter lists

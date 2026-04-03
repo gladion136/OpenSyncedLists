@@ -1,0 +1,6 @@
+- nuevo: importación de listas de texto con soporte de casillas Markdown (- [x] / - [ ])
+- nuevo: acciones masivas – marcar todo, desmarcar todo, eliminar completados, invertir todo
+- nuevo: la última lista vista se abre automáticamente al iniciar la app
+- fix: volver desde los ajustes de la lista regresa a la lista, no al resumen
+- ui: menús desplegables agrupados en la vista general de listas y en la vista individual
+- traducciones: portugués brasileño, español, francés

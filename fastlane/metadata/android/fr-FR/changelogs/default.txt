@@ -1,0 +1,6 @@
+- nouveau : import de listes texte avec prise en charge des cases Markdown (- [x] / - [ ])
+- nouveau : actions groupées – tout cocher, tout décocher, supprimer les faits, tout inverser
+- nouveau : la dernière liste consultée s'ouvre automatiquement au démarrage
+- fix : plusieurs bugs corrigés
+- ui : menus déroulants groupés dans l'aperçu des listes et la vue liste individuelle
+- traductions : portugais brésilien, espagnol, français

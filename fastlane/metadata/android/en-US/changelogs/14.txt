@@ -1,6 +1,6 @@
 - feat: import text list with markdown checkbox support (- [x] / - [ ])
 - feat: bulk actions – check all, uncheck all, delete done, toggle all
 - feat: open last viewed list automatically on app start
-- fix: multiple bugs fixed
+- fix: back from list settings returns to the list, not the overview
 - ui: grouped overflow menus in list overview and single-list view
 - translations: Brazilian Portuguese, Spanish, French
