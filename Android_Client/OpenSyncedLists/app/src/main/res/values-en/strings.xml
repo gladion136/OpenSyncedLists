@@ -125,4 +125,15 @@
     <string name="menu_show_changelog">Show changelog</string>
     <string name="pref_list_overview_instead_cards_summary">Display all lists inside a list view instead of a grid of cards</string>
     <string name="pref_list_overview_instead_cards_title">List overview as list instead of cards</string>
+    <string name="menu_import_text">Import text list</string>
+    <string name="import_text_title">Import text list</string>
+    <string name="import_text_msg">Paste or type your list items. Supports:\n\n• Bullet points: - Item or * Item\n• Comma-separated: Item1, Item2, Item3\n• Indented descriptions (4 spaces or tab after item)</string>
+    <string name="import_text_hint">- Apple\n- Banana\n    Yellow fruit</string>
+    <string name="import_text_to_list_msg">Add items to existing list?</string>
+    <string name="import_text_yes">Import</string>
+    <string name="import_text_cancel">Cancel</string>
+    <string name="import_text_empty">No items to import. Check your text format.</string>
+    <string name="import_text_success">Successfully imported %d items</string>
+    <string name="import_text_help_title">Text List Formats</string>
+    <string name="import_text_help_content">Supported formats:\n\n<b>Bullet Points:</b>\n- Item 1\n- Item 2\n* Item 1\n* Item 2\n\n<b>Comma-Separated:</b>\nItem 1, Item 2, Item 3\n\n<b>With Descriptions:</b>\n- Item 1\n    Description of item 1\n- Item 2\n    Description of item 2\n\nDescriptions require indentation (4 spaces or tab).\n\nEmpty lines and items are filtered out.</string>
 </resources>

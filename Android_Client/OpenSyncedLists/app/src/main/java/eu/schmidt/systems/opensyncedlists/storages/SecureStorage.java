@@ -273,6 +273,7 @@ public class SecureStorage
                 ListTag tag = new ListTag(tagJsonObject);
                 if (tag.untagged)
                 {
+                    untaggedTag.filterEnabled = tag.filterEnabled;
                     continue;
                 }
                 if (allTags.stream()

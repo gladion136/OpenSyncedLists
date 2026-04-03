@@ -149,4 +149,16 @@
     <string name="menu_show_changelog">Öffne den Changelog</string>
     <string name="pref_list_overview_instead_cards_summary">Listen Übersicht: Darstellung als Liste anstatt Karten.</string>
     <string name="pref_list_overview_instead_cards_title">Listen Übersicht: Liste anstatt Karten</string>
+    <string name="menu_import_text">Text-Liste importieren</string>
+    <string name="import_text_title">Text-Liste importieren</string>
+    <string name="import_text_msg">Füge deine Listeneinträge ein. Unterstützte Formate:\n\n• Aufzählungen: - Eintrag oder * Eintrag\n• Komma-getrennt: Eintrag1, Eintrag2, Eintrag3\n• Eingerückte Beschreibungen (4 Leerzeichen oder Tab nach Eintrag)</string>
+    <string name="import_text_hint">- Apfel\n- Banane\n    Gelbe Frucht</string>
+    <string name="import_text_to_list_msg">Elemente zur bestehenden Liste hinzufügen?</string>
+    <string name="import_text_yes">Importieren</string>
+    <string name="import_text_cancel">Abbrechen</string>
+    <string name="import_text_empty">Keine Einträge zum Importieren. Überprüfe dein Textformat.</string>
+    <string name="import_text_success">Erfolgreich %d Einträge importiert</string>
+    <string name="import_text_help_title">Text-Listen Formate</string>
+    <string name="import_text_help_content">Unterstützte Formate:\n\n<b>Aufzählungen:</b>\n- Eintrag 1\n- Eintrag 2\n* Eintrag 1\n* Eintrag 2\n\n<b>Komma-getrennt:</b>\nEintrag 1, Eintrag 2, Eintrag 3\n\n<b>Mit Beschreibungen:</b>\n- Eintrag 1\n    Beschreibung von Eintrag 1\n- Eintrag 2\n    Beschreibung von Eintrag 2\n\nBeschreibungen erfordern Einrückung (4 Leerzeichen oder Tab).\n\nLeere Zeilen und Einträge werden gefiltert.</string>
+
 </resources>

@@ -67,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity
     @Override public void onSharedPreferenceChanged(
         SharedPreferences sharedPreferences, String key)
     {
-        if (key.equals("design"))
+        if (key != null && key.equals("design"))
         {
             if (sharedPreferences.getString("design", "")
                 .equals(getString(R.string.pref_design_light)))

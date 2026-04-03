@@ -31,6 +31,9 @@
         android:title="@string/action_overview_title"
         app:showAsAction="ifRoom" />
 
+    <item android:id="@+id/import_text"
+        android:title="@string/menu_import_text" />
+
     <item android:id="@+id/list_clear"
         android:title="@string/menu_list_clear" />
 

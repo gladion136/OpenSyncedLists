@@ -25,16 +25,19 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.preference.PreferenceManager;
@@ -45,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter;
@@ -58,6 +62,9 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
+import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
+import eu.schmidt.systems.opensyncedlists.utils.ParsedElement;
+import eu.schmidt.systems.opensyncedlists.utils.TextListParser;
 
 /**
  * Activity for displaying one syncedList.
@@ -188,6 +195,10 @@ public class ListActivity extends AppCompatActivity
                 }
                 this.recyclerView.post(
                     () -> syncedListAdapter.notifyDataSetChanged());
+                return true;
+            case R.id.import_text:
+                // Import text and add to current list
+                showImportTextDialog();
                 return true;
             case R.id.export_md:
                 // Export the list as markdown/text and send it to another app.
@@ -574,5 +585,89 @@ public class ListActivity extends AppCompatActivity
                     }
                 });
         }
+    }
+
+    /**
+     * Shows the import text dialog and adds parsed elements to current list.
+     */
+    private void showImportTextDialog()
+    {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final EditText editText = new EditText(this);
+
+        editText.setInputType(InputType.TYPE_CLASS_TEXT |
+            InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        editText.setMinLines(5);
+        editText.setMaxLines(10);
+        editText.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
+        editText.setHint(getString(R.string.import_text_hint));
+
+        android.widget.LinearLayout.LayoutParams params =
+            new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        int margin_in_dp = 10;
+        int margin_in_px = (int) (margin_in_dp * getResources()
+            .getDisplayMetrics().density);
+        params.setMargins(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
+        editText.setLayoutParams(params);
+        editText.setPadding(margin_in_px, margin_in_px, margin_in_px, margin_in_px);
+
+        alert.setTitle(getString(R.string.import_text_title));
+        alert.setMessage(getString(R.string.import_text_msg));
+        alert.setView(editText);
+        alert.setPositiveButton(getString(R.string.import_text_yes),
+            (dialog, whichButton) ->
+            {
+                String result = editText.getText().toString();
+                if (result != null && !result.isEmpty())
+                {
+                    TextListParser parser = new TextListParser();
+                    ArrayList<ParsedElement> elements =
+                        new ArrayList<>(parser.parse(result));
+
+                    if (elements.isEmpty())
+                    {
+                        Toast.makeText(this,
+                            getString(R.string.import_text_empty),
+                            Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    addParsedElementsToList(elements);
+                }
+            });
+        alert.setNegativeButton(getString(R.string.import_text_cancel),
+            (dialog, whichButton) -> dialog.cancel());
+
+        alert.create().show();
+    }
+
+    /**
+     * Adds parsed elements to the current list.
+     *
+     * @param elements List of parsed elements to add
+     */
+    private void addParsedElementsToList(ArrayList<ParsedElement> elements)
+    {
+        for (ParsedElement element : elements)
+        {
+            String id = syncedList.generateUniqueElementId();
+            SyncedListStep step = new SyncedListStep(id, ACTION.ADD,
+                new SyncedListElement(id, element.getName(),
+                    element.getDescription()));
+            addElementStepAndSave(step, false);
+        }
+
+        // Refresh the view
+        this.recyclerView.post(
+            () -> syncedListAdapter.notifyDataSetChanged());
+
+        Toast.makeText(this,
+            String.format(getString(R.string.import_text_success),
+                elements.size()), Toast.LENGTH_SHORT).show();
+
+        Log.d("ListActivity",
+            "Added " + elements.size() + " elements to list");
     }
 }
