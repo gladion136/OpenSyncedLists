@@ -88,8 +88,14 @@ public class ListActivityTest {
     @Before
     public void setUp() {
         ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        // If a child activity is on top, navigate back to ListsActivity.
+        // We detect this by checking whether lVLists is currently displayed;
+        // if not, press Back once (or twice for the 2-deep case) to pop it.
+        // We avoid pressing Back when ListsActivity is already on top because
+        // on some devices pressBack() on the task root finishes it.
+        TestHelper.navigateToListsActivity(R.id.lVLists);
         TestHelper.clearAll(ctx);
-        activityRule.getScenario().recreate();
+        activityRule.getScenario().onActivity(ListsActivity::resetForTest);
     }
 
     // -------------------------------------------------------------------------
@@ -176,22 +182,22 @@ public class ListActivityTest {
         onView(withId(R.id.recyclerView))
                 .check(matches(hasDescendant(allOf(withId(R.id.checkBox), isChecked()))));
 
-        // ---- C: Element editor ----
+        // ---- C: Element editor (BottomSheetDialogFragment) ----
         // Unchecked section: Bottom(0), Second(1), Ime(2)
         onView(withId(R.id.recyclerView))
                 .perform(actionOnItemAtPosition(0, TestHelper.clickItemRoot()));
-        onView(withId(R.id.eTName)).check(matches(isDisplayed()));
-        onView(withId(R.id.btnDelete)).check(matches(isDisplayed()));
+        onView(withId(R.id.eTName)).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(withId(R.id.btnDelete)).inRoot(isDialog()).check(matches(isDisplayed()));
 
-        onView(withId(R.id.eTName))
+        onView(withId(R.id.eTName)).inRoot(isDialog())
                 .perform(clearText(), replaceText("Renamed"), closeSoftKeyboard());
-        onView(withId(R.id.btnApplyChanges)).perform(click());
+        onView(withId(R.id.btnApplyChanges)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.recyclerView))
                 .check(matches(hasDescendant(withText("Renamed"))));
 
         onView(withId(R.id.recyclerView))
                 .perform(actionOnItemAtPosition(0, TestHelper.clickItemRoot()));
-        onView(withId(R.id.btnDelete)).perform(click());
+        onView(withId(R.id.btnDelete)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.recyclerView))
                 .check(matches(not(hasDescendant(withText("Renamed")))));
 
@@ -266,6 +272,9 @@ public class ListActivityTest {
         onView(withId(R.id.recyclerView))
                 .check(matches(atPosition(2,
                         hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
+        // Return to ListsActivity so that setUp() for the next test can safely
+        // call recreate() on it without hitting the "Activity STOPPED" error.
+        pressBack();
     }
 
     /**
@@ -337,6 +346,8 @@ public class ListActivityTest {
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_list_settings)).perform(click());
         onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+        pressBack(); // ListSettingsActivity → ListActivity
+        // Return to ListsActivity so setUp() for the next test can recreate it cleanly.
         pressBack();
     }
 }

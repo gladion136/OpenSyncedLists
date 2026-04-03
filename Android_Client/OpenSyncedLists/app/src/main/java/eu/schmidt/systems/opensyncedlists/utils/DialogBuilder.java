@@ -155,6 +155,10 @@ public class DialogBuilder
         SyncedListHeader listHeader, TagCallback callback)
     {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+        // Build a filtered list of assignable tags (excluding the virtual
+        // "untagged" entry) and a matching list of CheckBoxes.
+        final ArrayList<ListTag> assignableTags = new ArrayList<>();
         final ArrayList<CheckBox> checkBoxes = new ArrayList<>();
         for (ListTag tag : tags)
         {
@@ -162,6 +166,7 @@ public class DialogBuilder
             {
                 continue;
             }
+            assignableTags.add(tag);
             CheckBox checkBox = new CheckBox(context);
             checkBox.setText(tag.name);
             checkBox.setChecked(listHeader.getTagList().stream()
@@ -173,9 +178,9 @@ public class DialogBuilder
         {
             linearLayout.addView(checkBox);
         }
-        
+
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        
+
         LinearLayout.LayoutParams params =
             new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
@@ -187,10 +192,10 @@ public class DialogBuilder
         linearLayout.setLayoutParams(params);
         linearLayout.setPadding(margin_in_px, margin_in_px, margin_in_px,
             margin_in_px);
-        
+
         alert.setTitle(title);
         alert.setMessage(descrp);
-        
+
         alert.setView(linearLayout);
         alert.setPositiveButton("OK", (dialog, whichButton) ->
         {
@@ -199,17 +204,15 @@ public class DialogBuilder
             {
                 if (checkBoxes.get(i).isChecked())
                 {
-                    selectedTags.add(tags.get(i + 1));
+                    selectedTags.add(assignableTags.get(i));
                 }
             }
             callback.callback(selectedTags);
         });
-        alert.setNegativeButton("Cancel",
-            (dialog, whichButton) -> callback.callback(null));
-        
-        AlertDialog dialog = alert.create();
-        
-        dialog.show();
+        // Cancel: do nothing — the caller is not notified so no null is passed.
+        alert.setNegativeButton("Cancel", null);
+
+        alert.create().show();
     }
     
     /**

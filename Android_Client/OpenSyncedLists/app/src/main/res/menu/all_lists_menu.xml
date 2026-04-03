@@ -16,25 +16,40 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/new_list"
-        android:title="@string/menu_new_list" />
-    <item
-        android:id="@+id/import_text"
-        android:title="@string/menu_import_text" />
-    <item
-        android:id="@+id/import_lists"
-        android:title="@string/menu_import" />
-    <item
-        android:id="@+id/import_lists_url"
-        android:title="@string/menu_import_url" />
-    <item
-        android:id="@+id/export_lists"
-        android:title="@string/menu_export" />
-    <item
-        android:id="@+id/settings"
-        android:title="@string/menu_settings" />
-    <item
-        android:id="@+id/about"
-        android:title="@string/menu_about" />
+
+    <!-- List creation -->
+    <group android:id="@+id/group_create">
+        <item
+            android:id="@+id/new_list"
+            android:title="@string/menu_new_list" />
+        
+    </group>
+
+    <!-- Import / Export -->
+    <group android:id="@+id/group_transfer">
+        <item
+            android:id="@+id/import_text"
+            android:title="@string/menu_import_text" />
+        <item
+            android:id="@+id/import_lists"
+            android:title="@string/menu_import" />
+        <item
+            android:id="@+id/import_lists_url"
+            android:title="@string/menu_import_url" />
+        
+    </group>
+
+    <!-- App -->
+    <group android:id="@+id/group_app">
+        <item
+            android:id="@+id/export_lists"
+            android:title="@string/menu_export" />
+        <item
+            android:id="@+id/settings"
+            android:title="@string/menu_settings" />
+        <item
+            android:id="@+id/about"
+            android:title="@string/menu_about" />
+    </group>
+
 </menu>

@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
 import eu.schmidt.systems.opensyncedlists.helpers.TestHelper;
 
 /**
@@ -60,8 +61,9 @@ public class SettingsActivityTest
     @Before public void setUp()
     {
         ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        TestHelper.navigateToListsActivity(R.id.lVLists);
         TestHelper.clearAll(ctx);
-        activityRule.getScenario().recreate();
+        activityRule.getScenario().onActivity(ListsActivity::resetForTest);
     }
     
     /**

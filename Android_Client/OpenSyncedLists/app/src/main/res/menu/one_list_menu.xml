@@ -46,6 +46,10 @@
         <item
             android:id="@+id/toggle_all"
             android:title="@string/menu_toggle_all" />
+
+        <item
+            android:id="@+id/list_clear"
+            android:title="@string/menu_list_clear" />
     </group>
 
     <!-- Import -->
@@ -76,9 +80,7 @@
 
     <!-- List management -->
     <group android:id="@+id/group_manage">
-        <item
-            android:id="@+id/list_clear"
-            android:title="@string/menu_list_clear" />
+       
         <item
             android:id="@+id/manual_sync"
             android:title="@string/menu_manual_sync" />

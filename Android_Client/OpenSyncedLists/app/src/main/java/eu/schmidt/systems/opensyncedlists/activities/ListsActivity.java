@@ -98,6 +98,40 @@ import eu.schmidt.systems.opensyncedlists.utils.TextListParser;
 public class ListsActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener
 {
+    /**
+     * Set to true once the last-list auto-open has been attempted for this
+     * process lifetime. Prevents it from firing again on activity recreate
+     * (e.g. configuration change or test setUp cycles).
+     */
+    private static boolean sAutoOpenAttempted = false;
+
+    /** Resets the auto-open flag. Intended for use in tests only. */
+    public static void resetAutoOpenForTesting()
+    {
+        sAutoOpenAttempted = false;
+    }
+
+    /**
+     * Reloads all list data and refreshes the UI from the current storage.
+     * Called by instrumented tests after {@code TestHelper.clearAll()} so that
+     * the adapter reflects the cleared state without requiring a full
+     * {@code recreate()} (which fails when the activity is STOPPED because a
+     * child activity is on top of it).
+     */
+    public void resetForTest()
+    {
+        try
+        {
+            syncedListsHeaders = secureStorage.getListsHeaders();
+        }
+        catch (Exception e)
+        {
+            syncedListsHeaders = new ArrayList<>();
+        }
+        updateNavigrationDrawer();
+        listsAdapter.updateItems(syncedListsHeaders, true);
+    }
+
     /** Stores the global settings */
     public SharedPreferences globalSharedPreferences;
     public SecureStorage secureStorage;
@@ -182,6 +216,12 @@ public class ListsActivity extends AppCompatActivity
         init();
         updateNavigrationDrawer();
         showChangelogIfUpdated();
+
+        // On first launch after app start, re-open the last viewed list
+        if (savedInstanceState == null)
+        {
+            openLastListIfAvailable();
+        }
     }
     
     @Override protected void onResume()
@@ -250,6 +290,7 @@ public class ListsActivity extends AppCompatActivity
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.all_lists_menu, menu);
+        androidx.core.view.MenuCompat.setGroupDividerEnabled(menu, true);
         return true;
     }
     
@@ -835,7 +876,7 @@ public class ListsActivity extends AppCompatActivity
             getString(R.string.import_list_url_yes),
             getString(R.string.import_list_url_cancel), result ->
             {
-                if (result != null)
+                if (result != null && !result.isEmpty())
                 {
                     Uri url = Uri.parse(result);
                     importListFromUrl(url);
@@ -843,6 +884,44 @@ public class ListsActivity extends AppCompatActivity
             });
     }
     
+    /**
+     * Re-opens the last viewed list on app start if the ID is still valid.
+     * Only fires once per process lifetime so that activity recreates (e.g.
+     * configuration changes or test setUp cycles) do not trigger a second
+     * auto-open.
+     */
+    private void openLastListIfAvailable()
+    {
+        if (sAutoOpenAttempted)
+        {
+            return;
+        }
+        sAutoOpenAttempted = true;
+
+        String lastId = globalSharedPreferences.getString("last_list_id", null);
+        if (lastId == null)
+        {
+            return;
+        }
+        // Verify the list still exists
+        boolean found = false;
+        for (SyncedListHeader header : syncedListsHeaders)
+        {
+            if (header.getId().equals(lastId))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            return;
+        }
+        Intent intent = new Intent(this, ListActivity.class);
+        intent.putExtra("id", lastId);
+        startActivity(intent);
+    }
+
     /**
      * Initialize fills the activity with content. (Fill list view, read
      * settings, ..)
@@ -1009,8 +1088,16 @@ public class ListsActivity extends AppCompatActivity
         }
         
         String changelog;
+        String lang = java.util.Locale.getDefault().getLanguage();
+        java.util.Map<String, String> localeAssets = new java.util.HashMap<>();
+        localeAssets.put("de", "changelog_de.txt");
+        localeAssets.put("fr", "changelog_fr.txt");
+        localeAssets.put("pt", "changelog_pt.txt");
+        localeAssets.put("es", "changelog_es.txt");
+        String assetName = localeAssets.containsKey(lang)
+            ? localeAssets.get(lang) : "changelog.txt";
         try (BufferedReader reader = new BufferedReader(
-            new InputStreamReader(getAssets().open("changelog.txt"))))
+            new InputStreamReader(getAssets().open(assetName))))
         {
             StringBuilder sb = new StringBuilder();
             String line;

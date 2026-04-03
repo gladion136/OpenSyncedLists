@@ -293,7 +293,6 @@ public class ListActivity extends AppCompatActivity
                     new Intent(this, ListSettingsActivity.class);
                 listSettingsIntent.putExtra("id", syncedList.getId());
                 startActivity(listSettingsIntent);
-                finish();
                 return true;
             case R.id.manual_sync:
                 // Synchronize the app
@@ -350,7 +349,6 @@ public class ListActivity extends AppCompatActivity
                 Intent settingsIntent =
                     new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
-                finish();
                 return true;
         }
         // Item not handled.. pass to super
@@ -581,7 +579,12 @@ public class ListActivity extends AppCompatActivity
         // Load global preferances
         globalSharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this);
-        
+
+        // Remember the last opened list so ListsActivity can re-open it
+        globalSharedPreferences.edit()
+            .putString("last_list_id", syncedList.getId())
+            .apply();
+
         // Update ActionBar
         setTitle(syncedList.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

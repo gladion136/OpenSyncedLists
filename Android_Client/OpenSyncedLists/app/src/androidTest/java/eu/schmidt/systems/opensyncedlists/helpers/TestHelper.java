@@ -16,7 +16,11 @@
  */
 package eu.schmidt.systems.opensyncedlists.helpers;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 import android.app.UiAutomation;
 import android.content.Context;
@@ -24,9 +28,12 @@ import android.os.ParcelFileDescriptor;
 import android.view.View;
 
 import androidx.preference.PreferenceManager;
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.platform.app.InstrumentationRegistry;
+
+import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
 
 import org.hamcrest.Matcher;
 
@@ -56,6 +63,28 @@ public class TestHelper
      *
      * @param context target app context from InstrumentationRegistry
      */
+    /**
+     * Presses Back until the view with {@code rootViewId} (e.g. lVLists) is
+     * displayed, up to a maximum of 3 times.  Stops immediately when the root
+     * screen is already visible so that it never presses Back on the task root
+     * activity (which would finish it on some devices).
+     */
+    public static void navigateToListsActivity(int rootViewId)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            try
+            {
+                onView(withId(rootViewId)).check(matches(isDisplayed()));
+                return; // already on the right screen
+            }
+            catch (NoMatchingViewException ignored)
+            {
+                pressBack();
+            }
+        }
+    }
+
     public static void clearAll(Context context)
     {
         // Clear the list storage (SecureStorage)
@@ -77,12 +106,15 @@ public class TestHelper
         }
         
         // Clear global app preferences, then set defaults needed by tests:
-        //   check_option=true              → CheckBoxes visible in list
-        //   elements
+        //   check_option=true              → CheckBoxes visible in list elements
         //   last_seen_version_code=current → suppress changelog dialog
         PreferenceManager.getDefaultSharedPreferences(context).edit().clear()
             .putBoolean("check_option", true)
             .putInt("last_seen_version_code", versionCode).commit();
+
+        // Reset the one-shot auto-open flag so each test class gets a clean
+        // slate and the feature can be verified in testOpenLastListAndSettingsNavigation.
+        ListsActivity.resetAutoOpenForTesting();
         
         // Disable system animations so Espresso can interact with
         // popups/dialogs

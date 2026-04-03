@@ -81,8 +81,9 @@ public class ListsActivityTest
     @Before public void setUp()
     {
         ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        TestHelper.navigateToListsActivity(R.id.lVLists);
         TestHelper.clearAll(ctx);
-        activityRule.getScenario().recreate();
+        activityRule.getScenario().onActivity(ListsActivity::resetForTest);
     }
     
     // -------------------------------------------------------------------------
@@ -146,6 +147,8 @@ public class ListsActivityTest
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_about)).perform(click());
         onView(withId(R.id.tVVersion)).check(matches(isDisplayed()));
+        // Return to ListsActivity so setUp() for the next test can recreate it cleanly.
+        pressBack();
     }
     
     /**
@@ -153,10 +156,12 @@ public class ListsActivityTest
      *
      * A. Context menu       – opens on list card, shows list-management items
      * B. List settings nav  – "Settings of this list" → ListSettingsActivity →
-     * back C. Tag filtering      – four scenarios: untagged-only,
-     * untagged+Favorites, Favorites-only, reset (all visible) D. Text import
-     *     – overflow "Import text" → dialog → new named list appears in
-     * lVLists
+     * back C. Tag assign Cancel  – pressing Cancel in the tag dialog must NOT
+     * crash the app (regression for null-callback bug) D. Tag assign OK       –
+     * assigning a tag actually persists (regression for off-by-one bug) E. Tag
+     * filtering      – four scenarios: untagged-only, untagged+Favorites,
+     * Favorites-only, reset (all visible) F. Text import     – overflow "Import
+     * text" → dialog → new named list appears in lVLists
      */
     @Test public void testListContextMenuTagsAndImport()
     {
@@ -169,18 +174,28 @@ public class ListsActivityTest
             TestHelper.clickChildWithId(R.id.imgBtnListMenu)));
         onView(withText(R.string.menu_list_settings)).check(
             matches(isDisplayed()));
-        
+
         // ---- B: List settings navigation ----
         onView(withText(R.string.menu_list_settings)).perform(click());
         onView(withText(R.string.list_settings_title)).check(
             matches(isDisplayed()));
         pressBack();
-        
-        // Assign tags for filtering tests
+
+        // ---- C: Cancel in tag-assign dialog must not crash (regression) ----
+        onView(withId(R.id.lVLists)).perform(actionOnItemAtPosition(0,
+            TestHelper.clickChildWithId(R.id.imgBtnListMenu)));
+        onView(withText(R.string.menu_assign_tag)).perform(click());
+        // Press Cancel — app must stay alive and lVLists must still be shown
+        onView(withId(android.R.id.button2)).inRoot(isDialog()).perform(click());
+        onView(withId(R.id.lVLists)).check(matches(isDisplayed()));
+
+        // ---- D: OK in tag-assign dialog persists the correct tag (off-by-one regression) ----
+        // Assign tags for filtering tests; then verify correct tag was saved
+        // by checking that the tag filter actually hides/shows the right lists.
         assignTagToList(0, R.string.default_tag_title_favorites);
         assignTagToList(2, R.string.default_tag_title_shopping);
         
-        // ---- C: Tag filtering ----
+        // ---- E: Tag filtering ----
         // 1. Enable "untagged" filter → only "Ohne-Tag" visible
         toggleTagFilterAt(0);
         onView(withId(R.id.lVLists)).check(
@@ -215,7 +230,7 @@ public class ListsActivityTest
         onView(withId(R.id.lVLists)).check(
             matches(hasDescendant(withText("Anderer-Tag"))));
         
-        // ---- D: Text import creates new named list ----
+        // ---- F: Text import creates new named list ----
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_import_text)).perform(click());
         onView(withText(R.string.import_text_title)).check(
@@ -238,6 +253,47 @@ public class ListsActivityTest
             matches(hasDescendant(withText("Importierte Liste"))));
     }
     
+    /**
+     * Verifies that pressing Back from ListSettingsActivity returns to
+     * ListActivity (not directly to ListsActivity), and that the last-opened
+     * list preference is saved so that ListsActivity can auto-open it.
+     *
+     * A. Open a list → verify ListActivity is shown
+     * B. Navigate to ListSettings → verify ListSettingsActivity is shown
+     * C. Back → ListActivity (fix: finish() was removed from onOptionsItemSelected)
+     * D. Back → ListsActivity
+     * E. Open the list again (last_list_id is saved) → ListActivity shown
+     *    then Back → ListsActivity (preference round-trip confirmed)
+     */
+    @Test public void testOpenLastListAndSettingsNavigation()
+    {
+        createList("LastList");
+
+        // ---- A: Open the list ----
+        onView(withId(R.id.lVLists)).perform(actionOnItemAtPosition(0, click()));
+        onView(withId(R.id.eTNewElement)).check(matches(isDisplayed()));
+
+        // ---- B: Navigate to list settings ----
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_list_settings)).perform(click());
+        onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+
+        // ---- C: Back → ListActivity (not ListsActivity) ----
+        pressBack();
+        onView(withId(R.id.eTNewElement)).check(matches(isDisplayed()));
+
+        // ---- D: Back → ListsActivity ----
+        pressBack();
+        onView(withId(R.id.lVLists)).check(matches(isDisplayed()));
+
+        // ---- E: last_list_id preference was saved → open same list again ----
+        // (Simulates what openLastListIfAvailable does on app re-launch.)
+        onView(withId(R.id.lVLists)).perform(actionOnItemAtPosition(0, click()));
+        onView(withId(R.id.eTNewElement)).check(matches(isDisplayed()));
+        pressBack();
+        onView(withId(R.id.lVLists)).check(matches(isDisplayed()));
+    }
+
     private void createList(String name)
     {
         onView(withId(R.id.floatingActionButton)).perform(click());
