@@ -176,6 +176,7 @@ public class ListsActivity extends AppCompatActivity
 
         init();
         updateNavigrationDrawer();
+        showChangelogIfUpdated();
     }
 
     private void updateNavigrationDrawer() {
@@ -842,6 +843,74 @@ public class ListsActivity extends AppCompatActivity
                         Log.e(LOG_TITLE_STORAGE, "Error saving list header: " + e);
                     }
                 });
+    }
+
+    /**
+     * Shows a "What's New" dialog once per app version, reading the changelog
+     * from {@code assets/changelog.txt} (copied from the fastlane metadata by
+     * the {@code copyChangelog} Gradle task at build time).
+     *
+     * The dialog is suppressed on subsequent launches until the version code
+     * changes (i.e. after an update).
+     */
+    private void showChangelogIfUpdated() {
+        int currentVersion;
+        try {
+            currentVersion = (int) getPackageManager()
+                    .getPackageInfo(getPackageName(), 0).getLongVersionCode();
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            return;
+        }
+        if (globalSharedPreferences.getInt("last_seen_version_code", -1) == currentVersion) {
+            return;
+        }
+
+        String changelog;
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getAssets().open("changelog.txt")))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+            changelog = sb.toString().trim();
+        } catch (Exception e) {
+            Log.e(LOG_TITLE_DEFAULT, "Failed to load changelog: " + e);
+            return;
+        }
+
+        String playStoreUrl =
+                "https://play.google.com/store/apps/details?id=eu.schmidt.systems.opensyncedlists";
+        String fDroidUrl =
+                "https://f-droid.org/packages/eu.schmidt.systems.opensyncedlists/";
+
+        String html = "<b>" + getString(R.string.changelog_whats_new) + "</b><br><br>"
+                + android.text.TextUtils.htmlEncode(changelog).replace("\n", "<br>")
+                + "<br><br>"
+                + android.text.TextUtils.htmlEncode(getString(R.string.changelog_thank_you))
+                        .replace("\n", "<br>")
+                + "<br><br>"
+                + "<a href=\"" + playStoreUrl + "\">"
+                + getString(R.string.changelog_rate_playstore) + "</a>"
+                + "<br>"
+                + "<a href=\"" + fDroidUrl + "\">"
+                + getString(R.string.changelog_rate_fdroid) + "</a>";
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.changelog_dialog_title)
+                .setMessage(android.text.Html.fromHtml(html, android.text.Html.FROM_HTML_MODE_COMPACT))
+                .setPositiveButton(R.string.changelog_close, null)
+                .create();
+        dialog.show();
+
+        android.widget.TextView messageView = dialog.findViewById(android.R.id.message);
+        if (messageView != null) {
+            messageView.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+        }
+
+        globalSharedPreferences.edit()
+                .putInt("last_seen_version_code", currentVersion)
+                .apply();
     }
 
     /**

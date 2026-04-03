@@ -2,6 +2,16 @@ plugins {
     id 'com.android.application'
 }
 
+// Copies the fastlane changelog (single source of truth) into assets so the
+// app can read it at runtime without any additional network requests.
+task copyChangelog(type: Copy) {
+    from new File(rootProject.projectDir,
+            '../../fastlane/metadata/android/en-US/changelogs/default.txt')
+    into 'src/main/assets'
+    rename { 'changelog.txt' }
+}
+preBuild.dependsOn copyChangelog
+
 android {
     compileSdk 35
     

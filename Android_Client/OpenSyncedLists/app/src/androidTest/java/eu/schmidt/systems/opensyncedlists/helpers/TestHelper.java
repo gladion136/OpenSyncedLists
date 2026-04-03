@@ -58,12 +58,23 @@ public class TestHelper {
         context.getSharedPreferences(SECURE_STORAGE_PREF_KEY, Context.MODE_PRIVATE)
                 .edit().clear().commit();
 
+        // Resolve the current version code so the changelog "What's New" dialog
+        // is suppressed during tests (it would otherwise block every test after
+        // clearAll() resets the shared preferences).
+        int versionCode = -1;
+        try {
+            versionCode = (int) context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).getLongVersionCode();
+        } catch (android.content.pm.PackageManager.NameNotFoundException ignored) { }
+
         // Clear global app preferences, then set defaults needed by tests:
-        //   check_option=true  → CheckBoxes visible in list elements
+        //   check_option=true              → CheckBoxes visible in list elements
+        //   last_seen_version_code=current → suppress changelog dialog
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .clear()
                 .putBoolean("check_option", true)
+                .putInt("last_seen_version_code", versionCode)
                 .commit();
 
         // Disable system animations so Espresso can interact with popups/dialogs

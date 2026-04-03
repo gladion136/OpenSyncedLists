@@ -123,6 +123,12 @@
     <string name="default_tag_title_work">Work</string>
     <string name="change_tag_color_picker_title">Pick color</string>
     <string name="menu_show_changelog">Show changelog</string>
+    <string name="changelog_dialog_title">What\'s New</string>
+    <string name="changelog_whats_new">What\'s new in this version:</string>
+    <string name="changelog_thank_you">Thank you for using OpenSyncedLists! ❤️\nIf you enjoy the app, a rating helps a lot.</string>
+    <string name="changelog_rate_playstore">⭐ Rate on Google Play</string>
+    <string name="changelog_rate_fdroid">⭐ Rate on F-Droid</string>
+    <string name="changelog_close">Close</string>
     <string name="pref_list_overview_instead_cards_summary">Display all lists inside a list view instead of a grid of cards</string>
     <string name="pref_list_overview_instead_cards_title">List overview as list instead of cards</string>
     <string name="menu_import_text">Import text list</string>
