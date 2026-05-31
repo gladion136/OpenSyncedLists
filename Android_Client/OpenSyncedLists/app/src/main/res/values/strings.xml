@@ -172,6 +172,11 @@
     <string name="changelog_view_fdroid">📦 View on F-Droid</string>
     <string name="changelog_close">Close</string>
     <string name="changelog_webpage" translatable="false">https://gitlab.com/gladion136/opensyncedlists/-/blob/main/CHANGELOG.md</string>
+    <string name="feedback_dialog_title">Your feedback?</string>
+    <string name="feedback_dialog_message">Do you enjoy OpenSyncedLists? A rating helps a lot. If something is missing or broken, send us your feedback or a bug report by mail.</string>
+    <string name="feedback_dialog_send">Send mail</string>
+    <string name="feedback_dialog_cancel">Not now</string>
+    <string name="feedback_mail_subject">OpenSyncedLists feedback / bug report</string>
     <string name="pref_list_overview_instead_cards_summary">Display all lists inside a list view instead of a grid of cards</string>
     <string name="pref_list_overview_instead_cards_title">List overview as list instead of cards</string>
     <string name="menu_import_text">Import text list</string>

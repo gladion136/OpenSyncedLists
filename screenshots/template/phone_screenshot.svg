@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1080"
+   height="2220"
+   viewBox="0 0 1080 2220"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="phone_screenshot.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.4173589"
+     inkscape:cx="489.98596"
+     inkscape:cy="1235.148"
+     inkscape:window-width="2560"
+     inkscape:window-height="1299"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="callouts" />
+  <defs
+     id="defs6">
+    <clipPath
+       id="phone-clip">
+      <rect
+         x="108"
+         y="360"
+         width="864"
+         height="1774"
+         rx="48"
+         ry="48"
+         id="rect3" />
+    </clipPath>
+    <filter
+       id="blur"
+       x="-0.033278655"
+       y="-0.15518132"
+       width="1.0665573"
+       height="1.3103626">
+      <feGaussianBlur
+         stdDeviation="14"
+         id="feGaussianBlur5" />
+    </filter>
+    <linearGradient
+       id="bgGrad"
+       x1="0"
+       y1="0"
+       x2="0.4"
+       y2="1">
+      <stop
+         offset="0"
+         stop-color="#7a1bff"
+         id="stop8" />
+      <stop
+         offset="0.5"
+         stop-color="#5f00e8"
+         id="stop10" />
+      <stop
+         offset="1"
+         stop-color="#3d0a9e"
+         id="stop12" />
+    </linearGradient>
+  </defs>
+  <g
+     id="background"
+     inkscape:groupmode="layer"
+     inkscape:label="background">
+    <rect
+       x="0"
+       y="0"
+       width="1080"
+       height="2220"
+       fill="url(#bgGrad)"
+       id="rect8" />
+    <!-- Vivid teal wave bands -->
+    <path
+       d="M 0 720 C 210 650 355 710 548 675 C 760 636 905 690 1080 615 V 920 C 875 1000 730 935 535 980 C 320 1030 180 960 0 1040 Z"
+       fill="#13c8b6"
+       opacity="0.55"
+       id="path16" />
+    <path
+       d="M 0 270 C 180 330 360 275 548 330 C 740 386 900 318 1080 360 V 470 H 0 Z"
+       fill="#13c8b6"
+       opacity="0.40"
+       id="path12" />
+    <path
+       d="M 0 1370 C 230 1295 360 1380 560 1328 C 770 1274 900 1338 1080 1264 V 1545 C 875 1615 735 1545 535 1590 C 320 1642 160 1570 0 1640 Z"
+       fill="#13c8b6"
+       opacity="0.45"
+       id="path22" />
+    <!-- Warm orange accents -->
+    <path
+       d="M 0 430 L 1080 318 V 430 L 0 540 Z"
+       fill="#ff8a65"
+       opacity="0.45"
+       id="path14" />
+    <path
+       d="M 0 1190 L 1080 1085 V 1300 L 0 1410 Z"
+       fill="#ff8a65"
+       opacity="0.38"
+       id="path20" />
+    <path
+       d="M 0 1900 L 1080 1815 V 1985 L 0 2070 Z"
+       fill="#ff8a65"
+       opacity="0.40"
+       id="path28" />
+    <path
+       d="M 0 2000 C 240 1940 380 2010 580 1965 C 800 1916 940 1980 1080 1925 V 2220 H 0 Z"
+       fill="#13c8b6"
+       opacity="0.50"
+       id="path26" />
+  </g>
+  <g
+     id="phone_screenshot"
+     inkscape:groupmode="layer"
+     inkscape:label="phone_screenshot"
+     transform="matrix(1.0,0,0,1.0,0,8)">
+    <rect
+       x="94"
+       y="350"
+       width="892"
+       height="1796"
+       rx="64"
+       ry="64"
+       fill="#111827"
+       opacity="0.14"
+       id="rect31" />
+    <rect
+       x="92"
+       y="340"
+       width="896"
+       height="1804"
+       rx="64"
+       ry="64"
+       fill="#ffffff"
+       id="rect33"
+       style="stroke-width:0.996604" />
+    <image
+       id="app_screenshot"
+       x="108"
+       y="360"
+       width="864"
+       height="1774"
+       preserveAspectRatio="xMidYMid slice"
+       clip-path="url(#phone-clip)"
+       xlink:href="__SCREENSHOT_PATH__"
+       href="__SCREENSHOT_PATH__" />
+    <rect
+       x="108"
+       y="360"
+       width="864"
+       height="1774"
+       rx="48"
+       ry="48"
+       fill="none"
+       stroke="#e5e7eb"
+       stroke-width="2"
+       id="rect36" />
+  </g>
+  <g
+     id="callouts"
+     inkscape:groupmode="layer"
+     inkscape:label="callouts">
+    <!-- Card shadow -->
+    <rect
+       x="40" y="62" width="1000" height="280" rx="34" ry="34"
+       fill="#1a0a3a" opacity="0.28"
+       filter="url(#blur)"
+       id="rect39_shadow" />
+    <!-- White card -->
+    <rect
+       x="40" y="50" width="1000" height="280" rx="34" ry="34"
+       fill="#ffffff"
+       id="rect39" />
+    <!-- Accent bar -->
+    <rect
+       x="72" y="92" width="13" height="188" rx="6.5" ry="6.5"
+       fill="#5f00e8"
+       id="accent_bar" />
+    <g
+       id="labels"
+       inkscape:groupmode="layer"
+       inkscape:label="labels">
+      <text
+         x="110"
+         y="160"
+         fill="#111827"
+         font-family="Inter, Roboto, Arial, sans-serif"
+         font-size="72px"
+         font-weight="800"
+         id="text42">__TITLE__</text>
+      <text
+         x="110"
+         y="256"
+         fill="#111827"
+         font-family="Inter, Roboto, Arial, sans-serif"
+         font-size="50px"
+         font-weight="500"
+         id="text44">__BODY__</text>
+    </g>
+  </g>
+</svg>

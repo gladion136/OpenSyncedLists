@@ -38,6 +38,7 @@ import java.io.IOException;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.activities.ListsActivity;
+import eu.schmidt.systems.opensyncedlists.activities.SettingsActivity;
 import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
@@ -116,6 +117,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         
         // Set listeners for preferences
         EditTextPreference editTextPreference = findPreference("list_name");
+        Preference defaultSettingsBtn = findPreference("default_settings_btn");
         Preference deleteBtn = findPreference("delete_btn");
         SwitchPreferenceCompat checkOptionPref = findPreference("check_option");
         SwitchPreferenceCompat checkListPref = findPreference("checked_list");
@@ -141,6 +143,12 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
                 return true;
             });
         
+        defaultSettingsBtn.setOnPreferenceClickListener(v ->
+        {
+            startActivity(new Intent(getContext(), SettingsActivity.class));
+            return true;
+        });
+
         deleteBtn.setOnPreferenceClickListener(v ->
         {
             DialogBuilder.confirmDialog(getContext(),

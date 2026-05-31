@@ -1,10 +1,26 @@
-Create easy to sort lists and synchronize it with your own server.
+OpenSyncedLists is the fast, private way to keep every checklist, to-do and small project under control – synced across your devices and encrypted end-to-end.
 
-Features:
-- Easily manage, create, edit and share lists
-- Easy sorting of list items (through 5 movement options)
-- Collaboration between multiple devices through fast and automatic synchronization
-- Share lists via URL
-- Export lists as Markdown, Clipboard, Message, JSON and more
-- Different servers for synchronization per list is possible
-- Server can/must be self-hosted (we don't collect data!)
+Whether it's the weekly shopping, a bucket list or the tasks for your next project: create a list in seconds, sort it your way and tick items off as you go. When you're done, reset the whole list with a single tap and start over.
+
+WHY YOU'LL LOVE IT
+
+• Effortless sorting – move any item up, down or to either end. No fiddly dragging.
+• Clear overview – tags, progress counters and a compact mode keep busy lists easy to scan.
+• Stays in order – checked items move aside but keep their place, ready to be reused.
+• One-tap reset – clear all checkmarks at once and run the same list again.
+• Perfect for small projects – group tasks with your own tags and track what's left.
+
+PRIVACY BY DESIGN
+
+• End-to-end encrypted sync – your lists are encrypted on your device.
+• Self-hosted – run synchronization on your own server, a different one per list if you like.
+• The server operator can never read your lists. No accounts, no tracking, no data collection.
+
+MADE TO FIT YOU
+
+• Left-handed mode and adjustable controls (with or without buttons).
+• Share lists via URL.
+• Export as Markdown, clipboard, message, JSON and more.
+• Free and open source.
+
+Your lists. Your server. Fully encrypted.

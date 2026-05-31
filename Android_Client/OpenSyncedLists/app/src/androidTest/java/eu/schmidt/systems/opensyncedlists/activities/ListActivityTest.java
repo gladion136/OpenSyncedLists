@@ -351,6 +351,15 @@ public class ListActivityTest {
                 onView(withId(R.id.action_overview)).perform(click());
                 onView(withId(R.id.recyclerView)).check(matches(isDisplayed()));
 
+                // In overview mode the 3-dot menu opens the same element editor
+                // as a row click. Open it on item 0, verify and dismiss.
+                onView(withId(R.id.recyclerView)).perform(
+                                actionOnItemAtPosition(0,
+                                                TestHelper.clickChildWithId(R.id.btnOverviewMenu)));
+                onView(withId(R.id.eTName)).inRoot(isDialog())
+                                .check(matches(isDisplayed()));
+                pressBack(); // close the editor bottom sheet
+
                 // ---- C: Clear list ----
                 openActionBarOverflowOrOptionsMenu(ctx);
                 onView(withText(R.string.menu_list_clear)).perform(click());

@@ -25,6 +25,11 @@
         android:selectable="false"
         android:summary="@string/list_settings_scope_hint" />
 
+    <Preference
+        android:key="default_settings_btn"
+        android:summary="@string/sync_hint_defaults_summary"
+        android:title="@string/sync_hint_defaults_title" />
+
     <EditTextPreference
         android:key="list_name"
         android:persistent="false"

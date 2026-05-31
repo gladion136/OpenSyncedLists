@@ -58,16 +58,32 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TouchTargetSizeCheck" />
 
+                <ImageView
+                    android:id="@+id/btnOverviewMenu"
+                    android:layout_width="28dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/edit_element_title"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="6dp"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/dot_menu_50"
+                    app:tint="?attr/colorControlNormal" />
+
                 <LinearLayout
                     android:id="@+id/linearLayout5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/checkBox"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnOverviewMenu"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <EditText

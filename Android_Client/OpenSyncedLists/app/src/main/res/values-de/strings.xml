@@ -242,5 +242,10 @@
     <string name="confirm_list_clear_msg">Liste leeren? %d Einträge werden entfernt.</string>
     <string name="confirm_delete_list_msg">Diese Liste lokal löschen?</string>
     <string name="confirm_delete_list_online_msg">Diese Liste online und lokal löschen? Wenn andere Geräte noch Zugriff haben, könnten sie sie erneut hochladen.</string>
+    <string name="feedback_dialog_title">Dein Feedback?</string>
+    <string name="feedback_dialog_message">Gefällt dir OpenSyncedLists? Eine Bewertung hilft sehr. Falls etwas fehlt oder nicht funktioniert, sende uns dein Feedback oder einen Fehlerbericht per Mail.</string>
+    <string name="feedback_dialog_send">Mail senden</string>
+    <string name="feedback_dialog_cancel">Nicht jetzt</string>
+    <string name="feedback_mail_subject">OpenSyncedLists Feedback / Fehlerbericht</string>
 
 </resources>

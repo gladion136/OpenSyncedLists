@@ -1139,9 +1139,10 @@ public class ListsActivity extends AppCompatActivity
                 R.string.changelog_dialog_title).setMessage(
                 android.text.Html.fromHtml(html,
                     android.text.Html.FROM_HTML_MODE_COMPACT))
-            .setPositiveButton(R.string.changelog_close, null).create();
+            .setPositiveButton(R.string.changelog_close,
+                (d, which) -> showFeedbackDialog()).create();
         dialog.show();
-        
+
         android.widget.TextView messageView =
             dialog.findViewById(android.R.id.message);
         if (messageView != null)
@@ -1149,9 +1150,50 @@ public class ListsActivity extends AppCompatActivity
             messageView.setMovementMethod(
                 android.text.method.LinkMovementMethod.getInstance());
         }
-        
+
         globalSharedPreferences.edit()
             .putInt("last_seen_version_code", currentVersion).apply();
+    }
+
+    /**
+     * Shown right after the changelog dialog: asks the user for a rating,
+     * feedback or a bug report. The user can either dismiss it or send a mail
+     * to the developer. Reuses the same mail target as the About screen.
+     */
+    private void showFeedbackDialog()
+    {
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.feedback_dialog_title)
+            .setMessage(R.string.feedback_dialog_message)
+            .setNegativeButton(R.string.feedback_dialog_cancel, null)
+            .setPositiveButton(R.string.feedback_dialog_send,
+                (d, which) -> sendFeedbackMail())
+            .show();
+    }
+
+    /**
+     * Opens the user's mail app with the developer address prefilled so they
+     * can send feedback or a bug report. Falls back to a Toast if no mail app
+     * is installed.
+     */
+    private void sendFeedbackMail()
+    {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL,
+            new String[]{getString(R.string.dev_mail_address)});
+        intent.putExtra(Intent.EXTRA_SUBJECT,
+            getString(R.string.feedback_mail_subject));
+        if (intent.resolveActivity(getPackageManager()) != null)
+        {
+            startActivity(intent);
+        }
+        else
+        {
+            Toast.makeText(this,
+                getString(R.string.no_app_for_intent_installed),
+                Toast.LENGTH_SHORT).show();
+        }
     }
     
     /**

@@ -67,6 +67,10 @@ public class SyncedListAdapter
     private final int jumpDistance;
     private final float fontScale;
     private boolean filterActive = false;
+    /** Element currently being dragged, or null when no drag is in progress. */
+    private SyncedListElement draggedElement = null;
+    /** True once a drag actually moved the element across at least one slot. */
+    private boolean dragMoved = false;
     private List<SyncedListElement> syncedListElementsFiltered;
     private Filter syncedListFilter = new Filter()
     {
@@ -156,34 +160,68 @@ public class SyncedListAdapter
                     RecyclerView.ViewHolder viewHolder,
                     RecyclerView.ViewHolder target)
                 {
-                    if (viewHolder instanceof ElementViewHolder
-                        && target instanceof ElementViewHolder)
+                    if (!(viewHolder instanceof ElementViewHolder)
+                        || !(target instanceof ElementViewHolder))
                     {
-                        SyncedListElement selectedElement =
-                            getElementOnPosition(
-                                viewHolder.getAdapterPosition());
-                        SyncedListElement displacedElement =
-                            getElementOnPosition(target.getAdapterPosition());
-                        if (syncedList.getHeader().isCheckedList()
-                            && selectedElement.getChecked()
-                            != displacedElement.getChecked())
-                        {
-                            return false;
-                        }
-                        int newPositionInList =
-                            syncedList.getElements().indexOf(displacedElement);
-                        SyncedListStep newStep =
-                            new SyncedListStep(selectedElement.getId(),
-                                ACTION.MOVE, newPositionInList);
-                        listActivity.addElementStepAndSave(newStep, false);
-                        
-                        notifyItemMoved(viewHolder.getAdapterPosition(),
-                            target.getAdapterPosition());
-                        return true;
+                        return false;
                     }
-                    return false;
+
+                    int fromPosition = viewHolder.getAdapterPosition();
+                    int toPosition = target.getAdapterPosition();
+                    SyncedListElement selectedElement =
+                        getElementOnPosition(fromPosition);
+                    SyncedListElement displacedElement =
+                        getElementOnPosition(toPosition);
+
+                    // In a checked list, dragging across the checked/unchecked
+                    // boundary is not allowed.
+                    if (syncedList.getHeader().isCheckedList()
+                        && selectedElement.getChecked()
+                        != displacedElement.getChecked())
+                    {
+                        return false;
+                    }
+
+                    // Reorder only the in-memory buffer and animate the swap.
+                    // Persisting the step is deferred to clearView() (on drop)
+                    // so the model is not rebuilt mid-drag, which made the row
+                    // jump back before snapping to its final slot.
+                    SyncedList.moveItem(
+                        syncedList.getElements().indexOf(selectedElement),
+                        syncedList.getElements().indexOf(displacedElement),
+                        syncedList.getElements());
+                    if (syncedList.getHeader().isCheckedList())
+                    {
+                        syncedList.recalculateCheckedBuffers();
+                    }
+                    draggedElement = selectedElement;
+                    dragMoved = true;
+                    notifyItemMoved(fromPosition, toPosition);
+                    return true;
                 }
-                
+
+                @Override public void clearView(RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder)
+                {
+                    super.clearView(recyclerView, viewHolder);
+                    // Drop finished: persist the final order once, if the
+                    // element was actually moved.
+                    if (draggedElement != null && dragMoved)
+                    {
+                        int finalPosition =
+                            syncedList.getElements().indexOf(draggedElement);
+                        if (finalPosition >= 0)
+                        {
+                            SyncedListStep newStep =
+                                new SyncedListStep(draggedElement.getId(),
+                                    ACTION.MOVE, finalPosition);
+                            listActivity.addElementStepAndSave(newStep, false);
+                        }
+                    }
+                    draggedElement = null;
+                    dragMoved = false;
+                }
+
                 @Override
                 public void onSwiped(RecyclerView.ViewHolder viewHolder,
                     int direction)
@@ -389,6 +427,13 @@ public class SyncedListAdapter
             elementViewHolder.iVBtnDown.setOnClickListener(
                 vi -> moveElementAndSave(currentSyncedListElement,
                     jumpDistance));
+
+            // overview 3-dot menu: open the same editor as clicking the row
+            if (elementViewHolder.iVOverviewMenu != null)
+            {
+                elementViewHolder.iVOverviewMenu.setOnClickListener(
+                    vi -> openElementEditor(currentSyncedListElement));
+            }
         }
     }
     
@@ -448,8 +493,17 @@ public class SyncedListAdapter
     @Override public void onClick(View view)
     {
         int itemPosition = recyclerView.getChildLayoutPosition(view);
-        SyncedListElement syncedListElement =
-            getElementOnPosition(itemPosition);
+        openElementEditor(getElementOnPosition(itemPosition));
+    }
+
+    /**
+     * Open the bottom sheet element editor for one element. Used both by a
+     * click on the whole row and by the overview 3-dot menu button.
+     *
+     * @param syncedListElement element to edit
+     */
+    public void openElementEditor(SyncedListElement syncedListElement)
+    {
         BottomSheetDialogFragment bottomSheetDialogFragment =
             new ElementEditorFragment().newInstance(syncedListElement,
                 syncedListStep -> listActivity.addElementStepAndSave(
@@ -676,6 +730,8 @@ public class SyncedListAdapter
         public final EditText eTName;
         public final TextView tVDescription;
         public final ImageView iVBtnUp, iVBtnDown, iVTop, iVBottom;
+        /** Overview-only 3-dot menu button; null in non-overview layouts. */
+        public final ImageView iVOverviewMenu;
         public final ConstraintLayout layoutJumpButtons;
         /** Wrapper around all four jump buttons; null in overview layouts. */
         public final View layoutAllJumpButtons;
@@ -692,6 +748,7 @@ public class SyncedListAdapter
             iVBtnDown = view.findViewById(R.id.btnJumpDown);
             iVTop = view.findViewById(R.id.btnJumpTop);
             iVBottom = view.findViewById(R.id.btnJumpBottom);
+            iVOverviewMenu = view.findViewById(R.id.btnOverviewMenu);
             layoutJumpButtons = view.findViewById(R.id.layoutJumpButtons);
             layoutAllJumpButtons =
                 view.findViewById(R.id.layoutAllJumpButtons);

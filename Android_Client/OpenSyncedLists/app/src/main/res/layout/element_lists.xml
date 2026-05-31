@@ -20,6 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="65dp"
     android:layout_margin="4dp"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="8dp"
     app:layout_constraintHorizontal_weight="1">
 
@@ -37,6 +38,7 @@
             android:layout_marginEnd="14dp"
             android:layout_weight="1"
             android:text="List name"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/chipGrpTags"
             app:layout_constraintEnd_toEndOf="parent"
@@ -67,6 +69,7 @@
             android:layout_marginBottom="4dp"
             android:layout_weight="0"
             android:text="0"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

@@ -239,6 +239,20 @@ public class SyncedList
     public void recalculateBuffers()
     {
         elementsBuffer = getReformatElements();
+        recalculateCheckedBuffers();
+    }
+
+    /**
+     * Re-derive the checked/unchecked sub-buffers from the current
+     * {@link #elementsBuffer} order, without replaying the steps and rebuilding
+     * {@code elementsBuffer}.
+     *
+     * Used during a drag-and-drop reorder, where {@code elementsBuffer} has
+     * already been reordered in place and rebuilding it would discard that
+     * order.
+     */
+    public void recalculateCheckedBuffers()
+    {
         if (getHeader().isCheckOption())
         {
             checkedElementsBuffer = new ArrayList<>();

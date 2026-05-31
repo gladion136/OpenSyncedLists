@@ -4,12 +4,24 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-export ANDROID_HOME="$HOME/Programme/android-studio/Sdk"
+ANDROID_HOME_CANDIDATES=(
+    "$HOME/Programme/android-studio/Sdk"
+    "$HOME/Android/Sdk"
+    "$HOME/Programme"
+)
+export ANDROID_HOME="${ANDROID_HOME_CANDIDATES[0]}"
+for sdk_dir in "${ANDROID_HOME_CANDIDATES[@]}"; do
+    if [ -x "$sdk_dir/platform-tools/adb" ]; then
+        export ANDROID_HOME="$sdk_dir"
+        break
+    fi
+done
 export JAVA_HOME="$HOME/Programme/android-studio/jbr"
 export PATH="$JAVA_HOME/bin:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH"
 
 UNIT_RESULT_DIR="app/build/test-results/testDebugUnitTest"
 UI_RESULT_DIR="app/build/outputs/androidTest-results/connected"
+REPO_ROOT="$(cd "$PROJECT_DIR/../.." && pwd)"
 
 cd "$PROJECT_DIR"
 
@@ -143,6 +155,33 @@ case "${1:-build}" in
             echo "No UI test results found. Make sure a device/emulator is connected."
         fi
         ;;
+    gen-screenshots)
+        echo "Generating Play Store screenshots (requires connected device or emulator)..."
+        command -v adb >/dev/null 2>&1 || {
+            echo "adb not found. Check ANDROID_HOME in this script."
+            exit 1
+        }
+        command -v inkscape >/dev/null 2>&1 || {
+            echo "inkscape not found. Install Inkscape and ensure it is on PATH."
+            exit 1
+        }
+        if ! adb devices | awk 'NR > 1 && $2 == "device" { found = 1 } END { exit found ? 0 : 1 }'; then
+            echo "No connected adb device found."
+            exit 1
+        fi
+
+        ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+
+        adb install -r -t app/build/outputs/apk/debug/app-debug.apk >/dev/null
+        adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk >/dev/null
+        adb shell cmd locale set-app-localeconfig eu.schmidt.systems.opensyncedlists --locales en-US >/dev/null 2>&1 || true
+        adb shell cmd locale set-app-locales eu.schmidt.systems.opensyncedlists --locales en-US >/dev/null 2>&1 || true
+        adb shell am instrument -w \
+            -e class eu.schmidt.systems.opensyncedlists.screenshots.ScreenshotGenerationTest \
+            eu.schmidt.systems.opensyncedlists.test/androidx.test.runner.AndroidJUnitRunner
+
+        "$REPO_ROOT/screenshots/generate.sh"
+        ;;
     test-all)
         echo "Running all tests: unit tests + UI / instrumented tests..."
         echo ""
@@ -182,7 +221,7 @@ case "${1:-build}" in
         ./gradlew lint
         ;;
     *)
-        echo "Usage: $0 {build|release|test|test-verbose|test-class <ClassName>|test-ui|test-all|clean|lint}"
+        echo "Usage: $0 {build|release|test|test-verbose|test-class <ClassName>|test-ui|gen-screenshots|test-all|clean|lint}"
         echo ""
         echo "Commands:"
         echo "  build        - Build debug APK"
@@ -191,6 +230,7 @@ case "${1:-build}" in
         echo "  test-verbose - Run unit tests with full output"
         echo "  test-class   - Run tests for specific class"
         echo "  test-ui      - Run UI / instrumented tests (needs device or emulator)"
+        echo "  gen-screenshots - Generate screenshots and replace fastlane images"
         echo "  test-all     - Run unit tests + UI tests"
         echo "  clean        - Clean build artifacts"
         echo "  lint         - Run lint checks"
