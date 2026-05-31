@@ -48,7 +48,7 @@
     <string name="title_activity_settings">Configurações do app</string>
     <string name="general_header">Geral</string>
     <string name="sync_header">Sincronização</string>
-    <string name="design_mode_title">Design</string>
+    <string name="design_mode_title">Tema</string>
     <string name="pref_design_system">Sistema</string>
     <string name="pref_design_light">Claro</string>
     <string name="pref_design_dark">Escuro</string>
@@ -149,6 +149,18 @@
     <string name="confirm_action_title">Tem certeza?</string>
     <string name="confirm_action_yes">Confirmar</string>
     <string name="confirm_action_no">Cancelar</string>
+    <string name="settings_screen_design">Design</string>
+    <string name="settings_screen_design_summary">Tema, visão geral das listas e tamanho da fonte</string>
+    <string name="settings_screen_interactions">Interações</string>
+    <string name="settings_screen_interactions_summary">Distância de salto e rolagem da lista</string>
+    <string name="settings_screen_sync">Configurações de sincronização</string>
+    <string name="settings_screen_sync_summary">Intervalo de sincronização</string>
+    <string name="settings_screen_defaults">Valores padrão para novas listas</string>
+    <string name="list_settings_screen_design">Design</string>
+    <string name="list_settings_screen_design_summary">Opções de exibição desta lista</string>
+    <string name="list_settings_screen_sync">Sincronização</string>
+    <string name="list_settings_screen_deletion">Exclusão</string>
+    <string name="list_settings_screen_deletion_summary">Excluir esta lista</string>
     <string name="pref_font_size_title">Tamanho da fonte</string>
     <string name="pref_font_size_summary">Tamanho do texto dos itens da lista. No modo de visão geral, um texto menor torna os itens mais compactos.</string>
     <string name="pref_font_size_small">Pequeno</string>

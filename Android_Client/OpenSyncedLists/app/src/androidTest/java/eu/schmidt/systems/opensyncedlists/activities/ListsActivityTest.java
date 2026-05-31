@@ -139,7 +139,8 @@ public class ListsActivityTest
         // ---- F: Settings ----
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_settings)).perform(click());
-        onView(withText(R.string.design_mode_title)).check(
+        // Settings now opens on a screen of subscreen links.
+        onView(withText(R.string.settings_screen_design)).check(
             matches(isDisplayed()));
         pressBack();
         

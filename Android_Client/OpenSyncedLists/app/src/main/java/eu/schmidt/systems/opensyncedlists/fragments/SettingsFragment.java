@@ -18,16 +18,26 @@ package eu.schmidt.systems.opensyncedlists.fragments;
 
 import android.os.Bundle;
 
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
 import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.utils.PreferenceScreenNavigator;
 
 /**
  * Fragment to handle global settings.
+ *
+ * The preferences are organised as nested {@link PreferenceScreen}s. Navigation
+ * between the root screen and its subscreens is handled by
+ * {@link PreferenceScreenNavigator} so everything stays inside this single
+ * fragment.
  */
 public class SettingsFragment extends PreferenceFragmentCompat
 {
-    
+    private final PreferenceScreenNavigator navigator =
+        new PreferenceScreenNavigator();
+
     /**
      * Pass the preference list to handle.
      *
@@ -38,5 +48,27 @@ public class SettingsFragment extends PreferenceFragmentCompat
         String rootKey)
     {
         setPreferencesFromResource(R.xml.preferences_root, rootKey);
+        navigator.bind(this);
+    }
+
+    @Override public boolean onPreferenceTreeClick(Preference preference)
+    {
+        if (preference instanceof PreferenceScreen)
+        {
+            navigator.navigateTo((PreferenceScreen) preference);
+            return true;
+        }
+        return super.onPreferenceTreeClick(preference);
+    }
+
+    /**
+     * Handle a Back press: pop to the previous (parent) screen if we are
+     * currently inside a subscreen.
+     *
+     * @return true if a subscreen was popped and the Back press was consumed.
+     */
+    public boolean onBackPressed()
+    {
+        return navigator.navigateBack();
     }
 }

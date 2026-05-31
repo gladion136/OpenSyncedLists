@@ -48,7 +48,7 @@
     <string name="title_activity_settings">App settings</string>
     <string name="general_header">General</string>
     <string name="sync_header">Synchronization</string>
-    <string name="design_mode_title">Design</string>
+    <string name="design_mode_title">Theme</string>
     <string name="pref_design_system">System</string>
     <string name="pref_design_light">Light</string>
     <string name="pref_design_dark">Dark</string>
@@ -149,6 +149,18 @@
     <string name="confirm_action_title">Are you sure?</string>
     <string name="confirm_action_yes">Confirm</string>
     <string name="confirm_action_no">Cancel</string>
+    <string name="settings_screen_design">Design</string>
+    <string name="settings_screen_design_summary">Theme, list overview and font size</string>
+    <string name="settings_screen_interactions">Interactions</string>
+    <string name="settings_screen_interactions_summary">Jump range and list scrolling</string>
+    <string name="settings_screen_sync">Sync settings</string>
+    <string name="settings_screen_sync_summary">Synchronization interval</string>
+    <string name="settings_screen_defaults">Default values for new lists</string>
+    <string name="list_settings_screen_design">Design</string>
+    <string name="list_settings_screen_design_summary">Display options for this list</string>
+    <string name="list_settings_screen_sync">Synchronization</string>
+    <string name="list_settings_screen_deletion">Deletion</string>
+    <string name="list_settings_screen_deletion_summary">Delete this list</string>
     <string name="pref_font_size_title">Font size</string>
     <string name="pref_font_size_summary">Size of list element text. In overview mode smaller text makes elements more compact.</string>
     <string name="pref_font_size_small">Small</string>

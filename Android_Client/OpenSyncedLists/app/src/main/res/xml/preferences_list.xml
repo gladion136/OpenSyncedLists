@@ -17,12 +17,16 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="list_settings">
-    <PreferenceCategory android:title="@string/general_header">
 
-        <EditTextPreference
-            android:key="list_name"
-            android:persistent="false"
-            android:title="@string/list_pref_name_title" />
+    <EditTextPreference
+        android:key="list_name"
+        android:persistent="false"
+        android:title="@string/list_pref_name_title" />
+
+    <PreferenceScreen
+        android:key="list_screen_design"
+        android:summary="@string/list_settings_screen_design_summary"
+        android:title="@string/list_settings_screen_design">
 
         <SwitchPreferenceCompat
             android:key="check_option"
@@ -48,16 +52,12 @@
             android:summary="@string/list_pref_invert_element_summary"
             android:title="@string/list_pref_invert_element_title" />
 
-        <Preference
-            android:key="delete_btn"
-            android:summary="@string/list_pref_delete_btn_summary"
-            android:title="@string/list_pref_delete_btn_title" />
+    </PreferenceScreen>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
+    <PreferenceScreen
+        android:key="list_screen_sync"
         android:summary="@string/list_pref_sync_summary"
-        android:title="@string/sync_header">
+        android:title="@string/list_settings_screen_sync">
 
         <SwitchPreferenceCompat
             android:key="auto_sync"
@@ -71,9 +71,23 @@
             android:persistent="false"
             android:title="@string/list_pref_server_name" />
 
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="list_screen_deletion"
+        android:summary="@string/list_settings_screen_deletion_summary"
+        android:title="@string/list_settings_screen_deletion">
+
+        <Preference
+            android:key="delete_btn"
+            android:summary="@string/list_pref_delete_btn_summary"
+            android:title="@string/list_pref_delete_btn_title" />
+
         <Preference
             android:key="delete_online_btn"
             android:summary="@string/list_pref_delete_online_btn_summary"
             android:title="@string/list_pref_delete_online_btn_title" />
-    </PreferenceCategory>
+
+    </PreferenceScreen>
+
 </PreferenceScreen>

@@ -48,7 +48,7 @@
     <string name="title_activity_settings">Paramètres de l\'application</string>
     <string name="general_header">Général</string>
     <string name="sync_header">Synchronisation</string>
-    <string name="design_mode_title">Apparence</string>
+    <string name="design_mode_title">Thème</string>
     <string name="pref_design_system">Système</string>
     <string name="pref_design_light">Clair</string>
     <string name="pref_design_dark">Sombre</string>
@@ -149,6 +149,18 @@
     <string name="confirm_action_title">Êtes-vous sûr ?</string>
     <string name="confirm_action_yes">Confirmer</string>
     <string name="confirm_action_no">Annuler</string>
+    <string name="settings_screen_design">Design</string>
+    <string name="settings_screen_design_summary">Thème, aperçu des listes et taille de police</string>
+    <string name="settings_screen_interactions">Interactions</string>
+    <string name="settings_screen_interactions_summary">Distance de saut et défilement de la liste</string>
+    <string name="settings_screen_sync">Paramètres de synchronisation</string>
+    <string name="settings_screen_sync_summary">Intervalle de synchronisation</string>
+    <string name="settings_screen_defaults">Valeurs par défaut pour les nouvelles listes</string>
+    <string name="list_settings_screen_design">Design</string>
+    <string name="list_settings_screen_design_summary">Options d\'affichage de cette liste</string>
+    <string name="list_settings_screen_sync">Synchronisation</string>
+    <string name="list_settings_screen_deletion">Suppression</string>
+    <string name="list_settings_screen_deletion_summary">Supprimer cette liste</string>
     <string name="pref_font_size_title">Taille de police</string>
     <string name="pref_font_size_summary">Taille du texte des éléments de la liste. En mode aperçu, un texte plus petit rend les éléments plus compacts.</string>
     <string name="pref_font_size_small">Petite</string>

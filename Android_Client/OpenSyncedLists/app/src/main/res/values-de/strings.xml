@@ -67,7 +67,7 @@
     <string name="sync_header">Synchronisation</string>
 
     <!-- General Preferences -->
-    <string name="design_mode_title">Design</string>
+    <string name="design_mode_title">Theme</string>
     <string name="pref_design_system">System</string>
     <string name="pref_design_light">Hell</string>
     <string name="pref_design_dark">Dunkel</string>
@@ -174,6 +174,18 @@
     <string name="confirm_action_title">Bist du sicher?</string>
     <string name="confirm_action_yes">Bestätigen</string>
     <string name="confirm_action_no">Abbrechen</string>
+    <string name="settings_screen_design">Design</string>
+    <string name="settings_screen_design_summary">Theme, Listenübersicht und Schriftgröße</string>
+    <string name="settings_screen_interactions">Interaktionen</string>
+    <string name="settings_screen_interactions_summary">Sprungweite und Listen-Scrollen</string>
+    <string name="settings_screen_sync">Synchronisations-Einstellungen</string>
+    <string name="settings_screen_sync_summary">Synchronisationsintervall</string>
+    <string name="settings_screen_defaults">Standardwerte für neue Listen</string>
+    <string name="list_settings_screen_design">Design</string>
+    <string name="list_settings_screen_design_summary">Anzeigeoptionen für diese Liste</string>
+    <string name="list_settings_screen_sync">Synchronisation</string>
+    <string name="list_settings_screen_deletion">Löschen</string>
+    <string name="list_settings_screen_deletion_summary">Diese Liste löschen</string>
     <string name="pref_font_size_title">Schriftgröße</string>
     <string name="pref_font_size_summary">Größe des Texts der Listenelemente. Im Übersichtsmodus macht kleinerer Text die Elemente kompakter.</string>
     <string name="pref_font_size_small">Klein</string>

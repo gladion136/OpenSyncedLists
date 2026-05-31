@@ -17,7 +17,10 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/general_header">
+    <PreferenceScreen
+        android:key="screen_design"
+        android:summary="@string/settings_screen_design_summary"
+        android:title="@string/settings_screen_design">
 
         <ListPreference
             android:defaultValue="@string/pref_design_system"
@@ -25,7 +28,6 @@
             android:entryValues="@array/pref_design"
             android:key="design"
             android:title="@string/design_mode_title" />
-
 
         <SwitchPreferenceCompat
             android:defaultValue="false"
@@ -41,10 +43,12 @@
             android:summary="@string/pref_font_size_summary"
             android:title="@string/pref_font_size_title" />
 
+    </PreferenceScreen>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Global list settings">
+    <PreferenceScreen
+        android:key="screen_interactions"
+        android:summary="@string/settings_screen_interactions_summary"
+        android:title="@string/settings_screen_interactions">
 
         <ListPreference
             android:defaultValue="1"
@@ -60,6 +64,13 @@
             android:summary="@string/scroll_list_summary"
             android:title="@string/scroll_list_title" />
 
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="screen_sync"
+        android:summary="@string/settings_screen_sync_summary"
+        android:title="@string/settings_screen_sync">
+
         <ListPreference
             android:defaultValue="5"
             android:entries="@array/pref_sync_interval"
@@ -68,11 +79,12 @@
             android:summary="@string/pref_sync_interval_summary"
             android:title="@string/pref_sync_interval" />
 
-    </PreferenceCategory>
+    </PreferenceScreen>
 
-    <PreferenceCategory
+    <PreferenceScreen
+        android:key="screen_defaults"
         android:summary="@string/defaults_list_summary"
-        android:title="@string/defaults_list">
+        android:title="@string/settings_screen_defaults">
 
         <SwitchPreferenceCompat
             android:defaultValue="true"
@@ -107,6 +119,6 @@
             android:summary="@string/list_pref_invert_element_summary"
             android:title="@string/list_pref_invert_element_title" />
 
-    </PreferenceCategory>
+    </PreferenceScreen>
 
 </PreferenceScreen>

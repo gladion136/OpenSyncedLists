@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
 
 import org.json.JSONException;
@@ -43,6 +44,7 @@ import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
+import eu.schmidt.systems.opensyncedlists.utils.PreferenceScreenNavigator;
 
 /**
  * Fragment to handle the view of one list settings
@@ -51,7 +53,9 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
 {
     SyncedList syncedList;
     SecureStorage secureStorage;
-    
+    private final PreferenceScreenNavigator navigator =
+        new PreferenceScreenNavigator();
+
     /**
      * Pass the preference list to show.
      *
@@ -62,6 +66,28 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         String rootKey)
     {
         setPreferencesFromResource(R.xml.preferences_list, rootKey);
+        navigator.bind(this);
+    }
+
+    @Override public boolean onPreferenceTreeClick(Preference preference)
+    {
+        if (preference instanceof PreferenceScreen)
+        {
+            navigator.navigateTo((PreferenceScreen) preference);
+            return true;
+        }
+        return super.onPreferenceTreeClick(preference);
+    }
+
+    /**
+     * Handle a Back press: pop to the previous (parent) screen if we are
+     * currently inside a subscreen.
+     *
+     * @return true if a subscreen was popped and the Back press was consumed.
+     */
+    public boolean onBackPressed()
+    {
+        return navigator.navigateBack();
     }
     
     /**

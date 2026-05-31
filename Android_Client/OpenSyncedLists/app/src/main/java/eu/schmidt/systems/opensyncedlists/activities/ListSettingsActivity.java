@@ -74,5 +74,18 @@ public class ListSettingsActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Route Back / Up first to the preference fragment so it can pop a
+     * subscreen before the activity itself finishes.
+     */
+    @Override public void onBackPressed()
+    {
+        if (listSettingsFragment != null && listSettingsFragment.onBackPressed())
+        {
+            return;
+        }
+        super.onBackPressed();
+    }
 }
 

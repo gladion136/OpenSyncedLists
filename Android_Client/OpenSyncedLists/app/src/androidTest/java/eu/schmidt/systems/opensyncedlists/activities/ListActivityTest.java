@@ -390,16 +390,18 @@ public class ListActivityTest {
     public void testDeleteListConfirmation() {
         createAndOpenList("DeleteMe");
 
-        // Open list settings
+        // Open list settings, then enter the Deletion subscreen.
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_list_settings)).perform(click());
         onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+        onView(withText(R.string.list_settings_screen_deletion)).perform(click());
 
         // ---- A: Delete → cancel → list survives ----
         onView(withText(R.string.list_pref_delete_btn_title)).perform(click());
         TestHelper.cancelDialog();
-        // Still on the settings screen
-        onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+        // Still on the deletion subscreen (delete button visible again).
+        onView(withText(R.string.list_pref_delete_btn_title))
+                .check(matches(isDisplayed()));
 
         // ---- B: Delete → confirm → list removed ----
         onView(withText(R.string.list_pref_delete_btn_title)).perform(click());
@@ -456,11 +458,14 @@ public class ListActivityTest {
                 .perform(actionOnItemAtPosition(0,
                         TestHelper.captureChildTextSizePx(R.id.eTTitle, before)));
 
-        // Open global settings, change font size to "Small", go back.
+        // Open global settings, enter the Design subscreen, change font size to
+        // "Small", then go back to the list.
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_settings)).perform(click());
+        onView(withText(R.string.settings_screen_design)).perform(click());
         onView(withText(R.string.pref_font_size_title)).perform(click());
         onView(withText(R.string.pref_font_size_small)).perform(click());
+        pressBack(); // Design subscreen → settings root screen (same activity)
         pressBack(); // SettingsActivity → ListActivity (triggers onResume reload)
 
         // Capture again; the title must now be smaller.

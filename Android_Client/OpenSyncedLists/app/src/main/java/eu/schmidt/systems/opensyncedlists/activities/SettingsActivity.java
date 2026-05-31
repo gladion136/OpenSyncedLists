@@ -24,6 +24,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
+
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.fragments.SettingsFragment;
 
@@ -33,7 +37,8 @@ import eu.schmidt.systems.opensyncedlists.fragments.SettingsFragment;
 public class SettingsActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    
+    private SettingsFragment settingsFragment;
+
     /**
      * onCreate initialize the view, fragment and PreferenceManager.
      *
@@ -45,8 +50,9 @@ public class SettingsActivity extends AppCompatActivity
         setContentView(R.layout.activity_settings);
         if (savedInstanceState == null)
         {
+            settingsFragment = new SettingsFragment();
             getSupportFragmentManager().beginTransaction()
-                .replace(R.id.settings, new SettingsFragment()).commit();
+                .replace(R.id.settings, settingsFragment).commit();
         }
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
@@ -56,6 +62,29 @@ public class SettingsActivity extends AppCompatActivity
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    /**
+     * Route Back / Up first to the preference fragment so it can pop a
+     * subscreen before the activity itself finishes.
+     */
+    @Override public void onBackPressed()
+    {
+        if (settingsFragment != null && settingsFragment.onBackPressed())
+        {
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
     
     /**

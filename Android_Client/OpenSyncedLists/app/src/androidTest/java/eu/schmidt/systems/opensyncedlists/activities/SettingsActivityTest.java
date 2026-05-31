@@ -20,8 +20,11 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
 
 import android.content.Context;
 
@@ -67,21 +70,34 @@ public class SettingsActivityTest
     }
     
     /**
-     * Navigating to Settings shows the title, the "Design" preference category,
-     * and all three theme options (Light / Dark / System).
+     * Navigating to Settings shows the title and the top-level subscreen links.
+     * Opening the "Design" subscreen reveals the theme preference whose choice
+     * dialog offers all three options (Light / Dark / System).
      */
     @Test public void testSettingsScreen()
     {
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_settings)).perform(click());
-        
+
         onView(withText(R.string.title_activity_settings)).check(
             matches(isDisplayed()));
-        onView(withText(R.string.design_mode_title)).check(
+        // Top-level entry points (subscreen links) are shown.
+        onView(withText(R.string.settings_screen_design)).check(
             matches(isDisplayed()));
-        
-        // Tap the Design preference to open the choice dialog
-        onView(withText(R.string.design_mode_title)).perform(click());
+        onView(withText(R.string.settings_screen_interactions)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.settings_screen_sync)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.settings_screen_defaults)).check(
+            matches(isDisplayed()));
+
+        // Enter the Design subscreen and open the theme choice dialog. After
+        // navigation the ActionBar title also reads "Design", so restrict the
+        // match to the preference list entry.
+        onView(withText(R.string.settings_screen_design)).perform(click());
+        onView(allOf(withText(R.string.design_mode_title),
+                isDescendantOfA(withId(androidx.preference.R.id.recycler_view))))
+                .perform(click());
         onView(withText(R.string.pref_design_light)).check(
             matches(isDisplayed()));
         onView(withText(R.string.pref_design_dark)).check(
@@ -93,13 +109,17 @@ public class SettingsActivityTest
     }
 
     /**
-     * The font-size preference is shown and its choice dialog offers all four
-     * size options. Selecting one persists without crashing.
+     * The font-size preference (inside the Design subscreen) is shown and its
+     * choice dialog offers all four size options. Selecting one persists
+     * without crashing.
      */
     @Test public void testFontSizePreference()
     {
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_settings)).perform(click());
+
+        // font_size lives in the Design subscreen.
+        onView(withText(R.string.settings_screen_design)).perform(click());
 
         onView(withText(R.string.pref_font_size_title)).check(
             matches(isDisplayed()));
