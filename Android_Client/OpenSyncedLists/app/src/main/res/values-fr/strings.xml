@@ -70,6 +70,11 @@
     <string name="list_pref_invert_element_summary">Afficher les boutons à gauche et la case à cocher à droite. Inverse la vue de l\'élément.</string>
     <string name="list_pref_delete_btn_title">Supprimer la liste</string>
     <string name="list_pref_delete_btn_summary">Attention ! La liste sera supprimée uniquement localement !</string>
+    <string name="list_pref_remove_server_btn_title">Retirer le serveur de la liste</string>
+    <string name="list_pref_remove_server_btn_summary">Supprime la liste uniquement du serveur. La liste locale est conservée et son URL de serveur est retirée.</string>
+    <string name="confirm_remove_server_msg">Retirer cette liste du serveur ? La copie locale est conservée et l\'URL du serveur sera effacée.</string>
+    <string name="server_removed">Liste retirée du serveur. La copie locale a été conservée.</string>
+    <string name="server_removed_local_only">URL du serveur retirée localement.</string>
     <string name="list_pref_delete_online_btn_title">Supprimer la liste en ligne et localement</string>
     <string name="list_pref_delete_online_btn_summary">Attention ! La liste sera supprimée à la fois localement et en ligne. Si d\'autres appareils y ont également accès, ils pourraient la remettre en ligne.</string>
     <string name="scroll_list_title">Faire défiler la liste</string>
@@ -160,6 +165,7 @@
     <string name="list_settings_screen_design">Design</string>
     <string name="list_settings_screen_design_summary">Options d\'affichage de cette liste</string>
     <string name="list_settings_screen_sync">Synchronisation</string>
+    <string name="list_settings_screen_sync_summary">URL du serveur, synchronisation auto, retirer le serveur</string>
     <string name="list_settings_screen_deletion">Suppression</string>
     <string name="list_settings_screen_deletion_summary">Supprimer cette liste</string>
     <string name="pref_font_size_title">Taille de police</string>

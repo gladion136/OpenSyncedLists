@@ -70,6 +70,11 @@
     <string name="list_pref_invert_element_summary">Mostrar los botones a la izquierda y la casilla a la derecha. Invierte la vista del elemento.</string>
     <string name="list_pref_delete_btn_title">Eliminar lista</string>
     <string name="list_pref_delete_btn_summary">¡Advertencia! La lista se eliminará solo localmente.</string>
+    <string name="list_pref_remove_server_btn_title">Quitar servidor de la lista</string>
+    <string name="list_pref_remove_server_btn_summary">Elimina la lista solo del servidor. La lista local se conserva y se quita su URL del servidor.</string>
+    <string name="confirm_remove_server_msg">¿Quitar esta lista del servidor? La copia local se conserva y se borrará la URL del servidor.</string>
+    <string name="server_removed">Lista eliminada del servidor. La copia local se conservó.</string>
+    <string name="server_removed_local_only">URL del servidor eliminada localmente.</string>
     <string name="list_pref_delete_online_btn_title">Eliminar lista online y localmente</string>
     <string name="list_pref_delete_online_btn_summary">¡Advertencia! La lista se eliminará tanto local como en línea. Si otros dispositivos también tienen acceso, podrían volver a subirla.</string>
     <string name="scroll_list_title">Desplazar lista</string>
@@ -160,6 +165,7 @@
     <string name="list_settings_screen_design">Diseño</string>
     <string name="list_settings_screen_design_summary">Opciones de visualización de esta lista</string>
     <string name="list_settings_screen_sync">Sincronización</string>
+    <string name="list_settings_screen_sync_summary">URL del servidor, sincronización automática, quitar servidor</string>
     <string name="list_settings_screen_deletion">Eliminación</string>
     <string name="list_settings_screen_deletion_summary">Eliminar esta lista</string>
     <string name="pref_font_size_title">Tamaño de fuente</string>

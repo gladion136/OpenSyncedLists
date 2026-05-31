@@ -70,6 +70,11 @@
     <string name="list_pref_invert_element_summary">Exibir os botões à esquerda e a caixa de seleção à direita. Inverte a visualização do elemento.</string>
     <string name="list_pref_delete_btn_title">Excluir lista</string>
     <string name="list_pref_delete_btn_summary">Atenção! A lista será excluída apenas localmente!</string>
+    <string name="list_pref_remove_server_btn_title">Remover servidor da lista</string>
+    <string name="list_pref_remove_server_btn_summary">Exclui a lista apenas do servidor. A lista local é mantida e sua URL do servidor é removida.</string>
+    <string name="confirm_remove_server_msg">Remover esta lista do servidor? A cópia local é mantida e a URL do servidor será apagada.</string>
+    <string name="server_removed">Lista removida do servidor. A cópia local foi mantida.</string>
+    <string name="server_removed_local_only">URL do servidor removida localmente.</string>
     <string name="list_pref_delete_online_btn_title">Excluir lista online e localmente</string>
     <string name="list_pref_delete_online_btn_summary">Atenção! A lista será excluída tanto local quanto online. Se outros dispositivos também tiverem acesso, ainda poderão enviá-la.</string>
     <string name="scroll_list_title">Rolar lista</string>
@@ -160,6 +165,7 @@
     <string name="list_settings_screen_design">Design</string>
     <string name="list_settings_screen_design_summary">Opções de exibição desta lista</string>
     <string name="list_settings_screen_sync">Sincronização</string>
+    <string name="list_settings_screen_sync_summary">URL do servidor, sincronização automática, remover servidor</string>
     <string name="list_settings_screen_deletion">Exclusão</string>
     <string name="list_settings_screen_deletion_summary">Excluir esta lista</string>
     <string name="pref_font_size_title">Tamanho da fonte</string>

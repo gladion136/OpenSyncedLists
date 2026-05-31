@@ -94,6 +94,11 @@
 
     <string name="list_pref_delete_btn_title">Liste löschen</string>
     <string name="list_pref_delete_btn_summary">Achtung! Die Liste wird nur lokal gelöscht!</string>
+    <string name="list_pref_remove_server_btn_title">Server von Liste entfernen</string>
+    <string name="list_pref_remove_server_btn_summary">Löscht die Liste nur vom Server. Die lokale Liste bleibt erhalten, die Server-URL wird entfernt.</string>
+    <string name="confirm_remove_server_msg">Diese Liste vom Server entfernen? Die lokale Kopie bleibt erhalten und die Server-URL wird geleert.</string>
+    <string name="server_removed">Liste vom Server entfernt. Die lokale Kopie wurde behalten.</string>
+    <string name="server_removed_local_only">Server-URL lokal entfernt.</string>
     <string name="list_pref_delete_online_btn_title">Liste online und lokal löschen</string>
     <string name="list_pref_delete_online_btn_summary">Achtung! Die Liste wird auf dem Server und lokal gelöscht! Sollte die Liste noch auf einem anderem Gerät existieren, könnte sie wieder auf den Server hochgeladen werden.</string>
     <string name="scroll_list_title">Liste scrollen</string>
@@ -185,6 +190,7 @@
     <string name="list_settings_screen_design">Design</string>
     <string name="list_settings_screen_design_summary">Anzeigeoptionen für diese Liste</string>
     <string name="list_settings_screen_sync">Synchronisation</string>
+    <string name="list_settings_screen_sync_summary">Host-URL, Auto-Sync, Server entfernen</string>
     <string name="list_settings_screen_deletion">Löschen</string>
     <string name="list_settings_screen_deletion_summary">Diese Liste löschen</string>
     <string name="pref_font_size_title">Schriftgröße</string>

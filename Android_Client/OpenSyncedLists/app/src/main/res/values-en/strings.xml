@@ -70,6 +70,11 @@
     <string name="list_pref_invert_element_summary">Display the buttons left and the checkbox right. Inverts the element view.</string>
     <string name="list_pref_delete_btn_title">Delete list</string>
     <string name="list_pref_delete_btn_summary">Warning! The list got only deleted local!</string>
+    <string name="list_pref_remove_server_btn_title">Remove server from list</string>
+    <string name="list_pref_remove_server_btn_summary">Deletes the list from the server only. The local list is kept and its server URL is removed.</string>
+    <string name="confirm_remove_server_msg">Remove this list from the server? The local copy is kept and the server URL will be cleared.</string>
+    <string name="server_removed">List removed from server. The local copy was kept.</string>
+    <string name="server_removed_local_only">Server URL removed locally.</string>
     <string name="list_pref_delete_online_btn_title">Delete list online and local</string>
     <string name="list_pref_delete_online_btn_summary">Warning! The list will be deleted both local and online. If others devices has also access they could still upload it.</string>
     <string name="scroll_list_title">Scroll list</string>
@@ -160,6 +165,7 @@
     <string name="list_settings_screen_design">Design</string>
     <string name="list_settings_screen_design_summary">Display options for this list</string>
     <string name="list_settings_screen_sync">Synchronization</string>
+    <string name="list_settings_screen_sync_summary">Host URL, auto sync, remove server</string>
     <string name="list_settings_screen_deletion">Deletion</string>
     <string name="list_settings_screen_deletion_summary">Delete this list</string>
     <string name="pref_font_size_title">Font size</string>

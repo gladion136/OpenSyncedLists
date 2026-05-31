@@ -413,6 +413,60 @@ public class ListActivityTest {
     }
 
     /**
+     * Verifies the "Remove server from list" option in the list settings'
+     * Synchronization subscreen:
+     *
+     * A. No server set → tapping shows no confirm dialog (just a Toast hint),
+     *    the list stays.
+     * B. After entering a server URL and confirming the removal, the server URL
+     *    is cleared from the list (the local list itself is kept). The URL is
+     *    cleared locally regardless of the (here unreachable) server response.
+     */
+    @Test
+    public void testRemoveServerFromList() {
+        createAndOpenList("Serverless");
+
+        // Open list settings → Synchronization subscreen.
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_list_settings)).perform(click());
+        onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+        onView(withText(R.string.list_settings_screen_sync)).perform(click());
+
+        // ---- A: no server set → no confirm dialog, only a Toast ----
+        onView(withText(R.string.list_pref_remove_server_btn_title))
+                .check(matches(isDisplayed()));
+        onView(withText(R.string.list_pref_remove_server_btn_title)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
+
+        // ---- B: set a server URL, then remove it ----
+        // Enter a (non-existent) server URL via the server-name preference.
+        onView(withText(R.string.list_pref_server_name)).perform(click());
+        onView(isAssignableFrom(android.widget.EditText.class))
+                .inRoot(isDialog())
+                .perform(replaceText("https://example.invalid"),
+                        closeSoftKeyboard());
+        onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
+
+        // Re-open the field to confirm the URL was stored.
+        onView(withText(R.string.list_pref_server_name)).perform(click());
+        onView(isAssignableFrom(android.widget.EditText.class))
+                .inRoot(isDialog())
+                .check(matches(withText("https://example.invalid")));
+        onView(withId(android.R.id.button2)).inRoot(isDialog()).perform(click());
+
+        // Remove the server; confirm the dialog.
+        onView(withText(R.string.list_pref_remove_server_btn_title)).perform(click());
+        TestHelper.confirmDialog();
+
+        // Re-open the server-name field: the URL must now be empty.
+        onView(withText(R.string.list_pref_server_name)).perform(click());
+        onView(isAssignableFrom(android.widget.EditText.class))
+                .inRoot(isDialog())
+                .check(matches(withText("")));
+        onView(withId(android.R.id.button2)).inRoot(isDialog()).perform(click());
+    }
+
+    /**
      * Verifies that the global font-size preference scales the element title
      * text. In normal mode the base title size is 20sp; with the "Small" scale
      * (0.8) the rendered title must be ~16sp.

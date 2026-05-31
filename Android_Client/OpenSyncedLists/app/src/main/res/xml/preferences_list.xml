@@ -56,8 +56,15 @@
 
     <PreferenceScreen
         android:key="list_screen_sync"
-        android:summary="@string/list_pref_sync_summary"
+        android:summary="@string/list_settings_screen_sync_summary"
         android:title="@string/list_settings_screen_sync">
+
+        <Preference
+            android:icon="@android:drawable/ic_dialog_info"
+            android:key="sync_info"
+            android:persistent="false"
+            android:selectable="false"
+            android:summary="@string/list_pref_sync_summary" />
 
         <SwitchPreferenceCompat
             android:key="auto_sync"
@@ -70,6 +77,11 @@
             android:key="server_name"
             android:persistent="false"
             android:title="@string/list_pref_server_name" />
+
+        <Preference
+            android:key="remove_server_btn"
+            android:summary="@string/list_pref_remove_server_btn_summary"
+            android:title="@string/list_pref_remove_server_btn_title" />
 
     </PreferenceScreen>
 

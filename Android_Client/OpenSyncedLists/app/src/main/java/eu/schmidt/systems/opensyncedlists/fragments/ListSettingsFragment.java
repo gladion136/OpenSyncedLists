@@ -124,6 +124,7 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         SwitchPreferenceCompat autoSyncPref = findPreference("auto_sync");
         SwitchPreferenceCompat jumpButtons = findPreference("jump_buttons");
         EditTextPreference serverNamePref = findPreference("server_name");
+        Preference removeServerBtn = findPreference("remove_server_btn");
         Preference deleteOnlineBtn = findPreference("delete_online_btn");
         
         editTextPreference.setText(syncedList.getName());
@@ -242,6 +243,25 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
             return true;
         }));
         
+        removeServerBtn.setOnPreferenceClickListener(v ->
+        {
+            // Nothing to do if the list is not connected to a server.
+            if (syncedList.getHeader().getHostname().equals(""))
+            {
+                Toast.makeText(getContext(),
+                    getString(R.string.no_server_selected),
+                    Toast.LENGTH_LONG).show();
+                return true;
+            }
+            DialogBuilder.confirmDialog(getContext(),
+                getString(R.string.confirm_action_title),
+                getString(R.string.confirm_remove_server_msg),
+                getString(R.string.confirm_action_yes),
+                getString(R.string.confirm_action_no),
+                () -> removeServerFromList(serverNamePref, autoSyncPref));
+            return true;
+        });
+
         deleteOnlineBtn.setOnPreferenceClickListener(v ->
         {
             DialogBuilder.confirmDialog(getContext(),
@@ -294,6 +314,57 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         return super.onCreateView(inflater, container, savedInstanceState);
     }
     
+    /**
+     * Removes the server connection from the list: detaches the list locally
+     * (clears its server hostname, disables auto-sync) and asks the server to
+     * delete its copy. The local list itself is always kept.
+     *
+     * The local detach happens immediately and unconditionally — even if the
+     * server request fails — so the list never keeps a stale server URL. The
+     * server-side deletion is best-effort; its result only drives the Toast
+     * message shown to the user.
+     *
+     * @param serverNamePref the server-name preference to clear in the UI
+     * @param autoSyncPref   the auto-sync preference to uncheck in the UI
+     */
+    @androidx.annotation.VisibleForTesting void removeServerFromList(
+        EditTextPreference serverNamePref, SwitchPreferenceCompat autoSyncPref)
+    {
+        String hostname = syncedList.getHeader().getHostname();
+        String id = syncedList.getId();
+        String secret = syncedList.getSecret();
+
+        // Detach locally first so the URL is removed regardless of the server
+        // response.
+        syncedList.getHeader().setHostname("");
+        syncedList.getHeader().setAutoSync(false);
+        save();
+        if (serverNamePref != null)
+        {
+            serverNamePref.setText("");
+        }
+        if (autoSyncPref != null)
+        {
+            autoSyncPref.setChecked(false);
+        }
+
+        // Best-effort: ask the server to delete its copy.
+        ServerWrapper.removeList(hostname, id, secret,
+            (jsonResult, exceptionFromServer) ->
+            {
+                if (jsonResult == null || exceptionFromServer != null)
+                {
+                    Toast.makeText(getContext(),
+                        getString(R.string.server_removed_local_only),
+                        Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Toast.makeText(getContext(),
+                    getString(R.string.server_removed), Toast.LENGTH_LONG)
+                    .show();
+            });
+    }
+
     /**
      * Save the list to storage and handle exceptions.
      */
