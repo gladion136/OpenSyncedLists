@@ -47,4 +47,18 @@
         <item>"60"</item>
         <item>"120"</item>
     </array>
+
+    <array name="pref_font_size_entries">
+        <item>@string/pref_font_size_small</item>
+        <item>@string/pref_font_size_medium</item>
+        <item>@string/pref_font_size_large</item>
+        <item>@string/pref_font_size_xlarge</item>
+    </array>
+
+    <array name="pref_font_size_values">
+        <item>"0.8"</item>
+        <item>"1.0"</item>
+        <item>"1.2"</item>
+        <item>"1.4"</item>
+    </array>
 </resources>

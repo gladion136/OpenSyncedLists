@@ -149,6 +149,12 @@
     <string name="confirm_action_title">Are you sure?</string>
     <string name="confirm_action_yes">Confirm</string>
     <string name="confirm_action_no">Cancel</string>
+    <string name="pref_font_size_title">Font size</string>
+    <string name="pref_font_size_summary">Size of list element text. In overview mode smaller text makes elements more compact.</string>
+    <string name="pref_font_size_small">Small</string>
+    <string name="pref_font_size_medium">Medium</string>
+    <string name="pref_font_size_large">Large</string>
+    <string name="pref_font_size_xlarge">Extra large</string>
     <string name="confirm_nothing_to_do">Nothing to do.</string>
     <string name="confirm_check_all_msg">Check %d elements?</string>
     <string name="confirm_uncheck_all_msg">Uncheck %d done elements?</string>

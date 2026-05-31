@@ -33,6 +33,14 @@
             android:summary="@string/pref_list_overview_instead_cards_summary"
             android:title="@string/pref_list_overview_instead_cards_title" />
 
+        <ListPreference
+            android:defaultValue="1.0"
+            android:entries="@array/pref_font_size_entries"
+            android:entryValues="@array/pref_font_size_values"
+            android:key="font_size"
+            android:summary="@string/pref_font_size_summary"
+            android:title="@string/pref_font_size_title" />
+
 
     </PreferenceCategory>
 

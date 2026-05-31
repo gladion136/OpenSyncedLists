@@ -65,6 +65,7 @@ public class SyncedListAdapter
     private final RecyclerView recyclerView;
     private final boolean scrollListTopBottom;
     private final int jumpDistance;
+    private final float fontScale;
     private boolean filterActive = false;
     private List<SyncedListElement> syncedListElementsFiltered;
     private Filter syncedListFilter = new Filter()
@@ -197,6 +198,35 @@ public class SyncedListAdapter
         jumpDistance =
             Integer.parseInt(sharedPreferences.getString("jump_range", "1"));
         scrollListTopBottom = sharedPreferences.getBoolean("scrollList", false);
+        fontScale = parseFontScale(
+            sharedPreferences.getString("font_size", "1.0"));
+    }
+
+    /**
+     * @return the font-size scale factor this adapter was created with.
+     */
+    public float getFontScale()
+    {
+        return fontScale;
+    }
+
+    /**
+     * Parse the stored font-size scale factor, falling back to 1.0 on any
+     * malformed value.
+     *
+     * @param value stored preference value
+     * @return scale factor, defaulting to 1.0
+     */
+    public static float parseFontScale(String value)
+    {
+        try
+        {
+            return Float.parseFloat(value);
+        }
+        catch (NumberFormatException e)
+        {
+            return 1.0f;
+        }
     }
     
     /**
@@ -262,6 +292,8 @@ public class SyncedListAdapter
             {
                 elementViewHolder.layoutJumpButtons.setVisibility(View.GONE);
             }
+
+            applyFontSize(elementViewHolder);
             
             // name edittext
             elementViewHolder.eTName.setOnFocusChangeListener((v, focused) ->
@@ -573,6 +605,59 @@ public class SyncedListAdapter
     }
     
     /**
+     * Apply the configured font-size scale to an element's text views.
+     *
+     * In overview mode the row is meant to be compact, so a smaller font also
+     * shrinks the checkbox and the row's minimum height, making the whole
+     * element thinner. In normal mode the element height is driven by the
+     * jump-buttons (40dp each), so only the text size changes while the
+     * checkbox and row height stay untouched.
+     *
+     * @param holder element view holder to adjust
+     */
+    private void applyFontSize(ElementViewHolder holder)
+    {
+        boolean overview = syncedList.getHeader().isOverviewActive();
+
+        // Base text sizes (sp) mirror the values defined in the layouts.
+        float titleBaseSp = overview ? 18f : 20f;
+        float descriptionBaseSp = 14f;
+
+        holder.eTName.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,
+            titleBaseSp * fontScale);
+        holder.tVDescription.setTextSize(
+            android.util.TypedValue.COMPLEX_UNIT_SP,
+            descriptionBaseSp * fontScale);
+
+        if (overview)
+        {
+            float density = holder.itemView.getResources()
+                .getDisplayMetrics().density;
+
+            // Shrink the checkbox proportionally so a smaller font yields a
+            // thinner element. Clamp the scale so it never grows the checkbox
+            // (its base touch target is already large enough).
+            float checkBoxScale = Math.min(fontScale, 1.0f);
+            holder.checkBox.setScaleX(checkBoxScale);
+            holder.checkBox.setScaleY(checkBoxScale);
+
+            if (holder.elementRow != null)
+            {
+                int minHeightPx = Math.round(40f * fontScale * density);
+                holder.elementRow.setMinimumHeight(minHeightPx);
+            }
+        }
+        else
+        {
+            // Normal mode: element height is driven by the jump buttons, so
+            // keep the checkbox at its default size (reset in case the view
+            // was recycled from an overview row).
+            holder.checkBox.setScaleX(1.0f);
+            holder.checkBox.setScaleY(1.0f);
+        }
+    }
+
+    /**
      * ViewHolder for one element.
      */
     public static class ElementViewHolder extends RecyclerView.ViewHolder
@@ -582,7 +667,9 @@ public class SyncedListAdapter
         public final TextView tVDescription;
         public final ImageView iVBtnUp, iVBtnDown, iVTop, iVBottom;
         public final ConstraintLayout layoutJumpButtons;
-        
+        /** Only present in the overview layouts; null otherwise. */
+        public final View elementRow;
+
         public ElementViewHolder(View view)
         {
             super(view);
@@ -594,6 +681,7 @@ public class SyncedListAdapter
             iVTop = view.findViewById(R.id.btnJumpTop);
             iVBottom = view.findViewById(R.id.btnJumpBottom);
             layoutJumpButtons = view.findViewById(R.id.layoutJumpButtons);
+            elementRow = view.findViewById(R.id.elementRow);
         }
     }
     

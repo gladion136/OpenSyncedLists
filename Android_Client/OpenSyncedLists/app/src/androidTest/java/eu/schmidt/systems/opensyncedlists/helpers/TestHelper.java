@@ -126,6 +126,48 @@ public class TestHelper
     }
     
     /**
+     * Sets the global "font_size" preference scale factor (e.g. "0.8", "1.0").
+     * Must be called before the list activity / adapter is created, because the
+     * adapter reads the value once at construction time.
+     *
+     * @param context target app context
+     * @param scale   scale factor as stored string
+     */
+    public static void setFontSizePref(Context context, String scale)
+    {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putString("font_size", scale).commit();
+    }
+
+    /**
+     * Returns a {@link ViewAction} that records the scaled text size (px) of
+     * the child TextView/EditText with id {@code childId} into {@code out[0]}.
+     * Use with RecyclerViewActions on a list item.
+     */
+    public static ViewAction captureChildTextSizePx(final int childId,
+        final float[] out)
+    {
+        return new ViewAction()
+        {
+            @Override public Matcher<View> getConstraints()
+            {
+                return isDisplayed();
+            }
+
+            @Override public String getDescription()
+            {
+                return "capture child text size (px) for id " + childId;
+            }
+
+            @Override public void perform(UiController uiController, View view)
+            {
+                android.widget.TextView tv = view.findViewById(childId);
+                out[0] = tv.getTextSize();
+            }
+        };
+    }
+
+    /**
      * Clicks the positive button of a confirmation {@link AlertDialog} (the
      * dialog shown before dangerous actions like check-all, clear list or
      * delete list). Use right after triggering such an action.

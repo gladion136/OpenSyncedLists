@@ -127,7 +127,33 @@ public class ListActivity extends AppCompatActivity
     @Override protected void onResume()
     {
         super.onResume();
+        // The font-size preference can be changed in the global settings while
+        // this list is on the back stack. The adapter reads the scale once at
+        // construction, so re-create it when the preference changed (e.g. after
+        // returning from SettingsActivity).
+        reloadAdapterIfFontSizeChanged();
         activateAutoSync();
+    }
+
+    /**
+     * Rebuilds the list adapter if the global font-size preference no longer
+     * matches the scale the current adapter was created with. Keeps the visible
+     * list in sync with the setting without recreating the whole activity.
+     */
+    private void reloadAdapterIfFontSizeChanged()
+    {
+        if (syncedListAdapter == null || globalSharedPreferences == null)
+        {
+            return;
+        }
+        float currentScale = SyncedListAdapter.parseFontScale(
+            globalSharedPreferences.getString("font_size", "1.0"));
+        if (currentScale != syncedListAdapter.getFontScale())
+        {
+            syncedListAdapter =
+                new SyncedListAdapter(this, recyclerView, syncedList);
+            recyclerView.setAdapter(syncedListAdapter);
+        }
     }
     
     /**

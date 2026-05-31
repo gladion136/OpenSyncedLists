@@ -411,6 +411,78 @@ public class ListActivityTest {
     }
 
     /**
+     * Verifies that the global font-size preference scales the element title
+     * text. In normal mode the base title size is 20sp; with the "Small" scale
+     * (0.8) the rendered title must be ~16sp.
+     */
+    @Test
+    public void testFontSizeScalesElementTitle() {
+        // Must be set before the list (and its adapter) is created.
+        TestHelper.setFontSizePref(ctx, "0.8");
+
+        createAndOpenList("Font-Test");
+        addElement("Sized");
+
+        float[] sizePx = {0f};
+        onView(withId(R.id.recyclerView))
+                .perform(actionOnItemAtPosition(0,
+                        TestHelper.captureChildTextSizePx(R.id.eTTitle, sizePx)));
+
+        // Expected: 20sp base * 0.8 = 16sp, converted to px via scaledDensity.
+        float scaledDensity =
+                ctx.getResources().getDisplayMetrics().scaledDensity;
+        float expectedPx = 16f * scaledDensity;
+        org.junit.Assert.assertEquals(expectedPx, sizePx[0], 1.5f);
+
+        pressBack();
+    }
+
+    /**
+     * Verifies that changing the font size in the global settings while a list
+     * is open takes effect after returning to the list (onResume reload path),
+     * without recreating the activity manually.
+     *
+     * Default scale is 1.0 (title 20sp). After selecting "Small" (0.8) in the
+     * settings and pressing Back, the same title must render smaller (~16sp).
+     */
+    @Test
+    public void testFontSizeChangeAppliesAfterReturningFromSettings() {
+        createAndOpenList("Live-Font-Test");
+        addElement("Sized");
+
+        // Capture the title size at the default scale (1.0 → 20sp).
+        float[] before = {0f};
+        onView(withId(R.id.recyclerView))
+                .perform(actionOnItemAtPosition(0,
+                        TestHelper.captureChildTextSizePx(R.id.eTTitle, before)));
+
+        // Open global settings, change font size to "Small", go back.
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_settings)).perform(click());
+        onView(withText(R.string.pref_font_size_title)).perform(click());
+        onView(withText(R.string.pref_font_size_small)).perform(click());
+        pressBack(); // SettingsActivity → ListActivity (triggers onResume reload)
+
+        // Capture again; the title must now be smaller.
+        float[] after = {0f};
+        onView(withId(R.id.recyclerView))
+                .perform(actionOnItemAtPosition(0,
+                        TestHelper.captureChildTextSizePx(R.id.eTTitle, after)));
+
+        org.junit.Assert.assertTrue(
+                "Title should shrink after lowering font size "
+                        + "(before=" + before[0] + ", after=" + after[0] + ")",
+                after[0] < before[0]);
+
+        // Expected ~16sp (20sp * 0.8).
+        float scaledDensity =
+                ctx.getResources().getDisplayMetrics().scaledDensity;
+        org.junit.Assert.assertEquals(16f * scaledDensity, after[0], 1.5f);
+
+        pressBack();
+    }
+
+    /**
      * Verifies that bulk actions on an empty list affect 0 elements and
      * therefore show NO confirmation dialog (a Toast is shown instead).
      *

@@ -88,5 +88,36 @@ public class SettingsActivityTest
             matches(isDisplayed()));
         onView(withText(R.string.pref_design_system)).check(
             matches(isDisplayed()));
+        // Dismiss the design dialog
+        onView(withText(R.string.pref_design_system)).perform(click());
+    }
+
+    /**
+     * The font-size preference is shown and its choice dialog offers all four
+     * size options. Selecting one persists without crashing.
+     */
+    @Test public void testFontSizePreference()
+    {
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_settings)).perform(click());
+
+        onView(withText(R.string.pref_font_size_title)).check(
+            matches(isDisplayed()));
+
+        // Open the font-size choice dialog and verify all options.
+        onView(withText(R.string.pref_font_size_title)).perform(click());
+        onView(withText(R.string.pref_font_size_small)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.pref_font_size_medium)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.pref_font_size_large)).check(
+            matches(isDisplayed()));
+        onView(withText(R.string.pref_font_size_xlarge)).check(
+            matches(isDisplayed()));
+
+        // Pick "Small" and confirm the screen is still shown afterwards.
+        onView(withText(R.string.pref_font_size_small)).perform(click());
+        onView(withText(R.string.pref_font_size_title)).check(
+            matches(isDisplayed()));
     }
 }

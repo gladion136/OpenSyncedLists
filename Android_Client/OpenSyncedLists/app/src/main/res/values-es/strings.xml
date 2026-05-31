@@ -149,6 +149,12 @@
     <string name="confirm_action_title">¿Estás seguro?</string>
     <string name="confirm_action_yes">Confirmar</string>
     <string name="confirm_action_no">Cancelar</string>
+    <string name="pref_font_size_title">Tamaño de fuente</string>
+    <string name="pref_font_size_summary">Tamaño del texto de los elementos de la lista. En el modo de vista general, un texto más pequeño hace que los elementos sean más compactos.</string>
+    <string name="pref_font_size_small">Pequeño</string>
+    <string name="pref_font_size_medium">Mediano</string>
+    <string name="pref_font_size_large">Grande</string>
+    <string name="pref_font_size_xlarge">Muy grande</string>
     <string name="confirm_nothing_to_do">Nada que hacer.</string>
     <string name="confirm_check_all_msg">¿Marcar %d elementos?</string>
     <string name="confirm_uncheck_all_msg">¿Desmarcar %d elementos completados?</string>
