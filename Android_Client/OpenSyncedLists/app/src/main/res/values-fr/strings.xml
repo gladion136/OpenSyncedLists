@@ -21,7 +21,7 @@
     <string name="menu_new_list">Créer une nouvelle liste</string>
     <string name="menu_export">Exporter les listes</string>
     <string name="menu_import">Importer une ou des listes</string>
-    <string name="menu_settings">Paramètres</string>
+    <string name="menu_settings">Paramètres de l\'application</string>
     <string name="menu_list_settings">Paramètres de cette liste</string>
     <string name="menu_list_clear">Vider la liste</string>
     <string name="menu_check_all">Tout cocher</string>
@@ -45,7 +45,7 @@
     <string name="share_after_link">\n\n Veuillez ouvrir le lien avec l\'application OpenSyncedLists.</string>
     <string name="text_about">Créé par Etienne Schmidt.<![CDATA[<br/><br/>]]>
         Page de l\'application <![CDATA[<a href="https://schmidt-systems.eu/docs/opensyncedlists">sur Schmidt-Systems.eu</a><br/><br/>]]>Sous licence <![CDATA[<a href="https://gitlab.com/gladion136/opensyncedlists/-/raw/main/LICENSE">GNU GPL v3</a>]]></string>
-    <string name="title_activity_settings">Paramètres</string>
+    <string name="title_activity_settings">Paramètres de l\'application</string>
     <string name="general_header">Général</string>
     <string name="sync_header">Synchronisation</string>
     <string name="design_mode_title">Apparence</string>
