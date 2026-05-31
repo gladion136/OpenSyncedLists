@@ -127,32 +127,38 @@ public class ListActivity extends AppCompatActivity
     @Override protected void onResume()
     {
         super.onResume();
-        // The font-size preference can be changed in the global settings while
-        // this list is on the back stack. The adapter reads the scale once at
-        // construction, so re-create it when the preference changed (e.g. after
-        // returning from SettingsActivity).
-        reloadAdapterIfFontSizeChanged();
+        reloadListSettings();
         activateAutoSync();
     }
-
+    
     /**
-     * Rebuilds the list adapter if the global font-size preference no longer
-     * matches the scale the current adapter was created with. Keeps the visible
-     * list in sync with the setting without recreating the whole activity.
+     * Reloads the list from storage and recreates the adapter to reflect any
+     * changes to list-specific settings (jump_buttons, checked_list, etc.) that
+     * may have been made in ListSettingsActivity.
      */
-    private void reloadAdapterIfFontSizeChanged()
+    private void reloadListSettings()
     {
-        if (syncedListAdapter == null || globalSharedPreferences == null)
+        if (syncedList == null || secureStorage == null)
         {
             return;
         }
-        float currentScale = SyncedListAdapter.parseFontScale(
-            globalSharedPreferences.getString("font_size", "1.0"));
-        if (currentScale != syncedListAdapter.getFontScale())
+        try
         {
-            syncedListAdapter =
-                new SyncedListAdapter(this, recyclerView, syncedList);
-            recyclerView.setAdapter(syncedListAdapter);
+            // Reload the list from storage to pick up any setting changes
+            SyncedList reloadedList = secureStorage.getList(syncedList.getId());
+            if (reloadedList != null)
+            {
+                syncedList = reloadedList;
+                // Recreate the adapter with the updated list
+                syncedListAdapter =
+                    new SyncedListAdapter(this, recyclerView, syncedList);
+                recyclerView.setAdapter(syncedListAdapter);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.e(Constant.LOG_TITLE_DEFAULT,
+                "Error reloading list settings: " + e);
         }
     }
     
@@ -242,8 +248,9 @@ public class ListActivity extends AppCompatActivity
                         {
                             SyncedListElement updated = el.clone();
                             updated.setChecked(true);
-                            steps.add(new SyncedListStep(el.getId(),
-                                ACTION.UPDATE, updated));
+                            steps.add(
+                                new SyncedListStep(el.getId(), ACTION.UPDATE,
+                                    updated));
                         }
                         addElementStepsAndSave(steps);
                     });
@@ -261,8 +268,9 @@ public class ListActivity extends AppCompatActivity
                         {
                             SyncedListElement updated = el.clone();
                             updated.setChecked(false);
-                            steps.add(new SyncedListStep(el.getId(),
-                                ACTION.UPDATE, updated));
+                            steps.add(
+                                new SyncedListStep(el.getId(), ACTION.UPDATE,
+                                    updated));
                         }
                         addElementStepsAndSave(steps);
                     });
@@ -278,8 +286,8 @@ public class ListActivity extends AppCompatActivity
                         List<SyncedListStep> steps = new ArrayList<>();
                         for (SyncedListElement el : checked)
                         {
-                            steps.add(new SyncedListStep(el.getId(),
-                                ACTION.REMOVE));
+                            steps.add(
+                                new SyncedListStep(el.getId(), ACTION.REMOVE));
                         }
                         addElementStepsAndSave(steps);
                     });
@@ -297,8 +305,9 @@ public class ListActivity extends AppCompatActivity
                         {
                             SyncedListElement updated = el.clone();
                             updated.setChecked(!el.getChecked());
-                            steps.add(new SyncedListStep(el.getId(),
-                                ACTION.UPDATE, updated));
+                            steps.add(
+                                new SyncedListStep(el.getId(), ACTION.UPDATE,
+                                    updated));
                         }
                         addElementStepsAndSave(steps);
                     });
@@ -430,7 +439,7 @@ public class ListActivity extends AppCompatActivity
             getString(R.string.confirm_action_yes),
             getString(R.string.confirm_action_no), action);
     }
-
+    
     /**
      * Add step to list and save it
      *
@@ -655,12 +664,11 @@ public class ListActivity extends AppCompatActivity
         // Load global preferances
         globalSharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this);
-
+        
         // Remember the last opened list so ListsActivity can re-open it
         globalSharedPreferences.edit()
-            .putString("last_list_id", syncedList.getId())
-            .apply();
-
+            .putString("last_list_id", syncedList.getId()).apply();
+        
         // Update ActionBar
         setTitle(syncedList.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -790,7 +798,7 @@ public class ListActivity extends AppCompatActivity
                 {
                     TextListParser parser = new TextListParser();
                     ArrayList<ParsedElement> elements =
-                        new ArrayList<>(parser.parse(result));
+                        new ArrayList<>(TextListParser.parse(result));
                     
                     if (elements.isEmpty())
                     {

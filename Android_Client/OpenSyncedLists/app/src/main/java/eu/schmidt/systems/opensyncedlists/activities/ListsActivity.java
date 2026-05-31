@@ -104,13 +104,13 @@ public class ListsActivity extends AppCompatActivity
      * (e.g. configuration change or test setUp cycles).
      */
     private static boolean sAutoOpenAttempted = false;
-
+    
     /** Resets the auto-open flag. Intended for use in tests only. */
     public static void resetAutoOpenForTesting()
     {
         sAutoOpenAttempted = false;
     }
-
+    
     /**
      * Reloads all list data and refreshes the UI from the current storage.
      * Called by instrumented tests after {@code TestHelper.clearAll()} so that
@@ -131,7 +131,7 @@ public class ListsActivity extends AppCompatActivity
         updateNavigrationDrawer();
         listsAdapter.updateItems(syncedListsHeaders, true);
     }
-
+    
     /** Stores the global settings */
     public SharedPreferences globalSharedPreferences;
     public SecureStorage secureStorage;
@@ -216,7 +216,7 @@ public class ListsActivity extends AppCompatActivity
         init();
         updateNavigrationDrawer();
         showChangelogIfUpdated();
-
+        
         // On first launch after app start, re-open the last viewed list
         if (savedInstanceState == null)
         {
@@ -885,8 +885,8 @@ public class ListsActivity extends AppCompatActivity
     }
     
     /**
-     * Re-opens the last viewed list on app start if the ID is still valid.
-     * Only fires once per process lifetime so that activity recreates (e.g.
+     * Re-opens the last viewed list on app start if the ID is still valid. Only
+     * fires once per process lifetime so that activity recreates (e.g.
      * configuration changes or test setUp cycles) do not trigger a second
      * auto-open.
      */
@@ -897,7 +897,7 @@ public class ListsActivity extends AppCompatActivity
             return;
         }
         sAutoOpenAttempted = true;
-
+        
         String lastId = globalSharedPreferences.getString("last_list_id", null);
         if (lastId == null)
         {
@@ -921,7 +921,7 @@ public class ListsActivity extends AppCompatActivity
         intent.putExtra("id", lastId);
         startActivity(intent);
     }
-
+    
     /**
      * Initialize fills the activity with content. (Fill list view, read
      * settings, ..)
@@ -959,8 +959,7 @@ public class ListsActivity extends AppCompatActivity
                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
         
-        listsAdapter = new ListsAdapter(this,
-            (ArrayList<SyncedListHeader>) syncedListsHeaders, recyclerView);
+        listsAdapter = new ListsAdapter(this, syncedListsHeaders, recyclerView);
         updateListSettings();
         recyclerView.setAdapter(listsAdapter);
         
@@ -1094,8 +1093,9 @@ public class ListsActivity extends AppCompatActivity
         localeAssets.put("fr", "changelog_fr.txt");
         localeAssets.put("pt", "changelog_pt.txt");
         localeAssets.put("es", "changelog_es.txt");
-        String assetName = localeAssets.containsKey(lang)
-            ? localeAssets.get(lang) : "changelog.txt";
+        String assetName =
+            localeAssets.containsKey(lang) ? localeAssets.get(lang)
+                : "changelog.txt";
         try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(getAssets().open(assetName))))
         {
@@ -1121,7 +1121,7 @@ public class ListsActivity extends AppCompatActivity
         // F-Droid has no rating feature, so we only link to the page there and
         // instead ask for a star on the GitLab repository.
         String gitLabUrl = getString(R.string.sourcecode_webpage);
-
+        
         String html =
             "<b>" + getString(R.string.changelog_whats_new) + "</b><br><br>"
                 + android.text.TextUtils.htmlEncode(changelog)
@@ -1131,9 +1131,9 @@ public class ListsActivity extends AppCompatActivity
                 + "<br><br>" + "<a href=\"" + playStoreUrl + "\">" + getString(
                 R.string.changelog_rate_playstore) + "</a>" + "<br>"
                 + "<a href=\"" + gitLabUrl + "\">" + getString(
-                R.string.changelog_star_gitlab) + "</a>" + "<br>"
-                + "<a href=\"" + fDroidUrl + "\">" + getString(
-                R.string.changelog_view_fdroid) + "</a>";
+                R.string.changelog_star_gitlab) + "</a>" + "<br>" + "<a href=\""
+                + fDroidUrl + "\">" + getString(R.string.changelog_view_fdroid)
+                + "</a>";
         
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle(
                 R.string.changelog_dialog_title).setMessage(
@@ -1225,7 +1225,7 @@ public class ListsActivity extends AppCompatActivity
             {
                 TextListParser parser = new TextListParser();
                 ArrayList<ParsedElement> elements =
-                    new ArrayList<>(parser.parse(input));
+                    new ArrayList<>(TextListParser.parse(input));
                 
                 // Switch back to main thread for UI updates
                 new Handler(Looper.getMainLooper()).post(() ->

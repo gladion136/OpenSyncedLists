@@ -57,7 +57,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/dot_menu_50" />
+            app:srcCompat="@drawable/dot_menu_50"
+            app:tint="?attr/colorControlNormal" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGrpTags"

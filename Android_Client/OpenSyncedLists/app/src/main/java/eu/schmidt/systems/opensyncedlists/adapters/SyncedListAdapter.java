@@ -288,9 +288,19 @@ public class SyncedListAdapter
             {
                 elementViewHolder.checkBox.setVisibility(View.GONE);
             }
-            if (!syncedList.getHeader().isJumpButtons())
+            // Toggle ALL jump buttons (up/down + top/bottom) together. Set both
+            // states explicitly so recycled views never keep a stale value.
+            boolean showJumpButtons = syncedList.getHeader().isJumpButtons();
+            if (elementViewHolder.layoutAllJumpButtons != null)
             {
-                elementViewHolder.layoutJumpButtons.setVisibility(View.GONE);
+                elementViewHolder.layoutAllJumpButtons.setVisibility(
+                    showJumpButtons ? View.VISIBLE : View.GONE);
+            }
+            else
+            {
+                // Fallback (layouts without the wrapper): toggle up/down group.
+                elementViewHolder.layoutJumpButtons.setVisibility(
+                    showJumpButtons ? View.VISIBLE : View.GONE);
             }
 
             applyFontSize(elementViewHolder);
@@ -667,6 +677,8 @@ public class SyncedListAdapter
         public final TextView tVDescription;
         public final ImageView iVBtnUp, iVBtnDown, iVTop, iVBottom;
         public final ConstraintLayout layoutJumpButtons;
+        /** Wrapper around all four jump buttons; null in overview layouts. */
+        public final View layoutAllJumpButtons;
         /** Only present in the overview layouts; null otherwise. */
         public final View elementRow;
 
@@ -681,6 +693,8 @@ public class SyncedListAdapter
             iVTop = view.findViewById(R.id.btnJumpTop);
             iVBottom = view.findViewById(R.id.btnJumpBottom);
             layoutJumpButtons = view.findViewById(R.id.layoutJumpButtons);
+            layoutAllJumpButtons =
+                view.findViewById(R.id.layoutAllJumpButtons);
             elementRow = view.findViewById(R.id.elementRow);
         }
     }

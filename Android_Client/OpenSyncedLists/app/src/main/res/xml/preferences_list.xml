@@ -19,7 +19,7 @@
     android:key="list_settings">
 
     <Preference
-        android:icon="@android:drawable/ic_dialog_info"
+        android:icon="@drawable/ic_info"
         android:key="list_settings_scope_hint"
         android:persistent="false"
         android:selectable="false"
@@ -67,7 +67,7 @@
         android:title="@string/list_settings_screen_sync">
 
         <Preference
-            android:icon="@android:drawable/ic_dialog_info"
+            android:icon="@drawable/ic_info"
             android:key="sync_info"
             android:persistent="false"
             android:selectable="false"

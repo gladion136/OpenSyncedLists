@@ -60,7 +60,8 @@
             android:layout_height="match_parent"
             android:layout_weight="4"
             android:tooltipText="Add new element on top"
-            app:srcCompat="@drawable/up_arrow" />
+            app:srcCompat="@drawable/up_arrow"
+            app:tint="?attr/colorControlNormal" />
 
         <ImageView
             android:id="@+id/iVNewElementBottom"
@@ -68,7 +69,8 @@
             android:layout_height="match_parent"
             android:layout_weight="4"
             android:tooltipText="Add new element on bottom"
-            app:srcCompat="@drawable/down_arrow" />
+            app:srcCompat="@drawable/down_arrow"
+            app:tint="?attr/colorControlNormal" />
 
     </LinearLayout>
 

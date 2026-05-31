@@ -56,7 +56,8 @@
             android:scaleType="centerInside"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/dot_menu_50" />
+            app:srcCompat="@drawable/dot_menu_50"
+            app:tint="?attr/colorControlNormal" />
 
         <TextView
             android:id="@+id/tVSize"

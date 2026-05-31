@@ -34,8 +34,11 @@
             ?attr/colorPrimaryVariant
         </item>
         <!-- Customize your theme here. -->
-        <item name="android:textColor">#000000</item>
         <item name="toolbarStyle">@style/MyToolbarStyle</item>
+        <!-- Explicit dialog theme so button text colors are deterministic and
+             do not depend on the OEM default (Samsung/Xiaomi differ). -->
+        <item name="alertDialogTheme">@style/AppAlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/AppAlertDialogTheme</item>
     </style>
 
     <style name="MyToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
@@ -47,6 +50,24 @@
 
     <style name="ToolbarIconsTheme" parent="">
         <item name="colorControlNormal">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Shared dialog theme. The DayNight parent resolves the correct
+         background/text colors per mode; buttons use the primary color so they
+         stay clearly visible on every device. -->
+    <style name="AppAlertDialogTheme"
+        parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/AppAlertDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AppAlertDialogButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/AppAlertDialogButton</item>
+    </style>
+
+    <style name="AppAlertDialogButton"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <!-- textColorPrimary follows the theme (dark text on light, light text
+             on dark), guaranteeing contrast against the dialog surface on every
+             device. -->
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
 
