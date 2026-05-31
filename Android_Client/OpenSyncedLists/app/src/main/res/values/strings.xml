@@ -141,7 +141,8 @@
     <string name="changelog_whats_new">What\'s new in this version:</string>
     <string name="changelog_thank_you">Thank you for using OpenSyncedLists! ❤️\nIf you enjoy the app, a rating helps a lot.</string>
     <string name="changelog_rate_playstore">⭐ Rate on Google Play</string>
-    <string name="changelog_rate_fdroid">⭐ Rate on F-Droid</string>
+    <string name="changelog_star_gitlab">⭐ Star on GitLab</string>
+    <string name="changelog_view_fdroid">📦 View on F-Droid</string>
     <string name="changelog_close">Close</string>
     <string name="changelog_webpage" translatable="false">https://gitlab.com/gladion136/opensyncedlists/-/blob/main/CHANGELOG.md</string>
     <string name="pref_list_overview_instead_cards_summary">Display all lists inside a list view instead of a grid of cards</string>

@@ -1118,7 +1118,10 @@ public class ListsActivity extends AppCompatActivity
                 + ".opensyncedlists";
         String fDroidUrl =
             "https://f-droid.org/packages/eu.schmidt.systems.opensyncedlists/";
-        
+        // F-Droid has no rating feature, so we only link to the page there and
+        // instead ask for a star on the GitLab repository.
+        String gitLabUrl = getString(R.string.sourcecode_webpage);
+
         String html =
             "<b>" + getString(R.string.changelog_whats_new) + "</b><br><br>"
                 + android.text.TextUtils.htmlEncode(changelog)
@@ -1127,8 +1130,10 @@ public class ListsActivity extends AppCompatActivity
                 getString(R.string.changelog_thank_you)).replace("\n", "<br>")
                 + "<br><br>" + "<a href=\"" + playStoreUrl + "\">" + getString(
                 R.string.changelog_rate_playstore) + "</a>" + "<br>"
+                + "<a href=\"" + gitLabUrl + "\">" + getString(
+                R.string.changelog_star_gitlab) + "</a>" + "<br>"
                 + "<a href=\"" + fDroidUrl + "\">" + getString(
-                R.string.changelog_rate_fdroid) + "</a>";
+                R.string.changelog_view_fdroid) + "</a>";
         
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle(
                 R.string.changelog_dialog_title).setMessage(

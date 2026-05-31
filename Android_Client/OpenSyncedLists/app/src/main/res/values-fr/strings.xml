@@ -131,7 +131,8 @@
     <string name="changelog_whats_new">Nouveautés dans cette version :</string>
     <string name="changelog_thank_you">Merci d\'utiliser OpenSyncedLists ! ❤️\nSi vous appréciez l\'application, une note nous aide beaucoup.</string>
     <string name="changelog_rate_playstore">⭐ Noter sur Google Play</string>
-    <string name="changelog_rate_fdroid">⭐ Noter sur F-Droid</string>
+    <string name="changelog_star_gitlab">⭐ Mettre une étoile sur GitLab</string>
+    <string name="changelog_view_fdroid">📦 Voir sur F-Droid</string>
     <string name="changelog_close">Fermer</string>
     <string name="pref_list_overview_instead_cards_summary">Afficher toutes les listes dans une vue liste plutôt qu\'une grille de cartes</string>
     <string name="pref_list_overview_instead_cards_title">Vue d\'ensemble en liste plutôt qu\'en cartes</string>
