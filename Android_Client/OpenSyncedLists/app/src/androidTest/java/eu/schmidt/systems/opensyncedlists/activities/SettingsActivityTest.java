@@ -19,7 +19,11 @@ package eu.schmidt.systems.opensyncedlists.activities;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -139,5 +143,97 @@ public class SettingsActivityTest
         onView(withText(R.string.pref_font_size_small)).perform(click());
         onView(withText(R.string.pref_font_size_title)).check(
             matches(isDisplayed()));
+    }
+
+    /**
+     * The two hint links on the Sync Settings screen navigate to the related
+     * subscreens (Default values and Data / Storage).
+     */
+    @Test public void testSyncSettingsHintLinks()
+    {
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_settings)).perform(click());
+        onView(withText(R.string.settings_screen_sync)).perform(click());
+
+        // Both hints are shown.
+        onView(withText(R.string.sync_hint_defaults_title))
+            .check(matches(isDisplayed()));
+        onView(withText(R.string.sync_hint_data_title))
+            .check(matches(isDisplayed()));
+
+        // Hint 1 → Default values screen (its on-screen hint is shown there).
+        onView(withText(R.string.sync_hint_defaults_title)).perform(click());
+        onView(withText(R.string.defaults_list_hint))
+            .check(matches(isDisplayed()));
+        androidx.test.espresso.Espresso.pressBack(); // back to sync screen
+
+        // Hint 2 → Data / Storage screen.
+        onView(withText(R.string.sync_hint_data_title)).perform(click());
+        onView(withText(R.string.data_screen_hint))
+            .check(matches(isDisplayed()));
+        androidx.test.espresso.Espresso.pressBack(); // back to sync screen
+        androidx.test.espresso.Espresso.pressBack(); // back to settings root
+    }
+
+    /**
+     * Covers the "Data / Storage" screen in one test to keep setup short:
+     *
+     * A. All reset buttons are reachable on the Data screen.
+     * B. "Reset all settings" → confirm → a stored default pref is cleared.
+     * C. "Reset all lists" → confirm → the created list is gone from storage.
+     * D. "Reset everything" → the confirm dialog appears; we cancel it so the
+     *    test process is not killed by clearApplicationUserData().
+     */
+    @Test public void testDataStorageScreen() throws Exception {
+        // Arrange: one stored list + a known default pref present.
+        createList("DataTest");
+        TestHelper.setFontSizePref(ctx, "0.8");
+        org.junit.Assert.assertEquals(1, TestHelper.storedListCount(ctx));
+        org.junit.Assert.assertTrue(TestHelper.hasPref(ctx, "font_size"));
+
+        // Open settings → Data / Storage.
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_settings)).perform(click());
+        onView(withText(R.string.settings_screen_data)).perform(click());
+
+        // A: buttons present.
+        onView(withText(R.string.data_reset_lists_title))
+                .check(matches(isDisplayed()));
+        onView(withText(R.string.data_delete_server_lists_title))
+                .check(matches(isDisplayed()));
+        onView(withText(R.string.data_reset_settings_title))
+                .check(matches(isDisplayed()));
+        onView(withText(R.string.data_reset_everything_title))
+                .check(matches(isDisplayed()));
+
+        // B: reset settings.
+        onView(withText(R.string.data_reset_settings_title)).perform(click());
+        TestHelper.confirmDialog();
+        org.junit.Assert.assertFalse("font_size pref should be cleared",
+                TestHelper.hasPref(ctx, "font_size"));
+
+        // C: reset lists.
+        onView(withText(R.string.data_reset_lists_title)).perform(click());
+        TestHelper.confirmDialog();
+        org.junit.Assert.assertEquals(0, TestHelper.storedListCount(ctx));
+
+        // D: reset everything → dialog shows, cancel (must not wipe the test).
+        onView(withText(R.string.data_reset_everything_title)).perform(click());
+        onView(withText(R.string.data_reset_everything_confirm))
+                .inRoot(isDialog()).check(matches(isDisplayed()));
+        TestHelper.cancelDialog();
+
+        // Leave settings cleanly (data subscreen → settings root → ListsActivity).
+        androidx.test.espresso.Espresso.pressBack();
+        androidx.test.espresso.Espresso.pressBack();
+    }
+
+    /** Creates a list from ListsActivity via the FAB + name dialog. */
+    private void createList(String name) {
+        onView(withId(R.id.floatingActionButton)).perform(click());
+        onView(isAssignableFrom(android.widget.EditText.class))
+                .inRoot(isDialog())
+                .perform(replaceText(name), closeSoftKeyboard());
+        onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
     }
 }

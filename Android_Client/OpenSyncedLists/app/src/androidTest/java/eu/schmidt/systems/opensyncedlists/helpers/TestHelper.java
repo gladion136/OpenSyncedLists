@@ -126,6 +126,60 @@ public class TestHelper
     }
     
     /**
+     * Reads whether the first stored list currently has jump buttons enabled.
+     * Used to verify that a "default list setting" was persisted into the list
+     * headers, independent of any open UI.
+     *
+     * @param context target app context
+     * @return the first list's jump-buttons header flag
+     * @throws Exception if storage cannot be read or there is no list
+     */
+    public static boolean firstListHasJumpButtons(Context context)
+        throws Exception
+    {
+        eu.schmidt.systems.opensyncedlists.storages.SecureStorage storage =
+            new eu.schmidt.systems.opensyncedlists.storages.SecureStorage(
+                context);
+        String id = storage.getListsIds().get(0);
+        return storage.getListHeader(id).isJumpButtons();
+    }
+
+    /**
+     * @param context target app context
+     * @return number of locally stored lists.
+     * @throws Exception if storage cannot be read
+     */
+    public static int storedListCount(Context context) throws Exception
+    {
+        return new eu.schmidt.systems.opensyncedlists.storages.SecureStorage(
+            context).getListsIds().size();
+    }
+
+    /**
+     * @param context target app context
+     * @param key     preference key
+     * @return true if the given default-prefs key is currently stored.
+     */
+    public static boolean hasPref(Context context, String key)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+            .contains(key);
+    }
+
+    /**
+     * Sets the global "jump_buttons" default preference. Used so tests start
+     * from a known toggle state regardless of XML default values.
+     *
+     * @param context target app context
+     * @param enabled desired value
+     */
+    public static void setJumpButtonsDefault(Context context, boolean enabled)
+    {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putBoolean("jump_buttons", enabled).commit();
+    }
+
+    /**
      * Sets the global "font_size" preference scale factor (e.g. "0.8", "1.0").
      * Must be called before the list activity / adapter is created, because the
      * adapter reads the value once at construction time.

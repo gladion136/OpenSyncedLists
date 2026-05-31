@@ -18,6 +18,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="list_settings">
 
+    <Preference
+        android:icon="@android:drawable/ic_dialog_info"
+        android:key="list_settings_scope_hint"
+        android:persistent="false"
+        android:selectable="false"
+        android:summary="@string/list_settings_scope_hint" />
+
     <EditTextPreference
         android:key="list_name"
         android:persistent="false"

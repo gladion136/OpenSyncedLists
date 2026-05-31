@@ -17,6 +17,13 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Preference
+        android:icon="@android:drawable/ic_dialog_info"
+        android:key="app_settings_scope_hint"
+        android:persistent="false"
+        android:selectable="false"
+        android:summary="@string/app_settings_scope_hint" />
+
     <PreferenceScreen
         android:key="screen_design"
         android:summary="@string/settings_screen_design_summary"
@@ -79,6 +86,24 @@
             android:summary="@string/pref_sync_interval_summary"
             android:title="@string/pref_sync_interval" />
 
+        <PreferenceCategory android:title="@string/sync_hints_category">
+
+            <Preference
+                android:icon="@android:drawable/ic_menu_info_details"
+                android:key="sync_hint_defaults"
+                android:persistent="false"
+                android:summary="@string/sync_hint_defaults_summary"
+                android:title="@string/sync_hint_defaults_title" />
+
+            <Preference
+                android:icon="@android:drawable/ic_menu_info_details"
+                android:key="sync_hint_data"
+                android:persistent="false"
+                android:summary="@string/sync_hint_data_summary"
+                android:title="@string/sync_hint_data_title" />
+
+        </PreferenceCategory>
+
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -86,38 +111,99 @@
         android:summary="@string/defaults_list_summary"
         android:title="@string/settings_screen_defaults">
 
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="sync"
-            android:title="@string/sync_title" />
+        <Preference
+            android:icon="@android:drawable/ic_dialog_info"
+            android:key="defaults_info"
+            android:persistent="false"
+            android:selectable="false"
+            android:summary="@string/defaults_list_hint" />
 
-        <EditTextPreference
-            android:key="default_server"
-            android:title="@string/default_server_title" />
+        <PreferenceCategory android:title="@string/settings_screen_design">
 
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="check_option"
-            android:title="@string/list_pref_check_option_title" />
+            <SwitchPreferenceCompat
+                android:defaultValue="true"
+                android:key="check_option"
+                android:title="@string/list_pref_check_option_title" />
 
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:dependency="check_option"
-            android:key="checked_list"
-            android:summary="@string/list_pref_checked_list_summary"
-            android:title="@string/list_pref_checked_list_title" />
+            <SwitchPreferenceCompat
+                android:defaultValue="true"
+                android:dependency="check_option"
+                android:key="checked_list"
+                android:summary="@string/list_pref_checked_list_summary"
+                android:title="@string/list_pref_checked_list_title" />
 
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="jump_buttons"
-            android:summary="@string/list_pref_jump_buttons_summary"
-            android:title="@string/list_pref_jump_buttons_title" />
+            <SwitchPreferenceCompat
+                android:defaultValue="true"
+                android:key="jump_buttons"
+                android:summary="@string/list_pref_jump_buttons_summary"
+                android:title="@string/list_pref_jump_buttons_title" />
 
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="invert_element"
-            android:summary="@string/list_pref_invert_element_summary"
-            android:title="@string/list_pref_invert_element_title" />
+            <SwitchPreferenceCompat
+                android:defaultValue="false"
+                android:key="invert_element"
+                android:summary="@string/list_pref_invert_element_summary"
+                android:title="@string/list_pref_invert_element_title" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory android:title="@string/list_settings_screen_sync">
+
+            <SwitchPreferenceCompat
+                android:defaultValue="true"
+                android:key="sync"
+                android:title="@string/sync_title" />
+
+            <EditTextPreference
+                android:key="default_server"
+                android:title="@string/default_server_title" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="screen_data"
+        android:summary="@string/settings_screen_data_summary"
+        android:title="@string/settings_screen_data">
+
+        <Preference
+            android:icon="@android:drawable/ic_dialog_info"
+            android:key="data_info"
+            android:persistent="false"
+            android:selectable="false"
+            android:summary="@string/data_screen_hint" />
+
+        <PreferenceCategory android:title="@string/data_category_lists">
+
+            <Preference
+                android:key="reset_lists_btn"
+                android:summary="@string/data_reset_lists_summary"
+                android:title="@string/data_reset_lists_title" />
+
+            <Preference
+                android:key="delete_server_lists_btn"
+                android:summary="@string/data_delete_server_lists_summary"
+                android:title="@string/data_delete_server_lists_title" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory android:title="@string/data_category_settings">
+
+            <Preference
+                android:key="reset_settings_btn"
+                android:summary="@string/data_reset_settings_summary"
+                android:title="@string/data_reset_settings_title" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory android:title="@string/data_category_everything">
+
+            <Preference
+                android:key="reset_everything_btn"
+                android:summary="@string/data_reset_everything_summary"
+                android:title="@string/data_reset_everything_title" />
+
+        </PreferenceCategory>
 
     </PreferenceScreen>
 

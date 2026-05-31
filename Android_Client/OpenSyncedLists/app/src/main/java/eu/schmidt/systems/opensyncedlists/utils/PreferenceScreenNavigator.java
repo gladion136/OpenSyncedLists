@@ -16,6 +16,7 @@
  */
 package eu.schmidt.systems.opensyncedlists.utils;
 
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
@@ -69,6 +70,30 @@ public class PreferenceScreenNavigator
         backStack.push(fragment.getPreferenceScreen());
         fragment.setPreferenceScreen(screen);
         applyTitle(screen.getTitle());
+    }
+
+    /**
+     * Navigate to a subscreen identified by its key. The key is resolved
+     * against the root screen, so this works even while another subscreen is
+     * currently displayed (the displayed screen would not contain sibling
+     * subscreens).
+     *
+     * @param key key of the target PreferenceScreen
+     * @return true if a matching subscreen was found and shown
+     */
+    public boolean navigateToKey(String key)
+    {
+        if (rootScreen == null)
+        {
+            return false;
+        }
+        Preference target = rootScreen.findPreference(key);
+        if (target instanceof PreferenceScreen)
+        {
+            navigateTo((PreferenceScreen) target);
+            return true;
+        }
+        return false;
     }
 
     /**

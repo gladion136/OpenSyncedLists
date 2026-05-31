@@ -31,6 +31,7 @@ import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtP
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
@@ -464,6 +465,99 @@ public class ListActivityTest {
                 .inRoot(isDialog())
                 .check(matches(withText("")));
         onView(withId(android.R.id.button2)).inRoot(isDialog()).perform(click());
+
+        // Return to ListsActivity so the next test's setUp finds a resumed
+        // activity (sync subscreen → list settings → ListActivity → ListsActivity).
+        pressBack();
+        pressBack();
+        pressBack();
+    }
+
+    /**
+     * Verifies the "default list settings" propagation flow:
+     *
+     * Toggling the "jump buttons" default (off → on) under App settings →
+     * Default values for new lists, then accepting BOTH dialogs ("All lists" +
+     * confirm), applies the change to an existing list: its elements now show
+     * the jump-button bar that was hidden before.
+     */
+    @Test
+    public void testDefaultSettingApplyToAllLists() throws Exception {
+        // Start from a known state: jump buttons disabled by default, so the
+        // toggle in settings goes off → on.
+        TestHelper.setJumpButtonsDefault(ctx, false);
+
+        // Create a list (jump_buttons default = off → bar hidden) with an item.
+        createAndOpenList("Bulk-Target");
+        addElement("Item");
+        onView(allOf(withId(R.id.layoutJumpButtons),
+                isDescendantOfA(withId(R.id.recyclerView))))
+                .check(matches(not(isDisplayed())));
+        pressBack(); // back to ListsActivity
+
+        // Sanity: the existing list starts with jump buttons disabled.
+        org.junit.Assert.assertFalse(TestHelper.firstListHasJumpButtons(ctx));
+
+        // App settings → Default values → toggle jump buttons on.
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_settings)).perform(click());
+        onView(withText(R.string.settings_screen_defaults)).perform(click());
+        onView(withText(R.string.list_pref_jump_buttons_title)).perform(click());
+
+        // Dialog 1: choose "All lists". Dialog 2: confirm.
+        onView(withText(R.string.default_apply_all_lists))
+                .inRoot(isDialog()).perform(click());
+        TestHelper.confirmDialog();
+
+        // The change must be persisted into the existing list's header.
+        org.junit.Assert.assertTrue(
+                "jump_buttons should be enabled in the existing list after "
+                        + "applying the default to all lists",
+                TestHelper.firstListHasJumpButtons(ctx));
+
+        // And it must be visible after reopening the list.
+        pressBack(); // defaults subscreen → settings root
+        pressBack(); // settings → ListsActivity
+        onView(withId(R.id.lVLists))
+                .perform(actionOnItemAtPosition(0, click()));
+        onView(allOf(withId(R.id.layoutJumpButtons),
+                isDescendantOfA(withId(R.id.recyclerView))))
+                .check(matches(isDisplayed()));
+        pressBack();
+    }
+
+    /**
+     * Verifies that the "default list settings" change is NOT applied to
+     * existing lists when the first dialog is answered with "New lists only".
+     */
+    @Test
+    public void testDefaultSettingNewListsOnly() {
+        TestHelper.setJumpButtonsDefault(ctx, false);
+        createAndOpenList("Keep-As-Is");
+        addElement("Item");
+        onView(allOf(withId(R.id.layoutJumpButtons),
+                isDescendantOfA(withId(R.id.recyclerView))))
+                .check(matches(not(isDisplayed())));
+        pressBack();
+
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_settings)).perform(click());
+        onView(withText(R.string.settings_screen_defaults)).perform(click());
+        onView(withText(R.string.list_pref_jump_buttons_title)).perform(click());
+
+        // Dialog 1: choose "New lists only" → no second dialog, no bulk update.
+        onView(withText(R.string.default_apply_new_only))
+                .inRoot(isDialog()).perform(click());
+
+        pressBack(); // defaults subscreen → settings root
+        pressBack(); // settings → ListsActivity
+        onView(withId(R.id.lVLists))
+                .perform(actionOnItemAtPosition(0, click()));
+        // Existing list unchanged: bar still hidden.
+        onView(allOf(withId(R.id.layoutJumpButtons),
+                isDescendantOfA(withId(R.id.recyclerView))))
+                .check(matches(not(isDisplayed())));
+        pressBack();
     }
 
     /**

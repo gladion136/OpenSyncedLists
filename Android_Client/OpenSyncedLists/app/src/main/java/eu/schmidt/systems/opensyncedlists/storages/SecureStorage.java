@@ -234,6 +234,25 @@ public class SecureStorage
      * @param id id of the list
      * @throws Exception
      */
+    /**
+     * Delete every locally stored list (their steps, headers and the id index).
+     * Global app settings (stored in the default SharedPreferences) are not
+     * touched. The internal migration flag is preserved.
+     *
+     * @throws Exception if storage cannot be read
+     */
+    public void deleteAllLists() throws Exception
+    {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        for (String id : getListsIds())
+        {
+            editor.remove("LIST_" + id);
+            editor.remove("HEADER_" + id);
+        }
+        editor.remove("IDs");
+        editor.apply();
+    }
+
     public void deleteList(String id) throws Exception
     {
         ArrayList<String> ids = getListsIds();

@@ -101,7 +101,7 @@
     <string name="server_removed_local_only">Server-URL lokal entfernt.</string>
     <string name="list_pref_delete_online_btn_title">Liste online und lokal löschen</string>
     <string name="list_pref_delete_online_btn_summary">Achtung! Die Liste wird auf dem Server und lokal gelöscht! Sollte die Liste noch auf einem anderem Gerät existieren, könnte sie wieder auf den Server hochgeladen werden.</string>
-    <string name="scroll_list_title">Liste scrollen</string>
+    <string name="scroll_list_title">Automatisches Scrollen</string>
     <string name="scroll_list_summary">Liste scrollen nachdem ein Element nach ganz oben/unten verschoben wurde.</string>
 
     <!-- Toasts and others -->
@@ -126,7 +126,29 @@
     <string name="menu_open_webpage">Webseite öffnen</string>
     <string name="menu_show_source">Quellcode anzeigen</string>
     <string name="defaults_list">Standard Listen Einstellungen</string>
-    <string name="defaults_list_summary">Wird beim erstellen einer neuen Liste übernommen</string>
+    <string name="defaults_list_summary">Gilt für neue Listen; kann auch alle bestehenden Listen überschreiben</string>
+    <string name="defaults_list_hint">Diese Werte werden für neue Listen verwendet. Wenn du einen änderst, kannst du ihn auch auf alle bestehenden Listen anwenden.</string>
+    <string name="settings_screen_data">Daten / Speicher</string>
+    <string name="settings_screen_data_summary">Listen, Einstellungen oder alles zurücksetzen</string>
+    <string name="data_screen_hint">Gespeicherte Daten zurücksetzen. Diese Aktionen können nicht rückgängig gemacht werden.</string>
+    <string name="data_category_lists">Listen</string>
+    <string name="data_category_settings">Einstellungen</string>
+    <string name="data_category_everything">Alles</string>
+    <string name="data_reset_lists_title">Alle Listen zurücksetzen</string>
+    <string name="data_reset_lists_summary">Alle Listen von diesem Gerät löschen. App-Einstellungen bleiben erhalten.</string>
+    <string name="data_reset_lists_confirm">Alle %d Listen von diesem Gerät löschen?</string>
+    <string name="data_reset_lists_done">Alle Listen gelöscht.</string>
+    <string name="data_delete_server_lists_title">Alle Listen auf dem Server löschen</string>
+    <string name="data_delete_server_lists_summary">Die Server-Kopien aller Listen löschen und deren Server-URL entfernen. Lokale Listen bleiben erhalten.</string>
+    <string name="data_delete_server_lists_confirm">Die Server-Kopien aller Listen löschen? Lokale Listen bleiben erhalten.</string>
+    <string name="data_delete_server_lists_done">%d Listen mit Server verarbeitet.</string>
+    <string name="data_reset_settings_title">Alle Einstellungen zurücksetzen</string>
+    <string name="data_reset_settings_summary">Alle App-Einstellungen auf Standardwerte zurücksetzen. Listen bleiben erhalten.</string>
+    <string name="data_reset_settings_confirm">Alle App-Einstellungen auf Standardwerte zurücksetzen?</string>
+    <string name="data_reset_settings_done">Einstellungen zurückgesetzt.</string>
+    <string name="data_reset_everything_title">Alles zurücksetzen</string>
+    <string name="data_reset_everything_summary">Alle Daten (Listen, Einstellungen, Dateien) löschen und App neu starten, wie \"Daten löschen\".</string>
+    <string name="data_reset_everything_confirm">ALLE App-Daten löschen und neu starten? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="list_pref_jump_buttons_title">Sprungknöpfe</string>
     <string name="list_pref_jump_buttons_summary">Zeige Sprungknöpfe an, die Reichweite kann in den globalen Einstellungen angepasst werden.</string>
     <string name="menu_import_url">Liste aus Link importieren</string>
@@ -186,6 +208,13 @@
     <string name="settings_screen_interactions_summary">Sprungweite und Listen-Scrollen</string>
     <string name="settings_screen_sync">Synchronisations-Einstellungen</string>
     <string name="settings_screen_sync_summary">Synchronisationsintervall</string>
+    <string name="app_settings_scope_hint">Diese Einstellungen gelten für die ganze App. Einstellungen für eine einzelne Liste änderst du in der jeweiligen Liste unter deren Einstellungen.</string>
+    <string name="list_settings_scope_hint">Diese Einstellungen gelten nur für diese Liste. App-weite Einstellungen findest du in den App-Einstellungen.</string>
+    <string name="sync_hints_category">Verwandt</string>
+    <string name="sync_hint_defaults_title">Standardwerte für neue Listen</string>
+    <string name="sync_hint_defaults_summary">Standardwerte ändern und optional auf alle bestehenden Listen anwenden.</string>
+    <string name="sync_hint_data_title">Daten / Speicher</string>
+    <string name="sync_hint_data_summary">Listen auf dem Server löschen und Daten zurücksetzen.</string>
     <string name="settings_screen_defaults">Standardwerte für neue Listen</string>
     <string name="list_settings_screen_design">Design</string>
     <string name="list_settings_screen_design_summary">Anzeigeoptionen für diese Liste</string>
@@ -199,6 +228,12 @@
     <string name="pref_font_size_medium">Mittel</string>
     <string name="pref_font_size_large">Groß</string>
     <string name="pref_font_size_xlarge">Sehr groß</string>
+    <string name="default_apply_title">Auf bestehende Listen anwenden?</string>
+    <string name="default_apply_msg">Soll diese Änderung für alle bestehenden Listen oder nur für neue Listen gelten?</string>
+    <string name="default_apply_all_lists">Alle Listen</string>
+    <string name="default_apply_new_only">Nur neue Listen</string>
+    <string name="default_apply_confirm_msg">Diese Einstellung in %d bestehenden Listen aktualisieren?</string>
+    <string name="default_apply_done">%d Listen aktualisiert.</string>
     <string name="confirm_nothing_to_do">Nichts zu tun.</string>
     <string name="confirm_check_all_msg">%d Einträge abhaken?</string>
     <string name="confirm_uncheck_all_msg">%d erledigte Einträge abwählen?</string>
