@@ -146,4 +146,15 @@
     <string name="import_text_success">%d elementos importados correctamente</string>
     <string name="import_text_help_title">Formatos de lista de texto</string>
     <string name="import_text_help_content">Formatos compatibles:\n\n<b>Viñetas:</b>\n- Elemento 1\n- Elemento 2\n* Elemento 1\n* Elemento 2\n\n<b>Separados por comas:</b>\nElemento 1, Elemento 2, Elemento 3\n\n<b>Con descripciones:</b>\n- Elemento 1\n    Descripción del elemento 1\n- Elemento 2\n    Descripción del elemento 2\n\nLas descripciones requieren sangría (4 espacios o tabulación).\n\nLas líneas y elementos vacíos se filtran.</string>
+    <string name="confirm_action_title">¿Estás seguro?</string>
+    <string name="confirm_action_yes">Confirmar</string>
+    <string name="confirm_action_no">Cancelar</string>
+    <string name="confirm_nothing_to_do">Nada que hacer.</string>
+    <string name="confirm_check_all_msg">¿Marcar %d elementos?</string>
+    <string name="confirm_uncheck_all_msg">¿Desmarcar %d elementos completados?</string>
+    <string name="confirm_delete_checked_msg">¿Eliminar %d elementos completados?</string>
+    <string name="confirm_toggle_all_msg">¿Invertir %d elementos?</string>
+    <string name="confirm_list_clear_msg">¿Vaciar toda la lista? Se eliminarán %d elementos.</string>
+    <string name="confirm_delete_list_msg">¿Eliminar esta lista localmente?</string>
+    <string name="confirm_delete_list_online_msg">¿Eliminar esta lista en línea y localmente? Si otros dispositivos aún tienen acceso, podrían volver a subirla.</string>
 </resources>

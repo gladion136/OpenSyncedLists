@@ -42,6 +42,7 @@ import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 import eu.schmidt.systems.opensyncedlists.storages.SecureStorage;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedList;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
+import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 
 /**
  * Fragment to handle the view of one list settings
@@ -115,17 +116,25 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         
         deleteBtn.setOnPreferenceClickListener(v ->
         {
-            try
-            {
-                secureStorage.deleteList(syncedList.getId());
-            }
-            catch (Exception exception)
-            {
-                exception.printStackTrace();
-            }
-            Intent intent = new Intent(getContext(), ListsActivity.class);
-            startActivity(intent);
-            getActivity().finish();
+            DialogBuilder.confirmDialog(getContext(),
+                getString(R.string.confirm_action_title),
+                getString(R.string.confirm_delete_list_msg),
+                getString(R.string.confirm_action_yes),
+                getString(R.string.confirm_action_no), () ->
+                {
+                    try
+                    {
+                        secureStorage.deleteList(syncedList.getId());
+                    }
+                    catch (Exception exception)
+                    {
+                        exception.printStackTrace();
+                    }
+                    Intent intent =
+                        new Intent(getContext(), ListsActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                });
             return true;
         });
         
@@ -209,41 +218,50 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         
         deleteOnlineBtn.setOnPreferenceClickListener(v ->
         {
-            ServerWrapper.removeList(syncedList.getHeader().getHostname(),
-                syncedList.getId(), syncedList.getSecret(),
-                (jsonResult, exceptionFromServer) ->
-                {
-                    if (jsonResult == null || exceptionFromServer != null)
-                    {
-                        if (exceptionFromServer instanceof ServerException)
+            DialogBuilder.confirmDialog(getContext(),
+                getString(R.string.confirm_action_title),
+                getString(R.string.confirm_delete_list_online_msg),
+                getString(R.string.confirm_action_yes),
+                getString(R.string.confirm_action_no), () ->
+                    ServerWrapper.removeList(
+                        syncedList.getHeader().getHostname(),
+                        syncedList.getId(), syncedList.getSecret(),
+                        (jsonResult, exceptionFromServer) ->
                         {
-                            Toast.makeText(getContext(),
-                                getString(R.string.unexpected_error),
-                                Toast.LENGTH_LONG).show();
-                        }
-                        else
-                        {
-                            Toast.makeText(getContext(),
-                                getString(R.string.no_connection),
-                                Toast.LENGTH_LONG).show();
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            secureStorage.deleteList(syncedList.getId());
-                        }
-                        catch (Exception exception)
-                        {
-                            exception.printStackTrace();
-                        }
-                        Intent intent =
-                            new Intent(getContext(), ListsActivity.class);
-                        startActivity(intent);
-                        getActivity().finish();
-                    }
-                });
+                            if (jsonResult == null
+                                || exceptionFromServer != null)
+                            {
+                                if (exceptionFromServer
+                                    instanceof ServerException)
+                                {
+                                    Toast.makeText(getContext(),
+                                        getString(R.string.unexpected_error),
+                                        Toast.LENGTH_LONG).show();
+                                }
+                                else
+                                {
+                                    Toast.makeText(getContext(),
+                                        getString(R.string.no_connection),
+                                        Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    secureStorage.deleteList(
+                                        syncedList.getId());
+                                }
+                                catch (Exception exception)
+                                {
+                                    exception.printStackTrace();
+                                }
+                                Intent intent = new Intent(getContext(),
+                                    ListsActivity.class);
+                                startActivity(intent);
+                                getActivity().finish();
+                            }
+                        }));
             return true;
         });
         

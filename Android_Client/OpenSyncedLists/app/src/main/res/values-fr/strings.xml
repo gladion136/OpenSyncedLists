@@ -146,4 +146,15 @@
     <string name="import_text_success">%d éléments importés avec succès</string>
     <string name="import_text_help_title">Formats de liste texte</string>
     <string name="import_text_help_content">Formats pris en charge :\n\n<b>Puces :</b>\n- Élément 1\n- Élément 2\n* Élément 1\n* Élément 2\n\n<b>Séparés par des virgules :</b>\nÉlément 1, Élément 2, Élément 3\n\n<b>Avec descriptions :</b>\n- Élément 1\n    Description de l\'élément 1\n- Élément 2\n    Description de l\'élément 2\n\nLes descriptions nécessitent une indentation (4 espaces ou tabulation).\n\nLes lignes et éléments vides sont filtrés.</string>
+    <string name="confirm_action_title">Êtes-vous sûr ?</string>
+    <string name="confirm_action_yes">Confirmer</string>
+    <string name="confirm_action_no">Annuler</string>
+    <string name="confirm_nothing_to_do">Rien à faire.</string>
+    <string name="confirm_check_all_msg">Cocher %d éléments ?</string>
+    <string name="confirm_uncheck_all_msg">Décocher %d éléments terminés ?</string>
+    <string name="confirm_delete_checked_msg">Supprimer %d éléments terminés ?</string>
+    <string name="confirm_toggle_all_msg">Inverser %d éléments ?</string>
+    <string name="confirm_list_clear_msg">Vider toute la liste ? %d éléments seront supprimés.</string>
+    <string name="confirm_delete_list_msg">Supprimer cette liste localement ?</string>
+    <string name="confirm_delete_list_online_msg">Supprimer cette liste en ligne et localement ? Si d\'autres appareils y ont encore accès, ils pourraient la téléverser à nouveau.</string>
 </resources>

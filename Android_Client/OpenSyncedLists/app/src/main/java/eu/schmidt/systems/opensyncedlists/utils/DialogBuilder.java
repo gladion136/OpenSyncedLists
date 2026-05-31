@@ -216,6 +216,32 @@ public class DialogBuilder
     }
     
     /**
+     * Create a confirmation dialog for a dangerous/irreversible action.
+     * The callback runs only when the user confirms.
+     *
+     * @param context   Context
+     * @param title     title of the dialog
+     * @param message   message of the dialog
+     * @param yesOption text of the confirm option
+     * @param noOption  text of the cancel option
+     * @param callback  runnable executed on confirm
+     */
+    public static void confirmDialog(Context context, String title,
+        String message, String yesOption, String noOption, Runnable callback)
+    {
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+        alert.setTitle(title);
+        alert.setMessage(message);
+        alert.setPositiveButton(yesOption,
+            (dialog, whichButton) -> callback.run());
+        alert.setNegativeButton(noOption,
+            (dialog, whichButton) -> dialog.cancel());
+
+        alert.create().show();
+    }
+
+    /**
      * Create a help dialog showing supported text formats.
      *
      * @param context Context

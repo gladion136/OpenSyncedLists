@@ -171,5 +171,16 @@
     <string name="import_text_success">Erfolgreich %d Einträge importiert</string>
     <string name="import_text_help_title">Text-Listen Formate</string>
     <string name="import_text_help_content">Unterstützte Formate:\n\n<b>Aufzählungen:</b>\n- Eintrag 1\n- Eintrag 2\n* Eintrag 1\n* Eintrag 2\n\n<b>Komma-getrennt:</b>\nEintrag 1, Eintrag 2, Eintrag 3\n\n<b>Mit Beschreibungen:</b>\n- Eintrag 1\n    Beschreibung von Eintrag 1\n- Eintrag 2\n    Beschreibung von Eintrag 2\n\nBeschreibungen erfordern Einrückung (4 Leerzeichen oder Tab).\n\nLeere Zeilen und Einträge werden gefiltert.</string>
+    <string name="confirm_action_title">Bist du sicher?</string>
+    <string name="confirm_action_yes">Bestätigen</string>
+    <string name="confirm_action_no">Abbrechen</string>
+    <string name="confirm_nothing_to_do">Nichts zu tun.</string>
+    <string name="confirm_check_all_msg">%d Einträge abhaken?</string>
+    <string name="confirm_uncheck_all_msg">%d erledigte Einträge abwählen?</string>
+    <string name="confirm_delete_checked_msg">%d erledigte Einträge löschen?</string>
+    <string name="confirm_toggle_all_msg">%d Einträge umkehren?</string>
+    <string name="confirm_list_clear_msg">Liste leeren? %d Einträge werden entfernt.</string>
+    <string name="confirm_delete_list_msg">Diese Liste lokal löschen?</string>
+    <string name="confirm_delete_list_online_msg">Diese Liste online und lokal löschen? Wenn andere Geräte noch Zugriff haben, könnten sie sie erneut hochladen.</string>
 
 </resources>

@@ -209,6 +209,9 @@ public class ListActivityTest {
         // Unchecked: Second, Ime, Alpha, Beta  |  Checked: Top
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_check_all)).perform(click());
+        // 4 unchecked elements (Second, Ime, Alpha, Beta) → count shown in dialog
+        TestHelper.confirmDialogWithMessage(
+                ctx.getString(R.string.confirm_check_all_msg, 4));
         // All 5 elements now checked; isolator at 0, elements at 1-5
         onView(withId(R.id.recyclerView))
                 .check(matches(atPosition(1,
@@ -217,16 +220,31 @@ public class ListActivityTest {
                 .check(matches(atPosition(2,
                         hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
 
-        // check-all no-op: all already checked → still checked
+        // check-all no-op: all already checked → 0 affected → no dialog, just a
+        // Toast. The confirm dialog title must NOT appear.
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_check_all)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
         onView(withId(R.id.recyclerView))
                 .check(matches(atPosition(1,
                         hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
 
         // ---- E: uncheck-all ----
+        // First verify the confirm dialog can be cancelled (no-op): elements
+        // stay checked.
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_uncheck_all)).perform(click());
+        // 5 checked elements → count shown in dialog
+        onView(withText(ctx.getString(R.string.confirm_uncheck_all_msg, 5)))
+                .inRoot(isDialog()).check(matches(isDisplayed()));
+        TestHelper.cancelDialog();
+        onView(withId(R.id.recyclerView))
+                .check(matches(atPosition(1,
+                        hasDescendant(allOf(withId(R.id.checkBox), isChecked())))));
+
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_uncheck_all)).perform(click());
+        TestHelper.confirmDialog();
         // All unchecked, no isolator: positions 0 and 1 should be isNotChecked
         onView(withId(R.id.recyclerView))
                 .check(matches(atPosition(0,
@@ -242,14 +260,18 @@ public class ListActivityTest {
                         TestHelper.clickChildWithId(R.id.checkBox)));
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_delete_checked)).perform(click());
+        // 1 checked element (Beta) → count shown in dialog
+        TestHelper.confirmDialogWithMessage(
+                ctx.getString(R.string.confirm_delete_checked_msg, 1));
         onView(withId(R.id.recyclerView))
                 .check(matches(not(hasDescendant(withText("Beta")))));
         onView(withId(R.id.recyclerView))
                 .check(matches(hasDescendant(withText("Second"))));
 
-        // delete-done no-op (none checked)
+        // delete-done no-op (none checked) → 0 affected → no dialog, just a Toast
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_delete_checked)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
         onView(withId(R.id.recyclerView))
                 .check(matches(hasDescendant(withText("Second"))));
 
@@ -263,6 +285,9 @@ public class ListActivityTest {
         // After toggle:  Second/Ime/Alpha/Top checked, Last unchecked
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_toggle_all)).perform(click());
+        // 5 elements total (Second, Ime, Alpha, Top, Last) → count shown
+        TestHelper.confirmDialogWithMessage(
+                ctx.getString(R.string.confirm_toggle_all_msg, 5));
         // Last (was checked) is now unchecked → at position 0
         // Remaining 4 (were unchecked) are now checked → at positions 2-5 (isolator at 1)
         onView(withId(R.id.recyclerView))
@@ -320,6 +345,9 @@ public class ListActivityTest {
         // ---- C: Clear list ----
         openActionBarOverflowOrOptionsMenu(ctx);
         onView(withText(R.string.menu_list_clear)).perform(click());
+        // 3 elements (Apfel, Banane, Kirsche) → count shown in dialog
+        TestHelper.confirmDialogWithMessage(
+                ctx.getString(R.string.confirm_list_clear_msg, 3));
         onView(withId(R.id.recyclerView))
                 .check(matches(not(hasDescendant(withText("Apfel")))));
 
@@ -348,6 +376,73 @@ public class ListActivityTest {
         onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
         pressBack(); // ListSettingsActivity → ListActivity
         // Return to ListsActivity so setUp() for the next test can recreate it cleanly.
+        pressBack();
+    }
+
+    /**
+     * Verifies the confirmation dialog guarding the local "Delete list" action
+     * in ListSettings:
+     *
+     * A. Open list settings → tap "Delete list" → cancel → list still exists
+     * B. Tap "Delete list" again → confirm → back on ListsActivity, list gone
+     */
+    @Test
+    public void testDeleteListConfirmation() {
+        createAndOpenList("DeleteMe");
+
+        // Open list settings
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_list_settings)).perform(click());
+        onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+
+        // ---- A: Delete → cancel → list survives ----
+        onView(withText(R.string.list_pref_delete_btn_title)).perform(click());
+        TestHelper.cancelDialog();
+        // Still on the settings screen
+        onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));
+
+        // ---- B: Delete → confirm → list removed ----
+        onView(withText(R.string.list_pref_delete_btn_title)).perform(click());
+        TestHelper.confirmDialog();
+        // Confirm navigates to ListsActivity; the list is gone.
+        onView(withId(R.id.lVLists)).check(matches(isDisplayed()));
+        onView(withId(R.id.lVLists))
+                .check(matches(not(hasDescendant(withText("DeleteMe")))));
+    }
+
+    /**
+     * Verifies that bulk actions on an empty list affect 0 elements and
+     * therefore show NO confirmation dialog (a Toast is shown instead).
+     *
+     * check-all, uncheck-all, delete-done and toggle-all are all triggered on a
+     * freshly created empty list; none of them must open the confirm dialog.
+     */
+    @Test
+    public void testNoConfirmDialogWhenNothingAffected() {
+        createAndOpenList("Empty-Test");
+
+        // Empty list → every bulk action affects 0 elements → Toast, no dialog.
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_check_all)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
+
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_uncheck_all)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
+
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_delete_checked)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
+
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_toggle_all)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
+
+        // list-clear on an empty list also affects 0 elements → no dialog.
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_list_clear)).perform(click());
+        TestHelper.assertNoConfirmDialog(ctx);
+
         pressBack();
     }
 }

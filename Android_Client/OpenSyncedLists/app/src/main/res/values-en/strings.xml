@@ -146,4 +146,15 @@
     <string name="import_text_success">Successfully imported %d items</string>
     <string name="import_text_help_title">Text List Formats</string>
     <string name="import_text_help_content">Supported formats:\n\n<b>Bullet Points:</b>\n- Item 1\n- Item 2\n* Item 1\n* Item 2\n\n<b>Comma-Separated:</b>\nItem 1, Item 2, Item 3\n\n<b>With Descriptions:</b>\n- Item 1\n    Description of item 1\n- Item 2\n    Description of item 2\n\nDescriptions require indentation (4 spaces or tab).\n\nEmpty lines and items are filtered out.</string>
+    <string name="confirm_action_title">Are you sure?</string>
+    <string name="confirm_action_yes">Confirm</string>
+    <string name="confirm_action_no">Cancel</string>
+    <string name="confirm_nothing_to_do">Nothing to do.</string>
+    <string name="confirm_check_all_msg">Check %d elements?</string>
+    <string name="confirm_uncheck_all_msg">Uncheck %d done elements?</string>
+    <string name="confirm_delete_checked_msg">Delete %d done elements?</string>
+    <string name="confirm_toggle_all_msg">Toggle %d elements?</string>
+    <string name="confirm_list_clear_msg">Clear the whole list? %d elements will be removed.</string>
+    <string name="confirm_delete_list_msg">Delete this list locally?</string>
+    <string name="confirm_delete_list_online_msg">Delete this list online and locally? If other devices still have access, they could upload it again.</string>
 </resources>

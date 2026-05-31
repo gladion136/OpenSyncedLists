@@ -63,6 +63,7 @@ import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListElement;
 import eu.schmidt.systems.opensyncedlists.syncedlist.SyncedListStep;
 import eu.schmidt.systems.opensyncedlists.utils.Constant;
 import eu.schmidt.systems.opensyncedlists.utils.Cryptography;
+import eu.schmidt.systems.opensyncedlists.utils.DialogBuilder;
 import eu.schmidt.systems.opensyncedlists.utils.ParsedElement;
 import eu.schmidt.systems.opensyncedlists.utils.TextListParser;
 
@@ -207,57 +208,74 @@ public class ListActivity extends AppCompatActivity
             {
                 List<SyncedListElement> unchecked =
                     new ArrayList<>(syncedList.getUncheckedElements());
-                List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : unchecked)
-                {
-                    SyncedListElement updated = el.clone();
-                    updated.setChecked(true);
-                    steps.add(
-                        new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
-                }
-                addElementStepsAndSave(steps);
+                confirmDangerousAction(R.string.confirm_check_all_msg,
+                    unchecked.size(), () ->
+                    {
+                        List<SyncedListStep> steps = new ArrayList<>();
+                        for (SyncedListElement el : unchecked)
+                        {
+                            SyncedListElement updated = el.clone();
+                            updated.setChecked(true);
+                            steps.add(new SyncedListStep(el.getId(),
+                                ACTION.UPDATE, updated));
+                        }
+                        addElementStepsAndSave(steps);
+                    });
                 return true;
             }
             case R.id.uncheck_all:
             {
                 List<SyncedListElement> checked =
                     new ArrayList<>(syncedList.getCheckedElements());
-                List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : checked)
-                {
-                    SyncedListElement updated = el.clone();
-                    updated.setChecked(false);
-                    steps.add(
-                        new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
-                }
-                addElementStepsAndSave(steps);
+                confirmDangerousAction(R.string.confirm_uncheck_all_msg,
+                    checked.size(), () ->
+                    {
+                        List<SyncedListStep> steps = new ArrayList<>();
+                        for (SyncedListElement el : checked)
+                        {
+                            SyncedListElement updated = el.clone();
+                            updated.setChecked(false);
+                            steps.add(new SyncedListStep(el.getId(),
+                                ACTION.UPDATE, updated));
+                        }
+                        addElementStepsAndSave(steps);
+                    });
                 return true;
             }
             case R.id.delete_checked:
             {
                 List<SyncedListElement> checked =
                     new ArrayList<>(syncedList.getCheckedElements());
-                List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : checked)
-                {
-                    steps.add(new SyncedListStep(el.getId(), ACTION.REMOVE));
-                }
-                addElementStepsAndSave(steps);
+                confirmDangerousAction(R.string.confirm_delete_checked_msg,
+                    checked.size(), () ->
+                    {
+                        List<SyncedListStep> steps = new ArrayList<>();
+                        for (SyncedListElement el : checked)
+                        {
+                            steps.add(new SyncedListStep(el.getId(),
+                                ACTION.REMOVE));
+                        }
+                        addElementStepsAndSave(steps);
+                    });
                 return true;
             }
             case R.id.toggle_all:
             {
                 List<SyncedListElement> all =
                     new ArrayList<>(syncedList.getReformatElements());
-                List<SyncedListStep> steps = new ArrayList<>();
-                for (SyncedListElement el : all)
-                {
-                    SyncedListElement updated = el.clone();
-                    updated.setChecked(!el.getChecked());
-                    steps.add(
-                        new SyncedListStep(el.getId(), ACTION.UPDATE, updated));
-                }
-                addElementStepsAndSave(steps);
+                confirmDangerousAction(R.string.confirm_toggle_all_msg,
+                    all.size(), () ->
+                    {
+                        List<SyncedListStep> steps = new ArrayList<>();
+                        for (SyncedListElement el : all)
+                        {
+                            SyncedListElement updated = el.clone();
+                            updated.setChecked(!el.getChecked());
+                            steps.add(new SyncedListStep(el.getId(),
+                                ACTION.UPDATE, updated));
+                        }
+                        addElementStepsAndSave(steps);
+                    });
                 return true;
             }
             case R.id.import_text:
@@ -283,9 +301,13 @@ public class ListActivity extends AppCompatActivity
                 return true;
             case R.id.list_clear:
                 // Remove the list elements
-                SyncedListStep syncedListStep =
-                    new SyncedListStep("", ACTION.CLEAR, "");
-                addElementStepAndSave(syncedListStep, true);
+                confirmDangerousAction(R.string.confirm_list_clear_msg,
+                    syncedList.getElements().size(), () ->
+                    {
+                        SyncedListStep syncedListStep =
+                            new SyncedListStep("", ACTION.CLEAR, "");
+                        addElementStepAndSave(syncedListStep, true);
+                    });
                 return true;
             case R.id.list_settings:
                 // Open the list settings
@@ -355,6 +377,34 @@ public class ListActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
     
+    /**
+     * Shows a confirmation dialog for a dangerous action and runs the action
+     * only when the user confirms. The dialog message reports how many elements
+     * are affected. If no element would change ({@code affectedCount == 0}) no
+     * dialog is shown; instead a short Toast informs the user that there is
+     * nothing to do.
+     *
+     * @param messageRes    string resource describing the action (with a %d
+     *                      placeholder for the affected count)
+     * @param affectedCount number of elements affected by the action
+     * @param action        runnable executed on confirm
+     */
+    private void confirmDangerousAction(int messageRes, int affectedCount,
+        Runnable action)
+    {
+        if (affectedCount == 0)
+        {
+            Toast.makeText(this, getString(R.string.confirm_nothing_to_do),
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        DialogBuilder.confirmDialog(this,
+            getString(R.string.confirm_action_title),
+            getString(messageRes, affectedCount),
+            getString(R.string.confirm_action_yes),
+            getString(R.string.confirm_action_no), action);
+    }
+
     /**
      * Add step to list and save it
      *

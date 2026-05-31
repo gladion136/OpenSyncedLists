@@ -18,9 +18,12 @@ package eu.schmidt.systems.opensyncedlists.helpers;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.app.UiAutomation;
 import android.content.Context;
@@ -122,6 +125,140 @@ public class TestHelper
         disableAnimations();
     }
     
+    /**
+     * Clicks the positive button of a confirmation {@link AlertDialog} (the
+     * dialog shown before dangerous actions like check-all, clear list or
+     * delete list). Use right after triggering such an action.
+     */
+    public static void confirmDialog()
+    {
+        onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
+    }
+
+    /**
+     * Clicks the negative button of a confirmation {@link AlertDialog} to
+     * cancel a dangerous action without executing it.
+     */
+    public static void cancelDialog()
+    {
+        onView(withId(android.R.id.button2)).inRoot(isDialog()).perform(click());
+    }
+
+    /**
+     * Asserts that a confirmation dialog showing {@code message} is currently
+     * displayed (used to verify the affected-item count in the message), then
+     * confirms it by clicking the positive button.
+     *
+     * @param message the exact dialog message text expected (incl. the count)
+     */
+    public static void confirmDialogWithMessage(String message)
+    {
+        onView(withText(message)).inRoot(isDialog())
+            .check(matches(isDisplayed()));
+        confirmDialog();
+    }
+
+    /**
+     * Asserts that NO confirmation dialog is currently shown. Used to verify
+     * that a no-op action (0 affected elements) shows a Toast instead of a
+     * dialog. The confirm dialog is identified by its title
+     * (R.string.confirm_action_title).
+     *
+     * Does NOT use Espresso's onView/inRoot, because matching against a dialog
+     * root that does not exist makes Espresso wait on the root (and a freshly
+     * shown Toast window) until it times out / hangs. Instead it inspects the
+     * decor views of all running activities directly on the main thread.
+     *
+     * @param context target app context to resolve the title string
+     */
+    public static void assertNoConfirmDialog(Context context)
+    {
+        String title = context.getString(
+            eu.schmidt.systems.opensyncedlists.R.string.confirm_action_title);
+        boolean[] found = {false};
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
+        {
+            // The AlertDialog lives in its own window, not in the activity
+            // decor tree, so iterate over ALL root views currently attached to
+            // the WindowManager (activity decor + dialog + toast windows).
+            for (View root : getWindowManagerRootViews())
+            {
+                if (viewTreeHasText(root, title))
+                {
+                    found[0] = true;
+                }
+            }
+        });
+        if (found[0])
+        {
+            throw new AssertionError(
+                "Expected no confirm dialog, but one was displayed");
+        }
+    }
+
+    /**
+     * Returns all root views currently attached to the global WindowManager.
+     * Uses reflection on WindowManagerGlobal (test-only). This sees dialog and
+     * toast windows that are not part of any activity's decor view tree.
+     */
+    @SuppressWarnings("unchecked")
+    private static java.util.List<View> getWindowManagerRootViews()
+    {
+        java.util.List<View> roots = new java.util.ArrayList<>();
+        try
+        {
+            Class<?> wmgClass =
+                Class.forName("android.view.WindowManagerGlobal");
+            Object wmg = wmgClass.getMethod("getInstance").invoke(null);
+            java.lang.reflect.Field viewsField =
+                wmgClass.getDeclaredField("mViews");
+            viewsField.setAccessible(true);
+            Object views = viewsField.get(wmg);
+            if (views instanceof java.util.List)
+            {
+                roots.addAll((java.util.List<View>) views);
+            }
+            else if (views instanceof View[])
+            {
+                java.util.Collections.addAll(roots, (View[]) views);
+            }
+        }
+        catch (Exception ignored)
+        {
+            // Reflection failed (API change) — return empty; assertion then
+            // can't detect a dialog and will not false-fail.
+        }
+        return roots;
+    }
+
+    /**
+     * Recursively checks whether the view tree under {@code root} contains a
+     * TextView whose text equals {@code text}.
+     */
+    private static boolean viewTreeHasText(View root, String text)
+    {
+        if (root instanceof android.widget.TextView)
+        {
+            CharSequence t = ((android.widget.TextView) root).getText();
+            if (t != null && text.contentEquals(t))
+            {
+                return true;
+            }
+        }
+        if (root instanceof android.view.ViewGroup)
+        {
+            android.view.ViewGroup group = (android.view.ViewGroup) root;
+            for (int i = 0; i < group.getChildCount(); i++)
+            {
+                if (viewTreeHasText(group.getChildAt(i), text))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns a {@link ViewAction} that clicks the child view with the given id
      * inside a RecyclerView item. Used by multiple test classes.

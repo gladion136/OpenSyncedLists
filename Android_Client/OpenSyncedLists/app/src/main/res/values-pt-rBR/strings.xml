@@ -146,4 +146,15 @@
     <string name="import_text_success">%d itens importados com sucesso</string>
     <string name="import_text_help_title">Formatos de lista de texto</string>
     <string name="import_text_help_content">Formatos suportados:\n\n<b>Marcadores:</b>\n- Item 1\n- Item 2\n* Item 1\n* Item 2\n\n<b>Separados por vírgula:</b>\nItem 1, Item 2, Item 3\n\n<b>Com descrições:</b>\n- Item 1\n    Descrição do item 1\n- Item 2\n    Descrição do item 2\n\nAs descrições exigem recuo (4 espaços ou tabulação).\n\nLinhas e itens vazios são filtrados.</string>
+    <string name="confirm_action_title">Tem certeza?</string>
+    <string name="confirm_action_yes">Confirmar</string>
+    <string name="confirm_action_no">Cancelar</string>
+    <string name="confirm_nothing_to_do">Nada a fazer.</string>
+    <string name="confirm_check_all_msg">Marcar %d itens?</string>
+    <string name="confirm_uncheck_all_msg">Desmarcar %d itens concluídos?</string>
+    <string name="confirm_delete_checked_msg">Excluir %d itens concluídos?</string>
+    <string name="confirm_toggle_all_msg">Inverter %d itens?</string>
+    <string name="confirm_list_clear_msg">Esvaziar toda a lista? %d itens serão removidos.</string>
+    <string name="confirm_delete_list_msg">Excluir esta lista localmente?</string>
+    <string name="confirm_delete_list_online_msg">Excluir esta lista online e localmente? Se outros dispositivos ainda tiverem acesso, poderão enviá-la novamente.</string>
 </resources>
