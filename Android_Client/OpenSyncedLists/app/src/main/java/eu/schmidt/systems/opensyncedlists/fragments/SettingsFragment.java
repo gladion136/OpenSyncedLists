@@ -61,6 +61,13 @@ public class SettingsFragment extends PreferenceFragmentCompat
         setPreferencesFromResource(R.xml.preferences_root, rootKey);
         navigator.bind(this);
 
+        if (rootKey != null && getPreferenceScreen() != null
+            && getPreferenceScreen().getTitle() != null
+            && getActivity() != null)
+        {
+            getActivity().setTitle(getPreferenceScreen().getTitle());
+        }
+
         defaultApplier =
             new DefaultListSettingsApplier(new SecureStorage(getContext()));
         dataManager = new DataStorageManager(getContext());

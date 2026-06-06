@@ -61,4 +61,36 @@
         <item>"1.2"</item>
         <item>"1.4"</item>
     </array>
+
+    <array name="pref_button_size_entries">
+        <item>@string/pref_button_size_small</item>
+        <item>@string/pref_button_size_medium</item>
+        <item>@string/pref_button_size_large</item>
+        <item>@string/pref_button_size_xlarge</item>
+    </array>
+
+    <array name="pref_button_size_values">
+        <item>"30"</item>
+        <item>"35"</item>
+        <item>"40"</item>
+        <item>"45"</item>
+    </array>
+
+    <array name="pref_language_entries">
+        <item>@string/pref_language_system</item>
+        <item>@string/pref_language_english</item>
+        <item>@string/pref_language_german</item>
+        <item>@string/pref_language_spanish</item>
+        <item>@string/pref_language_french</item>
+        <item>@string/pref_language_portuguese</item>
+    </array>
+
+    <array name="pref_language_values">
+        <item>system</item>
+        <item>en</item>
+        <item>de</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>pt</item>
+    </array>
 </resources>

@@ -145,7 +145,9 @@ public class ListSettingsFragment extends PreferenceFragmentCompat
         
         defaultSettingsBtn.setOnPreferenceClickListener(v ->
         {
-            startActivity(new Intent(getContext(), SettingsActivity.class));
+            Intent intent = new Intent(getContext(), SettingsActivity.class);
+            intent.putExtra(SettingsActivity.EXTRA_ROOT_KEY, "screen_defaults");
+            startActivity(intent);
             return true;
         });
 

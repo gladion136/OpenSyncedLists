@@ -25,7 +25,7 @@
     <string name="menu_list_settings">Configurações desta lista</string>
     <string name="menu_list_clear">Limpar lista</string>
     <string name="menu_check_all">Marcar todos</string>
-    <string name="menu_uncheck_all">Desmarcar todos os concluídos</string>
+    <string name="menu_uncheck_all">Desmarcar concluídos</string>
     <string name="menu_delete_checked">Excluir todos marcados</string>
     <string name="menu_toggle_all">Alternar todos</string>
     <string name="menu_export_group">Exportar…</string>
@@ -53,7 +53,7 @@
     <string name="pref_design_light">Claro</string>
     <string name="pref_design_dark">Escuro</string>
     <string name="jump_range_title">Alcance de salto</string>
-    <string name="jump_range_description">Os elementos saltam assim ao clicar nos botões \"Cima\"/\"Baixo\".</string>
+    <string name="jump_range_description">Os elementos saltam essa distância ao clicar nos botões \"Acima\"/\"Abaixo\".</string>
     <string name="sync_title">Sincronização automática</string>
     <string name="default_server_title">Nome do host do servidor com protocolo</string>
     <string name="list_settings_title">Configurações da lista</string>
@@ -95,7 +95,7 @@
     <string name="cant_import_file">Não é possível importar o arquivo!</string>
     <string name="pref_sync_interval">Intervalo de sincronização</string>
     <string name="pref_sync_interval_summary">Intervalo de sincronização em segundos</string>
-    <string name="text_about_others">Ícones feitos por <![CDATA[<div><a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>]]> foram usados e modificados.</string>
+    <string name="text_about_others">Ícones feitos por <![CDATA[<div><a href="https://www.freepik.com" title="Freepik">Freepik</a> em <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>]]> foram usados e modificados.</string>
     <string name="menu_open_in_playstore">Abrir na Play Store</string>
     <string name="menu_contact_developer">Contatar o desenvolvedor</string>
     <string name="menu_open_webpage">Abrir página web</string>
@@ -161,8 +161,8 @@
     <string name="changelog_star_gitlab">⭐ Marcar com estrela no GitLab</string>
     <string name="changelog_view_fdroid">📦 Ver no F-Droid</string>
     <string name="changelog_close">Fechar</string>
-    <string name="pref_list_overview_instead_cards_summary">Exibir todas as listas em uma visualização de lista em vez de uma grade de cartões</string>
-    <string name="pref_list_overview_instead_cards_title">Visão geral como lista em vez de cartões</string>
+    <string name="pref_list_overview_instead_cards_summary">Exibir listas em visualização de lista em vez de cartões</string>
+    <string name="pref_list_overview_instead_cards_title">Visão como lista em vez de cartões</string>
     <string name="menu_import_text">Importar lista de texto</string>
     <string name="import_text_title">Importar lista de texto</string>
     <string name="import_text_msg">Cole ou digite os itens da sua lista. Suporta:\n\n• Marcadores: - Item ou * Item\n• Separados por vírgula: Item1, Item2, Item3\n• Descrições com recuo (4 espaços ou tabulação após o item)</string>
@@ -178,7 +178,7 @@
     <string name="confirm_action_yes">Confirmar</string>
     <string name="confirm_action_no">Cancelar</string>
     <string name="settings_screen_design">Design</string>
-    <string name="settings_screen_design_summary">Tema, visão geral das listas e tamanho da fonte</string>
+    <string name="settings_screen_design_summary">Tema, visão geral das listas, tamanho da fonte e tamanho dos botões</string>
     <string name="settings_screen_interactions">Interações</string>
     <string name="settings_screen_interactions_summary">Distância de salto e rolagem da lista</string>
     <string name="settings_screen_sync">Configurações de sincronização</string>
@@ -203,6 +203,12 @@
     <string name="pref_font_size_medium">Médio</string>
     <string name="pref_font_size_large">Grande</string>
     <string name="pref_font_size_xlarge">Muito grande</string>
+    <string name="pref_button_size_title">Tamanho dos botões</string>
+    <string name="pref_button_size_summary">Tamanho da caixa de seleção e dos quatro botões de salto nas linhas da lista.</string>
+    <string name="pref_button_size_small">Pequeno</string>
+    <string name="pref_button_size_medium">Médio</string>
+    <string name="pref_button_size_large">Grande</string>
+    <string name="pref_button_size_xlarge">Muito grande</string>
     <string name="default_apply_title">Aplicar às listas existentes?</string>
     <string name="default_apply_msg">Esta alteração deve ser aplicada a todas as listas existentes ou apenas às novas?</string>
     <string name="default_apply_all_lists">Todas as listas</string>
@@ -217,4 +223,18 @@
     <string name="confirm_list_clear_msg">Esvaziar toda a lista? %d itens serão removidos.</string>
     <string name="confirm_delete_list_msg">Excluir esta lista localmente?</string>
     <string name="confirm_delete_list_online_msg">Excluir esta lista online e localmente? Se outros dispositivos ainda tiverem acesso, poderão enviá-la novamente.</string>
+    <string name="feedback_dialog_title">Gostando de OpenSyncedLists?</string>
+    <string name="feedback_dialog_message">Uma classificação nos ajuda muito. Encontrou um erro ou algo faltando? Envie-nos um e-mail — você também pode fazer isso na tela Sobre.</string>
+    <string name="feedback_dialog_send">Enviar e-mail</string>
+    <string name="feedback_dialog_cancel">Agora não</string>
+
+    <string name="pref_language_title">Idioma</string>
+    <string name="pref_language_summary">Selecionar idioma do app</string>
+    <string name="pref_language_ai_note">Como o app é desenvolvido por um único desenvolvedor, as traduções tiveram que ser geradas por IA. Se você encontrar erros ou um idioma ausente, envie um e-mail pelo menu da página Sobre.</string>
+    <string name="pref_language_system">Idioma do sistema</string>
+    <string name="pref_language_english">English</string>
+    <string name="pref_language_german">Deutsch</string>
+    <string name="pref_language_spanish">Español</string>
+    <string name="pref_language_french">Français</string>
+    <string name="pref_language_portuguese">Português (Brasil)</string>
 </resources>

@@ -25,8 +25,8 @@
     <string name="menu_list_settings">Ajustes de esta lista</string>
     <string name="menu_list_clear">Vaciar lista</string>
     <string name="menu_check_all">Marcar todos</string>
-    <string name="menu_uncheck_all">Desmarcar todos los realizados</string>
-    <string name="menu_delete_checked">Eliminar todos los marcados</string>
+    <string name="menu_uncheck_all">Desmarcar completados</string>
+    <string name="menu_delete_checked">Eliminar completados</string>
     <string name="menu_toggle_all">Alternar todos</string>
     <string name="menu_export_group">Exportar…</string>
     <string name="menu_export_share">Compartir como enlace</string>
@@ -66,7 +66,7 @@
     <string name="list_pref_sync_off">Desactivado</string>
     <string name="list_pref_checked_list_title">Lista de elementos marcados</string>
     <string name="list_pref_checked_list_summary">Lista extra para elementos marcados en la parte inferior.</string>
-    <string name="list_pref_invert_element_title">Botones a la izquierda (Invertir)</string>
+    <string name="list_pref_invert_element_title">Botones a la izquierda</string>
     <string name="list_pref_invert_element_summary">Mostrar los botones a la izquierda y la casilla a la derecha. Invierte la vista del elemento.</string>
     <string name="list_pref_delete_btn_title">Eliminar lista</string>
     <string name="list_pref_delete_btn_summary">¡Advertencia! La lista se eliminará solo localmente.</string>
@@ -161,8 +161,8 @@
     <string name="changelog_star_gitlab">⭐ Marcar con estrella en GitLab</string>
     <string name="changelog_view_fdroid">📦 Ver en F-Droid</string>
     <string name="changelog_close">Cerrar</string>
-    <string name="pref_list_overview_instead_cards_summary">Mostrar todas las listas en una vista de lista en lugar de una cuadrícula de tarjetas</string>
-    <string name="pref_list_overview_instead_cards_title">Vista general como lista en lugar de tarjetas</string>
+    <string name="pref_list_overview_instead_cards_summary">Mostrar listas como vista de lista en lugar de tarjetas</string>
+    <string name="pref_list_overview_instead_cards_title">Vista como lista en lugar de tarjetas</string>
     <string name="menu_import_text">Importar lista de texto</string>
     <string name="import_text_title">Importar lista de texto</string>
     <string name="import_text_msg">Pega o escribe los elementos de tu lista. Compatible con:\n\n• Viñetas: - Elemento o * Elemento\n• Separados por comas: Elemento1, Elemento2, Elemento3\n• Descripciones con sangría (4 espacios o tabulación tras el elemento)</string>
@@ -178,7 +178,7 @@
     <string name="confirm_action_yes">Confirmar</string>
     <string name="confirm_action_no">Cancelar</string>
     <string name="settings_screen_design">Diseño</string>
-    <string name="settings_screen_design_summary">Tema, vista general de listas y tamaño de fuente</string>
+    <string name="settings_screen_design_summary">Tema, vista general de listas, tamaño de fuente y tamaño de botones</string>
     <string name="settings_screen_interactions">Interacciones</string>
     <string name="settings_screen_interactions_summary">Rango de salto y desplazamiento de la lista</string>
     <string name="settings_screen_sync">Ajustes de sincronización</string>
@@ -203,6 +203,12 @@
     <string name="pref_font_size_medium">Mediano</string>
     <string name="pref_font_size_large">Grande</string>
     <string name="pref_font_size_xlarge">Muy grande</string>
+    <string name="pref_button_size_title">Tamaño de botones</string>
+    <string name="pref_button_size_summary">Tamaño de la casilla y de los cuatro botones de salto en las filas de la lista.</string>
+    <string name="pref_button_size_small">Pequeño</string>
+    <string name="pref_button_size_medium">Mediano</string>
+    <string name="pref_button_size_large">Grande</string>
+    <string name="pref_button_size_xlarge">Muy grande</string>
     <string name="default_apply_title">¿Aplicar a las listas existentes?</string>
     <string name="default_apply_msg">¿Este cambio debe aplicarse a todas las listas existentes o solo a las nuevas?</string>
     <string name="default_apply_all_lists">Todas las listas</string>
@@ -217,4 +223,18 @@
     <string name="confirm_list_clear_msg">¿Vaciar toda la lista? Se eliminarán %d elementos.</string>
     <string name="confirm_delete_list_msg">¿Eliminar esta lista localmente?</string>
     <string name="confirm_delete_list_online_msg">¿Eliminar esta lista en línea y localmente? Si otros dispositivos aún tienen acceso, podrían volver a subirla.</string>
+    <string name="feedback_dialog_title">¿Te gusta OpenSyncedLists?</string>
+    <string name="feedback_dialog_message">Una calificación nos ayuda mucho. ¿Encontraste un error o algo que falta? Envíanos un correo — también puedes hacerlo desde la pantalla Acerca de.</string>
+    <string name="feedback_dialog_send">Enviar correo</string>
+    <string name="feedback_dialog_cancel">Ahora no</string>
+
+    <string name="pref_language_title">Idioma</string>
+    <string name="pref_language_summary">Seleccionar idioma de la app</string>
+    <string name="pref_language_ai_note">Como la app es desarrollada por un único desarrollador, las traducciones tuvieron que ser generadas por IA. Si encuentras errores o te falta un idioma, envía un correo desde el menú de la página Acerca de.</string>
+    <string name="pref_language_system">Idioma del sistema</string>
+    <string name="pref_language_english">English</string>
+    <string name="pref_language_german">Deutsch</string>
+    <string name="pref_language_spanish">Español</string>
+    <string name="pref_language_french">Français</string>
+    <string name="pref_language_portuguese">Português (Brasil)</string>
 </resources>

@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="65dp"
     android:layout_margin="4dp"
-    app:cardBackgroundColor="?attr/colorSurface"
+    app:cardBackgroundColor="@color/card_background_light"
     app:cardCornerRadius="8dp"
     app:layout_constraintHorizontal_weight="1">
 

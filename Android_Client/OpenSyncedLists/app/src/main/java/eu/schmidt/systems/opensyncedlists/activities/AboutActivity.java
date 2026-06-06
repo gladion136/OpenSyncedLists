@@ -19,6 +19,7 @@ package eu.schmidt.systems.opensyncedlists.activities;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAULT;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -37,13 +38,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import eu.schmidt.systems.opensyncedlists.R;
+import eu.schmidt.systems.opensyncedlists.helpers.LocaleHelper;
 
 /**
  * Activity for showing things about the app like author, licence, version.
  */
 public class AboutActivity extends AppCompatActivity
 {
-    
+    @Override protected void attachBaseContext(Context newBase)
+    {
+        super.attachBaseContext(LocaleHelper.attachBaseContext(newBase));
+    }
+
     /**
      * In onCreate the layout is set and the associated textViews got filled
      * with content.

@@ -178,7 +178,7 @@
     <string name="confirm_action_yes">Confirm</string>
     <string name="confirm_action_no">Cancel</string>
     <string name="settings_screen_design">Design</string>
-    <string name="settings_screen_design_summary">Theme, list overview and font size</string>
+    <string name="settings_screen_design_summary">Theme, list overview, font size and button size</string>
     <string name="settings_screen_interactions">Interactions</string>
     <string name="settings_screen_interactions_summary">Jump range and list scrolling</string>
     <string name="settings_screen_sync">Sync settings</string>
@@ -203,6 +203,12 @@
     <string name="pref_font_size_medium">Medium</string>
     <string name="pref_font_size_large">Large</string>
     <string name="pref_font_size_xlarge">Extra large</string>
+    <string name="pref_button_size_title">Button size</string>
+    <string name="pref_button_size_summary">Size of the checkbox and the four jump buttons in list rows.</string>
+    <string name="pref_button_size_small">Small</string>
+    <string name="pref_button_size_medium">Medium</string>
+    <string name="pref_button_size_large">Large</string>
+    <string name="pref_button_size_xlarge">Extra large</string>
     <string name="default_apply_title">Apply to existing lists?</string>
     <string name="default_apply_msg">Should this change apply to all existing lists or only to new lists?</string>
     <string name="default_apply_all_lists">All lists</string>

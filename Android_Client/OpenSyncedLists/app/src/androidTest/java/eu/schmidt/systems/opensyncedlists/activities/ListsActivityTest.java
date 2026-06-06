@@ -281,7 +281,8 @@ public class ListsActivityTest
 
         // ---- B2: Default-settings link opens the global settings, then back ----
         onView(withText(R.string.sync_hint_defaults_title)).perform(click());
-        onView(withText(R.string.app_settings_scope_hint))
+        // Verify we're in the defaults screen by checking for the screen title
+        onView(withText(R.string.settings_screen_defaults))
             .check(matches(isDisplayed()));
         pressBack();
         onView(withText(R.string.list_settings_title)).check(matches(isDisplayed()));

@@ -27,7 +27,7 @@
     <string name="menu_list_settings">Settings of this list</string>
     <string name="menu_list_clear">Clear list</string>
     <string name="menu_check_all">Check all</string>
-    <string name="menu_uncheck_all">Uncheck all done</string>
+    <string name="menu_uncheck_all">Uncheck completed</string>
     <string name="menu_delete_checked">Delete all done</string>
     <string name="menu_toggle_all">Toggle all</string>
     <string name="menu_export_group">Export…</string>
@@ -83,9 +83,9 @@
     <string name="list_pref_delete_online_btn_summary">Warning! The list will be deleted both local and online. If others devices has also access they could still upload it.</string>
     <string name="scroll_list_title">Automatic scrolling</string>
     <string name="scroll_list_summary">Scroll list after edit element</string>
-    <string name="unexpected_error">Error: Something wrent wrong.. Please try it again.</string>
+    <string name="unexpected_error">Error: Something went wrong… Please try again.</string>
     <string name="no_connection">No connection to server!</string>
-    <string name="no_app_for_intent_installed">You have no app installed for this event..</string>
+    <string name="no_app_for_intent_installed">No app installed for this action…</string>
     <string name="list_with_id_got_overridden">A list with the same id already exists and got overridden!</string>
     <string name="no_server_selected">No server selected!</string>
     <string name="cant_import_list">Can\'t import list!</string>
@@ -172,9 +172,9 @@
     <string name="changelog_view_fdroid">📦 View on F-Droid</string>
     <string name="changelog_close">Close</string>
     <string name="changelog_webpage" translatable="false">https://gitlab.com/gladion136/opensyncedlists/-/blob/main/CHANGELOG.md</string>
-    <string name="feedback_dialog_title">Your feedback?</string>
-    <string name="feedback_dialog_message">Do you enjoy OpenSyncedLists? A rating helps a lot. If something is missing or broken, send us your feedback or a bug report by mail.</string>
-    <string name="feedback_dialog_send">Send mail</string>
+    <string name="feedback_dialog_title">Enjoy OpenSyncedLists?</string>
+    <string name="feedback_dialog_message">Ratings help us a lot. Found a bug or missing feature? Send feedback via email — you can also contact us from the About screen.</string>
+    <string name="feedback_dialog_send">Send email</string>
     <string name="feedback_dialog_cancel">Not now</string>
     <string name="feedback_mail_subject">OpenSyncedLists feedback / bug report</string>
     <string name="pref_list_overview_instead_cards_summary">Display all lists inside a list view instead of a grid of cards</string>
@@ -194,7 +194,7 @@
     <string name="confirm_action_yes">Confirm</string>
     <string name="confirm_action_no">Cancel</string>
     <string name="settings_screen_design">Design</string>
-    <string name="settings_screen_design_summary">Theme, list overview and font size</string>
+    <string name="settings_screen_design_summary">Theme, list overview, font size and button size</string>
     <string name="settings_screen_interactions">Interactions</string>
     <string name="settings_screen_interactions_summary">Jump range and list scrolling</string>
     <string name="settings_screen_sync">Sync settings</string>
@@ -219,6 +219,22 @@
     <string name="pref_font_size_medium">Medium</string>
     <string name="pref_font_size_large">Large</string>
     <string name="pref_font_size_xlarge">Extra large</string>
+    <string name="pref_button_size_title">Button size</string>
+    <string name="pref_button_size_summary">Size of the checkbox and the four jump buttons in list rows.</string>
+    <string name="pref_button_size_small">Small</string>
+    <string name="pref_button_size_medium">Medium</string>
+    <string name="pref_button_size_large">Large</string>
+    <string name="pref_button_size_xlarge">Extra large</string>
+
+    <string name="pref_language_title">Language</string>
+    <string name="pref_language_summary">Select app language</string>
+    <string name="pref_language_ai_note">Since the app is built by a single developer, translations had to be AI-generated. If you find errors or miss a language, please send an email from the About menu.</string>
+    <string name="pref_language_system">System default</string>
+    <string name="pref_language_english">English</string>
+    <string name="pref_language_german">Deutsch</string>
+    <string name="pref_language_spanish">Español</string>
+    <string name="pref_language_french">Français</string>
+    <string name="pref_language_portuguese">Português (Brasil)</string>
     <string name="default_apply_title">Apply to existing lists?</string>
     <string name="default_apply_msg">Should this change apply to all existing lists or only to new lists?</string>
     <string name="default_apply_all_lists">All lists</string>

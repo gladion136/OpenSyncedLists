@@ -116,7 +116,47 @@ public class ListActivityTest {
                 onView(withId(R.id.iVNewElementBottom)).perform(click());
         }
 
-        private void checkAt(int position) {
+        /** Adds {@code count} elements named "E0".."E{count-1}" at the bottom. */
+    private void addElements(int count) {
+        for (int i = 0; i < count; i++) {
+            addElement("E" + i);
+        }
+    }
+
+    /**
+     * Asserts the RecyclerView shows exactly the given element names, top to
+     * bottom, at positions 0..names.length-1. Use for a list without an
+     * isolator (no checked elements).
+     */
+    private void assertOrder(String... names) {
+        // After many bottom-adds the list is scrolled down, so the top rows we
+        // assert on may not be laid out. Bring position 0 back on screen first
+        // (findViewHolderForAdapterPosition returns null for off-screen rows).
+        onView(withId(R.id.recyclerView))
+                .perform(androidx.test.espresso.contrib.RecyclerViewActions
+                        .scrollToPosition(0));
+        for (int i = 0; i < names.length; i++) {
+            onView(withId(R.id.recyclerView))
+                    .check(matches(atPosition(i, hasDescendant(withText(names[i])))));
+        }
+    }
+
+    /**
+     * Opens List settings → Design subscreen, clicks the given preference
+     * titles to toggle them, then returns to ListActivity.
+     */
+    private void toggleDesignPrefs(int... titleResIds) {
+        openActionBarOverflowOrOptionsMenu(ctx);
+        onView(withText(R.string.menu_list_settings)).perform(click());
+        onView(withText(R.string.list_settings_screen_design)).perform(click());
+        for (int titleResId : titleResIds) {
+            onView(withText(titleResId)).perform(click());
+        }
+        pressBack(); // design subscreen → list settings root
+        pressBack(); // ListSettingsActivity → ListActivity
+    }
+
+    private void checkAt(int position) {
                 onView(withId(R.id.recyclerView))
                                 .perform(actionOnItemAtPosition(position,
                                                 TestHelper.clickChildWithId(R.id.checkBox)));
@@ -398,7 +438,7 @@ public class ListActivityTest {
                 // Jump buttons start disabled (set above) → the button bar is hidden.
                 // Check on item 0 to avoid matching the bar of multiple elements.
                 onView(withId(R.id.recyclerView)).check(matches(atPosition(0,
-                                hasDescendant(allOf(withId(R.id.layoutAllJumpButtons),
+                                hasDescendant(allOf(withId(R.id.btnJumpUp),
                                                 androidx.test.espresso.matcher.ViewMatchers
                                                                 .withEffectiveVisibility(
                                                                                 androidx.test.espresso.matcher.ViewMatchers.Visibility.GONE))))));
@@ -415,7 +455,7 @@ public class ListActivityTest {
                 // Now the jump-button bar must be visible on the elements.
                 // Check on item 0 to avoid matching the bar of multiple elements.
                 onView(withId(R.id.recyclerView)).check(matches(atPosition(0,
-                                hasDescendant(allOf(withId(R.id.layoutAllJumpButtons),
+                                hasDescendant(allOf(withId(R.id.btnJumpUp),
                                                 androidx.test.espresso.matcher.ViewMatchers
                                                                 .withEffectiveVisibility(
                                                                                 androidx.test.espresso.matcher.ViewMatchers.Visibility.VISIBLE))))));
@@ -534,7 +574,7 @@ public class ListActivityTest {
                 // Create a list (jump_buttons default = off → bar hidden) with an item.
                 createAndOpenList("Bulk-Target");
                 addElement("Item");
-                onView(allOf(withId(R.id.layoutJumpButtons),
+                onView(allOf(withId(R.id.btnJumpUp),
                                 isDescendantOfA(withId(R.id.recyclerView))))
                                 .check(matches(not(isDisplayed())));
                 pressBack(); // back to ListsActivity
@@ -564,7 +604,7 @@ public class ListActivityTest {
                 pressBack(); // settings → ListsActivity
                 onView(withId(R.id.lVLists))
                                 .perform(actionOnItemAtPosition(0, click()));
-                onView(allOf(withId(R.id.layoutJumpButtons),
+                onView(allOf(withId(R.id.btnJumpUp),
                                 isDescendantOfA(withId(R.id.recyclerView))))
                                 .check(matches(isDisplayed()));
                 pressBack();
@@ -579,7 +619,7 @@ public class ListActivityTest {
                 TestHelper.setJumpButtonsDefault(ctx, false);
                 createAndOpenList("Keep-As-Is");
                 addElement("Item");
-                onView(allOf(withId(R.id.layoutJumpButtons),
+                onView(allOf(withId(R.id.btnJumpUp),
                                 isDescendantOfA(withId(R.id.recyclerView))))
                                 .check(matches(not(isDisplayed())));
                 pressBack();
@@ -598,7 +638,7 @@ public class ListActivityTest {
                 onView(withId(R.id.lVLists))
                                 .perform(actionOnItemAtPosition(0, click()));
                 // Existing list unchanged: bar still hidden.
-                onView(allOf(withId(R.id.layoutJumpButtons),
+                onView(allOf(withId(R.id.btnJumpUp),
                                 isDescendantOfA(withId(R.id.recyclerView))))
                                 .check(matches(not(isDisplayed())));
                 pressBack();
@@ -709,6 +749,94 @@ public class ListActivityTest {
                 openActionBarOverflowOrOptionsMenu(ctx);
                 onView(withText(R.string.menu_list_clear)).perform(click());
                 TestHelper.assertNoConfirmDialog(ctx);
+
+                pressBack();
+        }
+
+        /**
+         * End-to-end drag-and-drop test on a 20-element list.
+         *
+         * Builds a list E0..E19 and performs real long-press + drag gestures
+         * (injected as raw MotionEvents, exercising the production
+         * ItemTouchHelper path) across several view modes and with several move
+         * distances. Before and after every drag the FULL visible order is
+         * asserted so the test fails loudly when items refuse to move, lag, or
+         * the list "jumps back".
+         *
+         * Sections:
+         * A. Normal view (jump buttons hidden) – single-step + multi-step drags
+         *    in both directions.
+         * B. "Buttons left" (invert) view – a multi-step drag.
+         * C. Jump-buttons-visible view – a drag (taller rows / different layout).
+         * D. Overview view – a drag in the compact overview layout.
+         *
+         * NOTE: This test is expected to FAIL against the current code, which
+         * has a known drag-and-drop defect (some items don't move, others move
+         * only after a delay, the list jumps back and forth). The test
+         * documents the intended behaviour; the fix comes separately.
+         *
+         * Drags only between adjacent on-screen rows (top of the list) so that
+         * both the source and the target row are guaranteed to be laid out when
+         * the gesture starts.
+         */
+        @Test
+        public void testDragAndDropAcrossViewsAndDistances() {
+                // Known starting view state: jump buttons off, not inverted,
+                // not overview (XML defaults, made explicit).
+                TestHelper.setJumpButtonsDefault(ctx, false);
+                createAndOpenList("DnD-Test");
+
+                // 20 elements, top→bottom E0..E19.
+                addElements(20);
+                // Sanity: the first rows are in insertion order before any drag.
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+
+                // ---- A: Normal view ----
+                // A1: single-step drag, move E0 down one slot.
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(0, 1));
+                assertOrder("E1", "E0", "E2", "E3", "E4");
+
+                // A2: single-step drag back up → original order.
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(1, 0));
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+
+                // A3: multi-step drag, move E0 down four slots.
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(0, 4));
+                assertOrder("E1", "E2", "E3", "E4", "E0", "E5");
+
+                // A4: multi-step drag up, move E0 back to the top.
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(4, 0));
+                assertOrder("E0", "E1", "E2", "E3", "E4", "E5");
+
+                // ---- B: "Buttons left" (invert) view ----
+                toggleDesignPrefs(R.string.list_pref_invert_element_title);
+                // Order unchanged by switching view mode.
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+                // Multi-step drag in inverted layout: move E1 down three slots.
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(1, 4));
+                assertOrder("E0", "E2", "E3", "E4", "E1", "E5");
+                // Restore order and revert the invert flag.
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(4, 1));
+                assertOrder("E0", "E1", "E2", "E3", "E4", "E5");
+                toggleDesignPrefs(R.string.list_pref_invert_element_title);
+
+                // ---- C: Jump-buttons visible (taller rows) ----
+                toggleDesignPrefs(R.string.list_pref_jump_buttons_title);
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(2, 0));
+                assertOrder("E2", "E0", "E1", "E3", "E4");
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(0, 2));
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+                toggleDesignPrefs(R.string.list_pref_jump_buttons_title);
+
+                // ---- D: Overview view (compact layout, toolbar toggle) ----
+                onView(withId(R.id.action_overview)).perform(click());
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(0, 3));
+                assertOrder("E1", "E2", "E3", "E0", "E4");
+                onView(withId(R.id.recyclerView)).perform(TestHelper.dragItem(3, 0));
+                assertOrder("E0", "E1", "E2", "E3", "E4");
+                onView(withId(R.id.action_overview)).perform(click()); // leave overview
 
                 pressBack();
         }

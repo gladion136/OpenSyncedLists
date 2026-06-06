@@ -33,7 +33,6 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,18 +58,22 @@ public class SyncedListAdapter
     extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     implements View.OnClickListener, Filterable
 {
-    public Boolean overview = false;
     private final ListActivity listActivity;
     private final SyncedList syncedList;
     private final RecyclerView recyclerView;
     private final boolean scrollListTopBottom;
     private final int jumpDistance;
     private final float fontScale;
+    private final int buttonSizePx;
     private boolean filterActive = false;
-    /** Element currently being dragged, or null when no drag is in progress. */
-    private SyncedListElement draggedElement = null;
-    /** True once a drag actually moved the element across at least one slot. */
-    private boolean dragMoved = false;
+    /**
+     * Drag/drop controller. Kept as a field so it can be detached from the
+     * RecyclerView when this adapter is replaced — otherwise each replacement
+     * (e.g. reloading list settings) leaves the previous ItemTouchHelper still
+     * attached, and the stacked helpers fight over touch events, breaking
+     * drag-and-drop.
+     */
+    private ItemTouchHelper itemTouchHelper;
     private List<SyncedListElement> syncedListElementsFiltered;
     private Filter syncedListFilter = new Filter()
     {
@@ -134,7 +137,7 @@ public class SyncedListAdapter
         LayoutInflater.from(listActivity);
         
         // Add ItemTouchHelper for drag and drop events
-        ItemTouchHelper itemTouchHelper =
+        itemTouchHelper =
             new ItemTouchHelper(new ItemTouchHelper.Callback()
             {
                 @Override public int getMovementFlags(RecyclerView recyclerView,
@@ -165,61 +168,14 @@ public class SyncedListAdapter
                     {
                         return false;
                     }
-
                     int fromPosition = viewHolder.getAdapterPosition();
                     int toPosition = target.getAdapterPosition();
-                    SyncedListElement selectedElement =
-                        getElementOnPosition(fromPosition);
-                    SyncedListElement displacedElement =
-                        getElementOnPosition(toPosition);
-
-                    // In a checked list, dragging across the checked/unchecked
-                    // boundary is not allowed.
-                    if (syncedList.getHeader().isCheckedList()
-                        && selectedElement.getChecked()
-                        != displacedElement.getChecked())
+                    if (fromPosition == RecyclerView.NO_POSITION
+                        || toPosition == RecyclerView.NO_POSITION)
                     {
                         return false;
                     }
-
-                    // Reorder only the in-memory buffer and animate the swap.
-                    // Persisting the step is deferred to clearView() (on drop)
-                    // so the model is not rebuilt mid-drag, which made the row
-                    // jump back before snapping to its final slot.
-                    SyncedList.moveItem(
-                        syncedList.getElements().indexOf(selectedElement),
-                        syncedList.getElements().indexOf(displacedElement),
-                        syncedList.getElements());
-                    if (syncedList.getHeader().isCheckedList())
-                    {
-                        syncedList.recalculateCheckedBuffers();
-                    }
-                    draggedElement = selectedElement;
-                    dragMoved = true;
-                    notifyItemMoved(fromPosition, toPosition);
-                    return true;
-                }
-
-                @Override public void clearView(RecyclerView recyclerView,
-                    RecyclerView.ViewHolder viewHolder)
-                {
-                    super.clearView(recyclerView, viewHolder);
-                    // Drop finished: persist the final order once, if the
-                    // element was actually moved.
-                    if (draggedElement != null && dragMoved)
-                    {
-                        int finalPosition =
-                            syncedList.getElements().indexOf(draggedElement);
-                        if (finalPosition >= 0)
-                        {
-                            SyncedListStep newStep =
-                                new SyncedListStep(draggedElement.getId(),
-                                    ACTION.MOVE, finalPosition);
-                            listActivity.addElementStepAndSave(newStep, false);
-                        }
-                    }
-                    draggedElement = null;
-                    dragMoved = false;
+                    return handleDragMove(fromPosition, toPosition);
                 }
 
                 @Override
@@ -238,6 +194,9 @@ public class SyncedListAdapter
         scrollListTopBottom = sharedPreferences.getBoolean("scrollList", false);
         fontScale = parseFontScale(
             sharedPreferences.getString("font_size", "1.0"));
+        buttonSizePx = Math.round(
+            parseButtonSize(sharedPreferences.getString("button_size", "35"))
+                * listActivity.getResources().getDisplayMetrics().density);
     }
 
     /**
@@ -246,6 +205,63 @@ public class SyncedListAdapter
     public float getFontScale()
     {
         return fontScale;
+    }
+
+    /**
+     * Detach this adapter's drag/drop ItemTouchHelper from the RecyclerView.
+     * Call before replacing the adapter so a stale helper does not keep
+     * intercepting touch events alongside the new adapter's helper.
+     */
+    public void detachDragHelper()
+    {
+        if (itemTouchHelper != null)
+        {
+            itemTouchHelper.attachToRecyclerView(null);
+        }
+    }
+
+    /**
+     * Handle one drag step: move the element at recycler position
+     * {@code fromPosition} onto {@code toPosition}, persist the change and
+     * animate the swap.
+     *
+     * This mirrors the original (working) behaviour: each step persists a MOVE
+     * (which replays + rebuilds the buffers) and then calls
+     * {@code notifyItemMoved(fromPosition, toPosition)}. Rebuilding the buffer
+     * per step is what keeps {@code getElementOnPosition}, the buffer and the
+     * RecyclerView's adapter-position tracking consistent, so the next onMove
+     * reports an updated position.
+     *
+     * Extracted into a public method so instrumented tests can drive the same
+     * code path deterministically.
+     *
+     * @param fromPosition source recycler position
+     * @param toPosition   target recycler position
+     * @return true if the elements were reordered
+     */
+    public boolean handleDragMove(int fromPosition, int toPosition)
+    {
+        SyncedListElement selectedElement = getElementOnPosition(fromPosition);
+        SyncedListElement displacedElement = getElementOnPosition(toPosition);
+
+        // In a checked list, dragging across the checked/unchecked boundary is
+        // not allowed.
+        if (syncedList.getHeader().isCheckedList()
+            && selectedElement.getChecked() != displacedElement.getChecked())
+        {
+            return false;
+        }
+
+        // EXACT master behaviour: persist a MOVE step (which replays + rebuilds
+        // the buffers) and notifyItemMoved. Restored to verify the known-good
+        // baseline before layering any change on top.
+        int newPositionInList =
+            syncedList.getElements().indexOf(displacedElement);
+        SyncedListStep newStep = new SyncedListStep(selectedElement.getId(),
+            ACTION.MOVE, newPositionInList);
+        listActivity.addElementStepAndSave(newStep, false);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 
     /**
@@ -264,6 +280,25 @@ public class SyncedListAdapter
         catch (NumberFormatException e)
         {
             return 1.0f;
+        }
+    }
+
+    /**
+     * Parse the stored button-size value, falling back to 35dp on malformed
+     * input.
+     *
+     * @param value stored preference value
+     * @return button size in dp, defaulting to 35
+     */
+    public static int parseButtonSize(String value)
+    {
+        try
+        {
+            return Integer.parseInt(value);
+        }
+        catch (NumberFormatException e)
+        {
+            return 35;
         }
     }
     
@@ -326,22 +361,17 @@ public class SyncedListAdapter
             {
                 elementViewHolder.checkBox.setVisibility(View.GONE);
             }
-            // Toggle ALL jump buttons (up/down + top/bottom) together. Set both
-            // states explicitly so recycled views never keep a stale value.
-            boolean showJumpButtons = syncedList.getHeader().isJumpButtons();
-            if (elementViewHolder.layoutAllJumpButtons != null)
-            {
-                elementViewHolder.layoutAllJumpButtons.setVisibility(
-                    showJumpButtons ? View.VISIBLE : View.GONE);
-            }
-            else
-            {
-                // Fallback (layouts without the wrapper): toggle up/down group.
-                elementViewHolder.layoutJumpButtons.setVisibility(
-                    showJumpButtons ? View.VISIBLE : View.GONE);
-            }
+            // Toggle the jump buttons directly so both the old wrapped layouts
+            // and the new direct layout stay in sync.
+            int jumpVisibility = (syncedList.getHeader().isOverviewActive() || !syncedList.getHeader().isJumpButtons())
+                ? View.GONE : View.VISIBLE;
+            elementViewHolder.iVBtnUp.setVisibility(jumpVisibility);
+            elementViewHolder.iVBtnDown.setVisibility(jumpVisibility);
+            elementViewHolder.iVTop.setVisibility(jumpVisibility);
+            elementViewHolder.iVBottom.setVisibility(jumpVisibility);
 
             applyFontSize(elementViewHolder);
+            applyButtonSize(elementViewHolder);
             
             // name edittext
             elementViewHolder.eTName.setOnFocusChangeListener((v, focused) ->
@@ -364,9 +394,11 @@ public class SyncedListAdapter
                         InputMethodManager imm =
                             (InputMethodManager) listActivity.getSystemService(
                                 Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(
-                            listActivity.getCurrentFocus().getWindowToken(), 0);
-                        
+                        View focus = listActivity.getCurrentFocus();
+                        if (focus != null) {
+                            imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+                        }
+
                         return true;
                     }
                     return false;
@@ -672,10 +704,8 @@ public class SyncedListAdapter
      * Apply the configured font-size scale to an element's text views.
      *
      * In overview mode the row is meant to be compact, so a smaller font also
-     * shrinks the checkbox and the row's minimum height, making the whole
-     * element thinner. In normal mode the element height is driven by the
-     * jump-buttons (40dp each), so only the text size changes while the
-     * checkbox and row height stay untouched.
+     * shrinks the row's minimum height. The checkbox and jump buttons are
+     * controlled by the separate button-size preference.
      *
      * @param holder element view holder to adjust
      */
@@ -692,32 +722,34 @@ public class SyncedListAdapter
         holder.tVDescription.setTextSize(
             android.util.TypedValue.COMPLEX_UNIT_SP,
             descriptionBaseSp * fontScale);
+    }
 
-        if (overview)
+    /**
+     * Apply the configured button size to the checkbox and jump buttons.
+     *
+     * @param holder element view holder to adjust
+     */
+    private void applyButtonSize(ElementViewHolder holder)
+    {
+        applyButtonLayout(holder.iVBtnUp);
+        applyButtonLayout(holder.iVBtnDown);
+        applyButtonLayout(holder.iVTop);
+        applyButtonLayout(holder.iVBottom);
+    }
+
+    /**
+     * Apply the configured size to one individual jump button.
+     *
+     * @param button jump button image view
+     */
+    private void applyButtonLayout(ImageView button)
+    {
+        ViewGroup.LayoutParams params = button.getLayoutParams();
+        if (params != null)
         {
-            float density = holder.itemView.getResources()
-                .getDisplayMetrics().density;
-
-            // Shrink the checkbox proportionally so a smaller font yields a
-            // thinner element. Clamp the scale so it never grows the checkbox
-            // (its base touch target is already large enough).
-            float checkBoxScale = Math.min(fontScale, 1.0f);
-            holder.checkBox.setScaleX(checkBoxScale);
-            holder.checkBox.setScaleY(checkBoxScale);
-
-            if (holder.elementRow != null)
-            {
-                int minHeightPx = Math.round(40f * fontScale * density);
-                holder.elementRow.setMinimumHeight(minHeightPx);
-            }
-        }
-        else
-        {
-            // Normal mode: element height is driven by the jump buttons, so
-            // keep the checkbox at its default size (reset in case the view
-            // was recycled from an overview row).
-            holder.checkBox.setScaleX(1.0f);
-            holder.checkBox.setScaleY(1.0f);
+            params.width = buttonSizePx;
+            params.height = buttonSizePx;
+            button.setLayoutParams(params);
         }
     }
 
@@ -732,9 +764,6 @@ public class SyncedListAdapter
         public final ImageView iVBtnUp, iVBtnDown, iVTop, iVBottom;
         /** Overview-only 3-dot menu button; null in non-overview layouts. */
         public final ImageView iVOverviewMenu;
-        public final ConstraintLayout layoutJumpButtons;
-        /** Wrapper around all four jump buttons; null in overview layouts. */
-        public final View layoutAllJumpButtons;
         /** Only present in the overview layouts; null otherwise. */
         public final View elementRow;
 
@@ -749,9 +778,6 @@ public class SyncedListAdapter
             iVTop = view.findViewById(R.id.btnJumpTop);
             iVBottom = view.findViewById(R.id.btnJumpBottom);
             iVOverviewMenu = view.findViewById(R.id.btnOverviewMenu);
-            layoutJumpButtons = view.findViewById(R.id.layoutJumpButtons);
-            layoutAllJumpButtons =
-                view.findViewById(R.id.layoutAllJumpButtons);
             elementRow = view.findViewById(R.id.elementRow);
         }
     }

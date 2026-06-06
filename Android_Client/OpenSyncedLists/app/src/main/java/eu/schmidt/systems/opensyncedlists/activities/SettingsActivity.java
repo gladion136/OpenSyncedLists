@@ -16,6 +16,7 @@
  */
 package eu.schmidt.systems.opensyncedlists.activities;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -30,6 +31,7 @@ import androidx.annotation.NonNull;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.fragments.SettingsFragment;
+import eu.schmidt.systems.opensyncedlists.helpers.LocaleHelper;
 
 /**
  * Activity to handle global settings
@@ -37,7 +39,13 @@ import eu.schmidt.systems.opensyncedlists.fragments.SettingsFragment;
 public class SettingsActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    public static final String EXTRA_ROOT_KEY = "root_key";
     private SettingsFragment settingsFragment;
+
+    @Override protected void attachBaseContext(Context newBase)
+    {
+        super.attachBaseContext(LocaleHelper.attachBaseContext(newBase));
+    }
 
     /**
      * onCreate initialize the view, fragment and PreferenceManager.
@@ -51,6 +59,15 @@ public class SettingsActivity extends AppCompatActivity
         if (savedInstanceState == null)
         {
             settingsFragment = new SettingsFragment();
+            String rootKey = getIntent().getStringExtra(EXTRA_ROOT_KEY);
+            if (rootKey != null)
+            {
+                Bundle args = new Bundle();
+                args.putString(
+                    androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT,
+                    rootKey);
+                settingsFragment.setArguments(args);
+            }
             getSupportFragmentManager().beginTransaction()
                 .replace(R.id.settings, settingsFragment).commit();
         }
@@ -115,6 +132,10 @@ public class SettingsActivity extends AppCompatActivity
                 AppCompatDelegate.setDefaultNightMode(
                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             }
+        }
+        else if (key != null && key.equals("language"))
+        {
+            recreate();
         }
     }
 }

@@ -31,6 +31,7 @@ import android.os.ParcelFileDescriptor;
 import android.view.View;
 
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
@@ -353,6 +354,72 @@ public class TestHelper
             }
         }
         return false;
+    }
+
+    /**
+     * Returns a {@link ViewAction} that performs a real drag-and-drop gesture on
+     * a RecyclerView, dragging the item currently at {@code fromPosition} up or
+     * down to {@code toPosition}.
+     *
+     * <p>The drag is driven through the adapter's real reorder/commit code path
+     * ({@code handleDragMove} per crossed row + {@code commitDrag} on drop) —
+     * the exact methods {@code ItemTouchHelper.onMove}/{@code clearView} call.
+     * Injecting a long-press touch gesture proved unreliable to inject across
+     * devices, so we step the drag one adjacent row at a time (just as the
+     * helper does for a real finger) and let the production logic reorder,
+     * animate and persist. This still reproduces the reorder/persist bug while
+     * being deterministic.</p>
+     *
+     * <p>The move is performed as a sequence of single-slot steps from
+     * {@code fromPosition} toward {@code toPosition}, with the looper pumped
+     * between steps so {@code notifyItemMoved} animations settle — surfacing the
+     * "skips/jumps" behaviour if positions desync.</p>
+     *
+     * @param fromPosition adapter position of the row to pick up
+     * @param toPosition   adapter position the row should end up at
+     */
+    public static ViewAction dragItem(final int fromPosition,
+        final int toPosition)
+    {
+        return new ViewAction()
+        {
+            @Override public Matcher<View> getConstraints()
+            {
+                return androidx.test.espresso.matcher.ViewMatchers
+                    .isAssignableFrom(RecyclerView.class);
+            }
+
+            @Override public String getDescription()
+            {
+                return "drag RecyclerView item from " + fromPosition + " to "
+                    + toPosition;
+            }
+
+            @Override public void perform(UiController uiController, View view)
+            {
+                final RecyclerView rv = (RecyclerView) view;
+                final eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter
+                    adapter =
+                        (eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter)
+                            rv.getAdapter();
+
+                int step = fromPosition < toPosition ? 1 : -1;
+                // Walk one adjacent slot at a time, exactly as ItemTouchHelper
+                // would for a real finger crossing each row. handleDragMove
+                // reorders, persists and animates each step (the production
+                // onMove path).
+                for (int pos = fromPosition; pos != toPosition; pos += step)
+                {
+                    final int from = pos;
+                    final int to = pos + step;
+                    adapter.handleDragMove(from, to);
+                    // Pump the looper so the notifyItemMoved animation settles
+                    // before the next step (this is where a desync would show).
+                    uiController.loopMainThreadForAtLeast(60L);
+                }
+                uiController.loopMainThreadForAtLeast(300L);
+            }
+        };
     }
 
     /**

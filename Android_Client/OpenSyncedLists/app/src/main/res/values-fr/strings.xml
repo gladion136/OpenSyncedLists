@@ -25,7 +25,7 @@
     <string name="menu_list_settings">Paramètres de cette liste</string>
     <string name="menu_list_clear">Vider la liste</string>
     <string name="menu_check_all">Tout cocher</string>
-    <string name="menu_uncheck_all">Tout décocher</string>
+    <string name="menu_uncheck_all">Décocher les complétés</string>
     <string name="menu_delete_checked">Supprimer tout ce qui est coché</string>
     <string name="menu_toggle_all">Tout basculer</string>
     <string name="menu_export_group">Exporter…</string>
@@ -156,13 +156,13 @@
     <string name="menu_show_changelog">Afficher les nouveautés</string>
     <string name="changelog_dialog_title">Nouveautés</string>
     <string name="changelog_whats_new">Nouveautés dans cette version :</string>
-    <string name="changelog_thank_you">Merci d\'utiliser OpenSyncedLists ! ❤️\nSi vous appréciez l\'application, une note nous aide beaucoup.</string>
+    <string name="changelog_thank_you">Merci d\'utiliser OpenSyncedLists ! ❤️\nUne bonne note nous aide beaucoup.</string>
     <string name="changelog_rate_playstore">⭐ Noter sur Google Play</string>
     <string name="changelog_star_gitlab">⭐ Mettre une étoile sur GitLab</string>
     <string name="changelog_view_fdroid">📦 Voir sur F-Droid</string>
     <string name="changelog_close">Fermer</string>
-    <string name="pref_list_overview_instead_cards_summary">Afficher toutes les listes dans une vue liste plutôt qu\'une grille de cartes</string>
-    <string name="pref_list_overview_instead_cards_title">Vue d\'ensemble en liste plutôt qu\'en cartes</string>
+    <string name="pref_list_overview_instead_cards_summary">Afficher les listes en vue liste plutôt qu\'en grille de cartes</string>
+    <string name="pref_list_overview_instead_cards_title">Vue en liste plutôt qu\'en cartes</string>
     <string name="menu_import_text">Importer une liste texte</string>
     <string name="import_text_title">Importer une liste texte</string>
     <string name="import_text_msg">Collez ou saisissez vos éléments de liste. Compatible avec :\n\n• Puces : - Élément ou * Élément\n• Séparés par des virgules : Élément1, Élément2, Élément3\n• Descriptions avec indentation (4 espaces ou tabulation après l\'élément)</string>
@@ -178,7 +178,7 @@
     <string name="confirm_action_yes">Confirmer</string>
     <string name="confirm_action_no">Annuler</string>
     <string name="settings_screen_design">Design</string>
-    <string name="settings_screen_design_summary">Thème, aperçu des listes et taille de police</string>
+    <string name="settings_screen_design_summary">Thème, aperçu des listes, taille de police et taille des boutons</string>
     <string name="settings_screen_interactions">Interactions</string>
     <string name="settings_screen_interactions_summary">Distance de saut et défilement de la liste</string>
     <string name="settings_screen_sync">Paramètres de synchronisation</string>
@@ -203,6 +203,12 @@
     <string name="pref_font_size_medium">Moyenne</string>
     <string name="pref_font_size_large">Grande</string>
     <string name="pref_font_size_xlarge">Très grande</string>
+    <string name="pref_button_size_title">Taille des boutons</string>
+    <string name="pref_button_size_summary">Taille de la case à cocher et des quatre boutons de saut dans les lignes de liste.</string>
+    <string name="pref_button_size_small">Petite</string>
+    <string name="pref_button_size_medium">Moyenne</string>
+    <string name="pref_button_size_large">Grande</string>
+    <string name="pref_button_size_xlarge">Très grande</string>
     <string name="default_apply_title">Appliquer aux listes existantes ?</string>
     <string name="default_apply_msg">Ce changement doit-il s\'appliquer à toutes les listes existantes ou seulement aux nouvelles ?</string>
     <string name="default_apply_all_lists">Toutes les listes</string>
@@ -217,4 +223,18 @@
     <string name="confirm_list_clear_msg">Vider toute la liste ? %d éléments seront supprimés.</string>
     <string name="confirm_delete_list_msg">Supprimer cette liste localement ?</string>
     <string name="confirm_delete_list_online_msg">Supprimer cette liste en ligne et localement ? Si d\'autres appareils y ont encore accès, ils pourraient la téléverser à nouveau.</string>
+    <string name="feedback_dialog_title">Aimez-vous OpenSyncedLists ?</string>
+    <string name="feedback_dialog_message">Une notation nous aide beaucoup. Avez-vous trouvé un bug ou quelque chose manque ? Envoyez-nous un e-mail — vous pouvez aussi le faire depuis l\'écran À propos.</string>
+    <string name="feedback_dialog_send">Envoyer e-mail</string>
+    <string name="feedback_dialog_cancel">Pas maintenant</string>
+
+    <string name="pref_language_title">Langue</string>
+    <string name="pref_language_summary">Sélectionner la langue de l\'app</string>
+    <string name="pref_language_ai_note">Puisque l\'app est développée par un seul développeur, les traductions ont dû être générées par IA. Si vous trouvez des erreurs ou une langue manquante, envoyez un e-mail depuis le menu de la page À propos.</string>
+    <string name="pref_language_system">Langue du système</string>
+    <string name="pref_language_english">English</string>
+    <string name="pref_language_german">Deutsch</string>
+    <string name="pref_language_spanish">Español</string>
+    <string name="pref_language_french">Français</string>
+    <string name="pref_language_portuguese">Português (Brasil)</string>
 </resources>

@@ -32,6 +32,19 @@ run_gradle() {
     ./gradlew "$@" --info 2>&1 | grep -E "(> Task|PASSED|FAILED|Test |tests completed|SUCCESS|FAILURE)"
 }
 
+# Re-enable system animations on the connected device. The instrumented tests
+# disable all animation scales (so Espresso does not wait on animations); this
+# restores them to 1 so the device behaves normally after a test run.
+# Safe to call without a device (errors are ignored).
+restore_animations() {
+    command -v adb >/dev/null 2>&1 || return 0
+    for scale in window_animation_scale transition_animation_scale \
+        animator_duration_scale; do
+        adb shell settings put global "$scale" 1 >/dev/null 2>&1 || true
+    done
+    echo "Animations re-enabled on device."
+}
+
 # Print a table row for each XML file matching the given glob.
 # Usage: print_xml_rows <glob> <class_name_sed> <col_width>
 print_xml_rows() {
@@ -154,6 +167,75 @@ case "${1:-build}" in
         else
             echo "No UI test results found. Make sure a device/emulator is connected."
         fi
+        restore_animations
+        ;;
+    test-ui-class)
+        if [ -z "$2" ]; then
+            echo "Usage: $0 test-ui-class <Class[#method]>"
+            echo "  e.g. $0 test-ui-class ListActivityTest"
+            echo "       $0 test-ui-class ListActivityTest#testDragAndDropAcrossViewsAndDistances"
+            echo "       $0 test-ui-class eu.schmidt.systems.opensyncedlists.activities.ListActivityTest#testSearchAndMenuActions"
+            exit 1
+        fi
+        # Accept a short class name (matched against the known UI test classes)
+        # or a fully-qualified name, optionally with a #method suffix.
+        TARGET="$2"
+        CLASS_PART="${TARGET%%#*}"
+        METHOD_PART=""
+        case "$TARGET" in *#*) METHOD_PART="${TARGET#*#}";; esac
+        # Expand a short class name to its fully-qualified form if possible.
+        if [[ "$CLASS_PART" != *.* ]]; then
+            FOUND=$(find app/src/androidTest/java -name "${CLASS_PART}.java" 2>/dev/null | head -1)
+            if [ -n "$FOUND" ]; then
+                PKG=$(grep -oP '^package \K[^;]+' "$FOUND")
+                CLASS_PART="${PKG}.${CLASS_PART}"
+            fi
+        fi
+        if [ -n "$METHOD_PART" ]; then
+            RUN_ARG="${CLASS_PART}#${METHOD_PART}"
+        else
+            RUN_ARG="${CLASS_PART}"
+        fi
+        echo "Running UI test(s): $RUN_ARG (requires connected device or emulator)..."
+        run_gradle connectedDebugAndroidTest \
+            "-Pandroid.testInstrumentationRunnerArguments.class=${RUN_ARG}"
+
+        echo ""
+        echo "=========================================="
+        echo "UI Test Report Summary"
+        echo "=========================================="
+        if [ -d "$UI_RESULT_DIR" ]; then
+            [ -f "app/build/reports/androidTests/connected/index.html" ] && \
+                echo "Full HTML report: $PROJECT_DIR/app/build/reports/androidTests/connected/index.html"
+            show_ui_results 60
+            echo ""
+            print_totals "$UI_RESULT_DIR" "Total"
+        else
+            echo "No UI test results found. Make sure a device/emulator is connected."
+        fi
+        restore_animations
+        ;;
+    list-ui-tests)
+        echo "Available UI / instrumented tests:"
+        echo ""
+        # Scan androidTest sources: print each test class and its @Test methods.
+        find app/src/androidTest/java -name "*.java" | sort | while read -r src; do
+            # Only files that actually contain @Test methods.
+            grep -q '@Test' "$src" || continue
+            PKG=$(grep -oP '^package \K[^;]+' "$src")
+            CLASS=$(basename "$src" .java)
+            echo "  ${PKG}.${CLASS}"
+            # Method name on the line following an @Test annotation.
+            grep -A1 '@Test' "$src" \
+                | grep -oP 'public\s+void\s+\K[a-zA-Z0-9_]+' \
+                | while read -r m; do
+                    echo "      #${m}"
+                done
+            echo ""
+        done
+        echo "Run one with:"
+        echo "  $0 test-ui-class <Class>            # whole class"
+        echo "  $0 test-ui-class <Class>#<method>   # single test"
         ;;
     gen-screenshots)
         echo "Generating Play Store screenshots (requires connected device or emulator)..."
@@ -181,6 +263,7 @@ case "${1:-build}" in
             eu.schmidt.systems.opensyncedlists.test/androidx.test.runner.AndroidJUnitRunner
 
         "$REPO_ROOT/screenshots/generate.sh"
+        restore_animations
         ;;
     test-all)
         echo "Running all tests: unit tests + UI / instrumented tests..."
@@ -211,6 +294,7 @@ case "${1:-build}" in
         else
             echo "  (no UI test results – device/emulator not connected)"
         fi
+        restore_animations
         ;;
     clean)
         echo "Cleaning build..."
@@ -220,20 +304,28 @@ case "${1:-build}" in
         echo "Running lint..."
         ./gradlew lint
         ;;
+    restore-animations)
+        restore_animations
+        ;;
     *)
-        echo "Usage: $0 {build|release|test|test-verbose|test-class <ClassName>|test-ui|gen-screenshots|test-all|clean|lint}"
+        echo "Usage: $0 {build|release|test|test-verbose|test-class <ClassName>|test-ui|test-ui-class <Class[#method]>|list-ui-tests|gen-screenshots|test-all|clean|lint|restore-animations}"
         echo ""
         echo "Commands:"
         echo "  build        - Build debug APK"
         echo "  release      - Build release APK"
         echo "  test         - Run unit tests with summary"
         echo "  test-verbose - Run unit tests with full output"
-        echo "  test-class   - Run tests for specific class"
-        echo "  test-ui      - Run UI / instrumented tests (needs device or emulator)"
+        echo "  test-class   - Run unit tests for a specific class"
+        echo "  test-ui      - Run ALL UI / instrumented tests (needs device or emulator)"
+        echo "  test-ui-class <Class[#method]> - Run a single UI test class or method"
+        echo "                 e.g. $0 test-ui-class ListActivityTest"
+        echo "                      $0 test-ui-class ListActivityTest#testDragAndDropAcrossViewsAndDistances"
+        echo "  list-ui-tests - List all UI test classes and their test methods"
         echo "  gen-screenshots - Generate screenshots and replace fastlane images"
         echo "  test-all     - Run unit tests + UI tests"
         echo "  clean        - Clean build artifacts"
         echo "  lint         - Run lint checks"
+        echo "  restore-animations - Re-enable device animations (UI tests disable them)"
         exit 1
         ;;
 esac

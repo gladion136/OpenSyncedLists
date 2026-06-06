@@ -48,6 +48,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+
+import eu.schmidt.systems.opensyncedlists.helpers.LocaleHelper;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
@@ -104,7 +106,8 @@ public class ListsActivity extends AppCompatActivity
      * (e.g. configuration change or test setUp cycles).
      */
     private static boolean sAutoOpenAttempted = false;
-    
+    private String currentLanguage;
+
     /** Resets the auto-open flag. Intended for use in tests only. */
     public static void resetAutoOpenForTesting()
     {
@@ -149,6 +152,11 @@ public class ListsActivity extends AppCompatActivity
     private final Executor backgroundExecutor =
         Executors.newSingleThreadExecutor();
     
+    @Override protected void attachBaseContext(Context newBase)
+    {
+        super.attachBaseContext(LocaleHelper.attachBaseContext(newBase));
+    }
+
     /**
      * In onCreate the layout is set and the global Variables are initialised.
      *
@@ -157,6 +165,9 @@ public class ListsActivity extends AppCompatActivity
     @Override protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        currentLanguage = PreferenceManager
+            .getDefaultSharedPreferences(this)
+            .getString("language", "system");
         setContentView(R.layout.activity_lists);
         recyclerView = findViewById(R.id.lVLists);
         fab = findViewById(R.id.floatingActionButton);
@@ -226,6 +237,21 @@ public class ListsActivity extends AppCompatActivity
     
     @Override protected void onResume()
     {
+        super.onResume();
+
+        String newLanguage = PreferenceManager
+            .getDefaultSharedPreferences(this)
+            .getString("language", "system");
+
+        if (currentLanguage != null && !newLanguage.equals(currentLanguage))
+        {
+            currentLanguage = newLanguage;
+            new Handler(Looper.getMainLooper()).post(this::recreate);
+            return;
+        }
+
+        currentLanguage = newLanguage;
+
         try
         {
             syncedListsHeaders = secureStorage.getListsHeaders();
@@ -237,7 +263,6 @@ public class ListsActivity extends AppCompatActivity
         }
         updateListSettings();
         listsAdapter.updateItems(syncedListsHeaders, true);
-        super.onResume();
     }
     
     /**

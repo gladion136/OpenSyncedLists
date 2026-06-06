@@ -41,16 +41,17 @@
                 android:id="@+id/hLayoutMain"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="-5dp"
                 android:layout_weight="3"
                 android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/checkBox"
-                    android:layout_width="40dp"
+                    android:layout_width="35dp"
                     android:layout_height="0dp"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:minWidth="48dp"
+                    android:minWidth="35dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -60,7 +61,6 @@
                     android:id="@+id/linearLayout5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:orientation="vertical"
@@ -89,6 +89,54 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/btnJumpUp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="3dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@id/btnJumpTop"
+                    app:layout_constraintStart_toEndOf="@+id/linearLayout5"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/up_arrow"
+                    app:tint="?attr/colorControlNormal" />
+
+                <ImageView
+                    android:id="@+id/btnJumpDown"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="3dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btnJumpBottom"
+                    app:layout_constraintTop_toBottomOf="@+id/btnJumpUp"
+                    app:srcCompat="@drawable/down_arrow"
+                    app:tint="?attr/colorControlNormal" />
+
+                <ImageView
+                    android:id="@+id/btnJumpTop"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="3dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@+id/btnOverviewMenu"
+                    app:layout_constraintStart_toEndOf="@+id/btnJumpUp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/top_arrow"
+                    app:tint="?attr/colorControlNormal" />
+
+                <ImageView
+                    android:id="@+id/btnJumpBottom"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="3dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btnOverviewMenu"
+                    app:layout_constraintTop_toBottomOf="@+id/btnJumpTop"
+                    app:srcCompat="@drawable/bottom_arrow"
+                    app:tint="?attr/colorControlNormal" />
+
+                <ImageView
                     android:id="@+id/btnOverviewMenu"
                     android:layout_width="28dp"
                     android:layout_height="36dp"
@@ -103,75 +151,6 @@
                     app:srcCompat="@drawable/dot_menu_50"
                     app:tint="?attr/colorControlNormal" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                android:weightSum="4">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutJumpButtons"
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-
-                    <ImageView
-                        android:id="@+id/btnJumpUp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:padding="3dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/up_arrow"
-                        app:tint="?attr/colorControlNormal" />
-
-                    <ImageView
-                        android:id="@+id/btnJumpDown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:padding="3dp"
-                        android:src="@drawable/down_arrow"
-                        app:tint="?attr/colorControlNormal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/linearLayout3"
-                    android:layout_width="50dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/btnJumpTop"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:padding="3dp"
-                        android:src="@drawable/top_arrow"
-                        app:tint="?attr/colorControlNormal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/btnJumpBottom"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:padding="3dp"
-                        android:src="@drawable/bottom_arrow"
-                        app:tint="?attr/colorControlNormal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </LinearLayout>
 
         </LinearLayout>
 

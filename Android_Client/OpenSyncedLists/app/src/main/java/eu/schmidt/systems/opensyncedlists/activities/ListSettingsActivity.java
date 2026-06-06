@@ -16,6 +16,7 @@
  */
 package eu.schmidt.systems.opensyncedlists.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -25,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.fragments.ListSettingsFragment;
+import eu.schmidt.systems.opensyncedlists.helpers.LocaleHelper;
 
 /**
  * Activity to displaying settings for one SyncedList
@@ -32,7 +34,12 @@ import eu.schmidt.systems.opensyncedlists.fragments.ListSettingsFragment;
 public class ListSettingsActivity extends AppCompatActivity
 {
     ListSettingsFragment listSettingsFragment;
-    
+
+    @Override protected void attachBaseContext(Context newBase)
+    {
+        super.attachBaseContext(LocaleHelper.attachBaseContext(newBase));
+    }
+
     /**
      * In onCreate the layout is set and the global Variables are initialised.
      *

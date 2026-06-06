@@ -30,6 +30,20 @@
         android:title="@string/settings_screen_design">
 
         <ListPreference
+            android:defaultValue="system"
+            android:entries="@array/pref_language_entries"
+            android:entryValues="@array/pref_language_values"
+            android:key="language"
+            android:summary="@string/pref_language_summary"
+            android:title="@string/pref_language_title" />
+
+        <Preference
+            android:icon="@drawable/ic_info"
+            android:persistent="false"
+            android:selectable="false"
+            android:summary="@string/pref_language_ai_note" />
+
+        <ListPreference
             android:defaultValue="@string/pref_design_system"
             android:entries="@array/pref_design"
             android:entryValues="@array/pref_design"
@@ -49,6 +63,14 @@
             android:key="font_size"
             android:summary="@string/pref_font_size_summary"
             android:title="@string/pref_font_size_title" />
+
+        <ListPreference
+            android:defaultValue="35"
+            android:entries="@array/pref_button_size_entries"
+            android:entryValues="@array/pref_button_size_values"
+            android:key="button_size"
+            android:summary="@string/pref_button_size_summary"
+            android:title="@string/pref_button_size_title" />
 
     </PreferenceScreen>
 

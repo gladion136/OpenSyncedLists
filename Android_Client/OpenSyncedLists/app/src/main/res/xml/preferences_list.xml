@@ -18,17 +18,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="list_settings">
 
+
     <Preference
         android:icon="@drawable/ic_info"
         android:key="list_settings_scope_hint"
         android:persistent="false"
         android:selectable="false"
         android:summary="@string/list_settings_scope_hint" />
-
-    <Preference
-        android:key="default_settings_btn"
-        android:summary="@string/sync_hint_defaults_summary"
-        android:title="@string/sync_hint_defaults_title" />
 
     <EditTextPreference
         android:key="list_name"
@@ -113,5 +109,18 @@
             android:title="@string/list_pref_delete_online_btn_title" />
 
     </PreferenceScreen>
+
+
+    <PreferenceCategory android:title="@string/sync_hints_category">
+
+        <Preference
+            android:key="default_settings_btn"
+            android:icon="@drawable/ic_info"
+            android:summary="@string/sync_hint_defaults_summary"
+            android:title="@string/sync_hint_defaults_title" />
+
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

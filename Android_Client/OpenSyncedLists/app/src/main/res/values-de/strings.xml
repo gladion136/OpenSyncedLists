@@ -31,7 +31,7 @@
     <string name="menu_list_settings">Einstellungen für diese Liste</string>
     <string name="menu_list_clear">Liste leeren</string>
     <string name="menu_check_all">Alle abhaken</string>
-    <string name="menu_uncheck_all">Alle Erledigten abhaken</string>
+    <string name="menu_uncheck_all">Erledigte abhaken</string>
     <string name="menu_delete_checked">Alle Erledigten löschen</string>
     <string name="menu_toggle_all">Alle umkehren</string>
     <string name="menu_export_group">Exportieren…</string>
@@ -72,7 +72,7 @@
     <string name="pref_design_light">Hell</string>
     <string name="pref_design_dark">Dunkel</string>
     <string name="jump_range_title">Sprung Reichweite</string>
-    <string name="jump_range_description">So weit wird das Element mit den Pfeilen \"Hoch\"/\"Runter\" verschoben</string>
+    <string name="jump_range_description">So weit springt das Element mit den Pfeilen \"Auf\"/\"Ab\"</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Synchronisere Listen automatisch</string>
@@ -150,7 +150,7 @@
     <string name="data_reset_everything_summary">Alle Daten (Listen, Einstellungen, Dateien) löschen und App neu starten, wie \"Daten löschen\".</string>
     <string name="data_reset_everything_confirm">ALLE App-Daten löschen und neu starten? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="list_pref_jump_buttons_title">Sprungknöpfe</string>
-    <string name="list_pref_jump_buttons_summary">Zeige Sprungknöpfe an, die Reichweite kann in den globalen Einstellungen angepasst werden.</string>
+    <string name="list_pref_jump_buttons_summary">Sprungknöpfe anzeigen; Reichweite in globalen Einstellungen einstellen</string>
     <string name="menu_import_url">Liste aus Link importieren</string>
     <string name="import_list_url_title">Liste importieren</string>
     <string name="import_list_url_msg">Importiere eine List aus einem Link.</string>
@@ -159,7 +159,7 @@
     <string name="search">Suchen</string>
     <string name="unknown_file_type">Unbekanntes Dateiformat</string>
     <string name="create_tag_title">Neuen Tag erstellen</string>
-    <string name="create_tag_msg">Erstelle einen neuen Tag, um deine Listen damit zu soriteren.</string>
+    <string name="create_tag_msg">Erstelle einen neuen Tag, um deine Listen damit zu filtern.</string>
     <string name="create_tag_yes">Erstellen</string>
     <string name="create_tag_cancel">Abbrechen</string>
     <string name="menu_rename_tag">Tag umbenennen</string>
@@ -170,7 +170,7 @@
     <string name="assign_tag_to_list_title">Tags zuweisen</string>
     <string name="assign_tag_to_list_msg">Füge Tags zu der Liste hinzu.</string>
     <string name="rename_tag_dialog_title">Tag umbenennen</string>
-    <string name="rename_tag_dialog_message">Wähle einen neuen Namen für den Tag</string>
+    <string name="rename_tag_dialog_message">Gib einen neuen Namen ein</string>
     <string name="rename_tag_dialog_no_option">Abbrechen</string>
     <string name="rename_tag_dialog_yes_option">Bestätigen</string>
     <string name="default_tag_title_favorites">Favoriten</string>
@@ -203,7 +203,7 @@
     <string name="confirm_action_yes">Bestätigen</string>
     <string name="confirm_action_no">Abbrechen</string>
     <string name="settings_screen_design">Design</string>
-    <string name="settings_screen_design_summary">Theme, Listenübersicht und Schriftgröße</string>
+    <string name="settings_screen_design_summary">Theme, Listenübersicht, Schriftgröße und Buttongröße</string>
     <string name="settings_screen_interactions">Interaktionen</string>
     <string name="settings_screen_interactions_summary">Sprungweite und Listen-Scrollen</string>
     <string name="settings_screen_sync">Synchronisations-Einstellungen</string>
@@ -228,6 +228,12 @@
     <string name="pref_font_size_medium">Mittel</string>
     <string name="pref_font_size_large">Groß</string>
     <string name="pref_font_size_xlarge">Sehr groß</string>
+    <string name="pref_button_size_title">Buttongröße</string>
+    <string name="pref_button_size_summary">Größe von Checkbox und den vier Sprungknöpfen in den Listeneinträgen.</string>
+    <string name="pref_button_size_small">Klein</string>
+    <string name="pref_button_size_medium">Mittel</string>
+    <string name="pref_button_size_large">Groß</string>
+    <string name="pref_button_size_xlarge">Sehr groß</string>
     <string name="default_apply_title">Auf bestehende Listen anwenden?</string>
     <string name="default_apply_msg">Soll diese Änderung für alle bestehenden Listen oder nur für neue Listen gelten?</string>
     <string name="default_apply_all_lists">Alle Listen</string>
@@ -243,9 +249,19 @@
     <string name="confirm_delete_list_msg">Diese Liste lokal löschen?</string>
     <string name="confirm_delete_list_online_msg">Diese Liste online und lokal löschen? Wenn andere Geräte noch Zugriff haben, könnten sie sie erneut hochladen.</string>
     <string name="feedback_dialog_title">Dein Feedback?</string>
-    <string name="feedback_dialog_message">Gefällt dir OpenSyncedLists? Eine Bewertung hilft sehr. Falls etwas fehlt oder nicht funktioniert, sende uns dein Feedback oder einen Fehlerbericht per Mail.</string>
-    <string name="feedback_dialog_send">Mail senden</string>
+    <string name="feedback_dialog_message">Gefällt dir OpenSyncedLists? Eine Bewertung hilft uns sehr. Fehlt dir etwas oder hast du einen Fehler gefunden? Schreib uns — du kannst das auch vom Über-Bildschirm aus tun.</string>
+    <string name="feedback_dialog_send">E-Mail senden</string>
     <string name="feedback_dialog_cancel">Nicht jetzt</string>
     <string name="feedback_mail_subject">OpenSyncedLists Feedback / Fehlerbericht</string>
+
+    <string name="pref_language_title">Sprache</string>
+    <string name="pref_language_summary">Sprache der App wählen</string>
+    <string name="pref_language_ai_note">Da die App von nur einem Entwickler gebaut wird, mussten die Übersetzungen leider KI-generiert werden. Wenn du Fehler findest oder eine Sprache vermisst, schreib eine E-Mail über das Menü auf der About-Seite.</string>
+    <string name="pref_language_system">Systemsprache</string>
+    <string name="pref_language_english">English</string>
+    <string name="pref_language_german">Deutsch</string>
+    <string name="pref_language_spanish">Español</string>
+    <string name="pref_language_french">Français</string>
+    <string name="pref_language_portuguese">Português (Brasil)</string>
 
 </resources>

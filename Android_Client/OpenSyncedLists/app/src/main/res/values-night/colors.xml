@@ -27,6 +27,6 @@
     <color name="green">#FF07fc0f</color>
     <color name="grey">#8F5b5b5b</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="card_background_light">#FFFFFFFF</color>
+    <color name="card_background_light">#FF1E1E1E</color>
     <color name="card_background_dark">#FF1E1E1E</color>
 </resources>

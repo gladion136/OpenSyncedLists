@@ -20,6 +20,7 @@ import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_DEFAUL
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_NETWORK;
 import static eu.schmidt.systems.opensyncedlists.utils.Constant.LOG_TITLE_STORAGE;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -53,6 +54,7 @@ import java.util.List;
 
 import eu.schmidt.systems.opensyncedlists.R;
 import eu.schmidt.systems.opensyncedlists.adapters.SyncedListAdapter;
+import eu.schmidt.systems.opensyncedlists.helpers.LocaleHelper;
 import eu.schmidt.systems.opensyncedlists.network.ServerException;
 import eu.schmidt.systems.opensyncedlists.network.ServerWrapper;
 import eu.schmidt.systems.opensyncedlists.storages.FileStorage;
@@ -75,13 +77,25 @@ public class ListActivity extends AppCompatActivity
     private SecureStorage secureStorage;
     private SyncedList syncedList;
     private SyncedListAdapter syncedListAdapter;
+    /**
+     * Set when we navigate to a settings screen so the next onResume reloads
+     * the list + recreates the adapter to pick up changed settings. We must NOT
+     * recreate the adapter on every resume: doing so during/after a drag tears
+     * down the ItemTouchHelper state and breaks drag-and-drop.
+     */
+    private boolean reloadSettingsOnResume = false;
     private Handler autoSyncHandler;
     private Runnable autoSyncRunnable;
     private RecyclerView recyclerView;
     private EditText eTNewElement;
     private ImageView iVNewElementTop, iVNewElementBottom;
     private SharedPreferences globalSharedPreferences;
-    
+
+    @Override protected void attachBaseContext(Context newBase)
+    {
+        super.attachBaseContext(LocaleHelper.attachBaseContext(newBase));
+    }
+
     /**
      * In onCreate the layout is set and the global Variables are initialised.
      *
@@ -127,7 +141,14 @@ public class ListActivity extends AppCompatActivity
     @Override protected void onResume()
     {
         super.onResume();
-        reloadListSettings();
+        // Only reload (and recreate the adapter) when returning from the list
+        // settings, never on every resume — recreating the adapter mid/after a
+        // drag breaks ItemTouchHelper and the drag-and-drop gesture.
+        if (reloadSettingsOnResume)
+        {
+            reloadSettingsOnResume = false;
+            reloadListSettings();
+        }
         activateAutoSync();
     }
     
@@ -149,6 +170,13 @@ public class ListActivity extends AppCompatActivity
             if (reloadedList != null)
             {
                 syncedList = reloadedList;
+                // Detach the old adapter's drag helper before replacing it,
+                // otherwise the previous ItemTouchHelper stays attached to the
+                // RecyclerView and the stacked helpers break drag-and-drop.
+                if (syncedListAdapter != null)
+                {
+                    syncedListAdapter.detachDragHelper();
+                }
                 // Recreate the adapter with the updated list
                 syncedListAdapter =
                     new SyncedListAdapter(this, recyclerView, syncedList);
@@ -349,6 +377,8 @@ public class ListActivity extends AppCompatActivity
                 Intent listSettingsIntent =
                     new Intent(this, ListSettingsActivity.class);
                 listSettingsIntent.putExtra("id", syncedList.getId());
+                // Reload on return so changed settings take effect.
+                reloadSettingsOnResume = true;
                 startActivity(listSettingsIntent);
                 return true;
             case R.id.manual_sync:
@@ -405,6 +435,8 @@ public class ListActivity extends AppCompatActivity
                 // Open global settings
                 Intent settingsIntent =
                     new Intent(this, SettingsActivity.class);
+                // Reload on return so global design settings take effect.
+                reloadSettingsOnResume = true;
                 startActivity(settingsIntent);
                 return true;
         }
@@ -450,13 +482,21 @@ public class ListActivity extends AppCompatActivity
         boolean notify)
     {
         syncedList.addElementStep(syncedListStep);
-        
+
         if (notify)
         {
             this.recyclerView.post(
                 () -> syncedListAdapter.notifyDataSetChanged());
         }
-        
+
+        saveListToStorage();
+    }
+
+    /**
+     * Write the current list to local storage, logging any I/O/JSON error.
+     */
+    private void saveListToStorage()
+    {
         try
         {
             secureStorage.setList(syncedList);
