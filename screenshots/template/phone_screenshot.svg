@@ -23,8 +23,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="1.1059801"
-     inkscape:cx="317.36556"
-     inkscape:cy="268.99218"
+     inkscape:cx="268.54009"
+     inkscape:cy="682.20034"
      inkscape:window-width="2560"
      inkscape:window-height="1299"
      inkscape:window-x="0"
@@ -63,15 +63,17 @@
          id="stop12" />
     </linearGradient>
     <clipPath
-       id="phone-clip">
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath331">
       <rect
          x="108"
-         y="360"
+         y="359.98343"
          width="864"
-         height="1782"
+         height="1761.7644"
          rx="48"
-         ry="48"
-         id="rect3" />
+         ry="47.454933"
+         id="rect333"
+         style="stroke-width:0.994307" />
     </clipPath>
   </defs>
   <g
@@ -132,22 +134,22 @@
        x="94"
        y="345.40625"
        width="892"
-       height="1771.3384"
+       height="1791.8342"
        rx="64"
-       ry="63.121181"
+       ry="63.851551"
        fill="#111827"
        opacity="0.14"
        id="rect31"
-       style="opacity:0.904449;fill:#5212c9;fill-opacity:1;stroke:none;stroke-width:4.96555;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:0.904449;fill:#5212c9;fill-opacity:1;stroke:none;stroke-width:4.99419;stroke-dasharray:none;stroke-opacity:1"
        inkscape:label="rect31" />
     <image
        id="app_screenshot"
        x="108"
        y="352"
        width="864"
-       height="1774"
+       height="1770.3281"
        preserveAspectRatio="xMidYMid slice"
-       clip-path="url(#phone-clip)"
+       clip-path="url(#clipPath331)"
        xlink:href="__SCREENSHOT_PATH__"
        href="__SCREENSHOT_PATH__" />
   </g>
