@@ -1,0 +1,27 @@
+OpenSyncedLists es la forma rápida y privada de tener bajo control cada lista de tareas, pendiente y proyecto pequeño: sincronizada entre tus dispositivos y cifrada de extremo a extremo.
+
+Ya sea la compra semanal, una lista de deseos o las tareas de tu próximo proyecto: crea una lista en segundos, ordénala a tu manera y marca los elementos a medida que avanzas. Cuando termines, reinicia toda la lista con un solo toque y vuelve a empezar.
+
+POR QUÉ TE ENCANTARÁ
+
+• Orden sin esfuerzo: mueve cualquier elemento arrastrando y soltando, o envíalo directo al principio o al final.
+• Vista clara: etiquetas, contadores de progreso y un modo compacto mantienen legibles las listas largas.
+• Mantiene el orden: los elementos marcados se apartan pero conservan su lugar, listos para reutilizarse.
+• Reinicio con un toque: desmarca todo de una vez y vuelve a usar la misma lista.
+• Ideal para proyectos pequeños: agrupa tareas con tus propias etiquetas y controla lo que falta.
+
+PRIVACIDAD POR DISEÑO
+
+• Sincronización cifrada de extremo a extremo: tus listas se cifran en tu dispositivo.
+• Autoalojado: la sincronización se ejecuta en tu propio servidor, uno distinto por lista si quieres.
+• El operador del servidor nunca puede leer tus listas. Sin cuentas, sin seguimiento, sin recopilación de datos.
+
+HECHO A TU MEDIDA
+
+• Modo para zurdos y controles ajustables (con o sin botones).
+• Tamaño de fuente ajustable para los elementos de la lista.
+• Comparte listas mediante una URL.
+• Exporta como Markdown, portapapeles, mensaje, JSON y más.
+• Gratis y de código abierto.
+
+Tus listas. Tu servidor. Totalmente cifrado.

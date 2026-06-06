@@ -1,0 +1,4 @@
+- Confirmações antes de ações destrutivas
+- Muitas configurações novas, com padrões aplicáveis a todas as listas
+- Tamanho de fonte ajustável e mais personalização
+- Edite itens direto na visão geral

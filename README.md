@@ -1,20 +1,37 @@
 # OpenSyncedLists
 
-Create easy to sort lists and synchronize it with your own server.
+OpenSyncedLists is the fast, private way to keep every checklist, to-do and
+small project under control – synced across your devices and encrypted
+end-to-end.
 
-## Features
+Whether it's the weekly shopping, a bucket list or the tasks for your next
+project: create a list in seconds, sort it your way and tick items off as you
+go. When you're done, reset the whole list with a single tap and start over.
 
-- Easily manage, create, edit and share lists
-- Easy sorting of list items (through 5 movement options)
-- Collaboration between multiple devices through fast and automatic synchronization
-- Share lists via URL
-- Export lists as Markdown, Clipboard, Message, JSON and more
-- Different servers for synchronization per list is possible
-- Server can/must be self-hosted (we don't collect data!)
+## Why you'll love it
 
-## Data privacy
+- **Effortless sorting** – move any item by drag-and-drop, or jump it straight to the top or bottom.
+- **Clear overview** – tags, progress counters and a compact mode keep busy lists easy to scan.
+- **Stays in order** – checked items move aside but keep their place, ready to be reused.
+- **One-tap reset** – clear all checkmarks at once and run the same list again.
+- **Perfect for small projects** – group tasks with your own tags and track what's left.
 
-We don't collect data. Your lists are only synced with your own server instance. Also the lists are stored encrypted on the server instances. The private key to decrypt the lists is only stored offline on your local device.
+## Made to fit you
+
+- Left-handed mode and adjustable controls (with or without buttons).
+- Adjustable font size for list elements.
+- Share lists via URL.
+- Export as Markdown, clipboard, message, JSON and more.
+- Free and open source.
+
+## Privacy by design
+
+We don't collect data. Your lists are only synced with your own server
+instance and are stored **end-to-end encrypted** there – the server operator
+can never read them. The private key to decrypt the lists is only stored
+offline on your local device. You can even use a different server per list.
+
+No accounts, no tracking, no data collection.
 
 ## Install Android-Client
 

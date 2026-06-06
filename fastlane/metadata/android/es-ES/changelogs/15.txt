@@ -1,0 +1,4 @@
+- Confirmaciones antes de acciones destructivas
+- Muchos ajustes nuevos, con valores predeterminados aplicables a todas las listas
+- Tamaño de fuente ajustable y más personalización
+- Edita elementos directamente desde el resumen

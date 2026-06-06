@@ -1,5 +1,12 @@
 # Changelog of OpenSyncedLists
 
+## 1.3.0 (01.06.2026)
+
+- Safety checks before destructive actions
+- Lots of new settings, with defaults you can apply to all lists
+- Adjustable font size and more customization
+- Edit items right from the overview
+
 ## 1.2.0 (03.04.2026)
 
 - feat: import text list with markdown checkbox support (- [x] / - [ ])

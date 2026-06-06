@@ -1,6 +1,4 @@
-- neu: Textlisten-Import mit Markdown-Checkbox-Unterstützung (- [x] / - [ ])
-- neu: Massenaktionen – alle abhaken, alle abwählen, Erledigte löschen, alle umkehren
-- neu: Zuletzt geöffnete Liste wird beim App-Start automatisch geöffnet
-- fix: mehrere Fehler behoben
-- ui: Grupierte Überlaufmenüs in Listen-Übersicht und Einzellisten-Ansicht
-- Übersetzungen: Brasilianisches Portugiesisch, Spanisch, Französisch
+- Sicherheitsabfragen vor kritischen Aktionen
+- Viele neue Einstellungen, mit Standards für alle Listen anwendbar
+- Anpassbare Schriftgröße und mehr Individualisierung
+- Elemente direkt in der Übersicht bearbeiten

@@ -1,0 +1,27 @@
+OpenSyncedLists ist der schnelle, private Weg, jede Checkliste, To-do-Liste und kleines Projekt im Griff zu behalten – über deine Geräte synchronisiert und Ende-zu-Ende verschlüsselt.
+
+Ob Wocheneinkauf, Bucket-List oder die Aufgaben fürs nächste Projekt: Erstelle eine Liste in Sekunden, sortiere sie nach deinem Geschmack und hake Einträge ab. Bist du fertig, setzt du die ganze Liste mit einem Tipp zurück und legst neu los.
+
+DARUM WIRST DU SIE LIEBEN
+
+• Müheloses Sortieren – jeden Eintrag per Drag-and-drop verschieben oder direkt nach ganz oben oder unten springen.
+• Klare Übersicht – Tags, Fortschrittsanzeigen und ein kompakter Modus halten auch volle Listen übersichtlich.
+• Bleibt in Reihenfolge – abgehakte Einträge rücken zur Seite, behalten aber ihren Platz und sind wiederverwendbar.
+• Zurücksetzen mit einem Tipp – alle Haken auf einmal entfernen und dieselbe Liste erneut nutzen.
+• Perfekt für kleine Projekte – Aufgaben mit eigenen Tags gruppieren und behalten, was noch offen ist.
+
+PRIVATSPHÄRE VON GRUND AUF
+
+• Ende-zu-Ende verschlüsselte Synchronisation – deine Listen werden auf deinem Gerät verschlüsselt.
+• Selbst gehostet – Synchronisation läuft auf deinem eigenen Server, auf Wunsch ein anderer pro Liste.
+• Der Serverbetreiber kann deine Listen nie lesen. Keine Konten, kein Tracking, keine Datensammlung.
+
+PASST SICH DIR AN
+
+• Linkshänder-Modus und anpassbare Bedienung (mit oder ohne Buttons).
+• Anpassbare Schriftgröße für Listenelemente.
+• Listen per URL teilen.
+• Export als Markdown, Zwischenablage, Nachricht, JSON und mehr.
+• Kostenlos und Open Source.
+
+Deine Listen. Dein Server. Vollständig verschlüsselt.

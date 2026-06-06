@@ -1,0 +1,27 @@
+OpenSyncedLists est le moyen rapide et privé de garder le contrôle sur chaque check-list, tâche et petit projet – synchronisé entre vos appareils et chiffré de bout en bout.
+
+Que ce soit les courses de la semaine, une liste d'envies ou les tâches de votre prochain projet : créez une liste en quelques secondes, triez-la à votre façon et cochez les éléments au fur et à mesure. Une fois terminé, réinitialisez toute la liste d'un seul appui et recommencez.
+
+POURQUOI VOUS ALLEZ L'ADORER
+
+• Tri sans effort – déplacez n'importe quel élément par glisser-déposer, ou envoyez-le directement tout en haut ou tout en bas.
+• Vue d'ensemble claire – étiquettes, compteurs de progression et un mode compact gardent les listes chargées lisibles.
+• Reste dans l'ordre – les éléments cochés se rangent de côté mais gardent leur place, prêts à être réutilisés.
+• Réinitialisation en un appui – décochez tout d'un coup et relancez la même liste.
+• Parfait pour les petits projets – regroupez les tâches avec vos propres étiquettes et suivez ce qu'il reste.
+
+LA CONFIDENTIALITÉ PAR CONCEPTION
+
+• Synchronisation chiffrée de bout en bout – vos listes sont chiffrées sur votre appareil.
+• Auto-hébergé – la synchronisation tourne sur votre propre serveur, un par liste si vous le souhaitez.
+• L'opérateur du serveur ne peut jamais lire vos listes. Aucun compte, aucun suivi, aucune collecte de données.
+
+CONÇU POUR VOUS
+
+• Mode gaucher et commandes ajustables (avec ou sans boutons).
+• Taille de police ajustable pour les éléments de liste.
+• Partagez les listes via une URL.
+• Exportez en Markdown, presse-papiers, message, JSON et plus.
+• Gratuit et open source.
+
+Vos listes. Votre serveur. Entièrement chiffré.

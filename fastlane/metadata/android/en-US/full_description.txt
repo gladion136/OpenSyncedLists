@@ -4,7 +4,7 @@ Whether it's the weekly shopping, a bucket list or the tasks for your next proje
 
 WHY YOU'LL LOVE IT
 
-• Effortless sorting – move any item up, down or to either end. No fiddly dragging.
+• Effortless sorting – drag and drop any item, or jump it straight to the top or bottom.
 • Clear overview – tags, progress counters and a compact mode keep busy lists easy to scan.
 • Stays in order – checked items move aside but keep their place, ready to be reused.
 • One-tap reset – clear all checkmarks at once and run the same list again.
@@ -19,6 +19,7 @@ PRIVACY BY DESIGN
 MADE TO FIT YOU
 
 • Left-handed mode and adjustable controls (with or without buttons).
+• Adjustable font size for list elements.
 • Share lists via URL.
 • Export as Markdown, clipboard, message, JSON and more.
 • Free and open source.

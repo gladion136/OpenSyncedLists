@@ -1,6 +1,4 @@
-- feat: import text list with markdown checkbox support (- [x] / - [ ])
-- feat: bulk actions – check all, uncheck all, delete done, toggle all
-- feat: open last viewed list automatically on app start
-- fix: multiple bugs fixed
-- ui: grouped overflow menus in list overview and single-list view
-- translations: Brazilian Portuguese, Spanish, French
+- Safety checks before destructive actions
+- Lots of new settings, with defaults you can apply to all lists
+- Adjustable font size and more customization
+- Edit items right from the overview

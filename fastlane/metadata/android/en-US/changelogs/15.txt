@@ -1,0 +1,4 @@
+- Safety checks before destructive actions
+- Lots of new settings, with defaults you can apply to all lists
+- Adjustable font size and more customization
+- Edit items right from the overview

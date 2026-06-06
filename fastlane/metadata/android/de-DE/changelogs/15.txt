@@ -1,0 +1,5 @@
+- Sicherheitsabfragen vor kritischen Aktionen
+- Viele neue Einstellungen, mit Standards für alle Listen anwendbar
+- Anpassbare Schriftgröße und mehr Individualisierung
+- Buttongröße für Checkbox und Sprungknöpfe einstellbar
+- Elemente direkt in der Übersicht bearbeiten

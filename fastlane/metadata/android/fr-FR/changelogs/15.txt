@@ -1,0 +1,4 @@
+- Confirmations avant les actions destructrices
+- De nombreux nouveaux paramètres, avec des valeurs par défaut applicables à toutes les listes
+- Taille de police ajustable et plus de personnalisation
+- Modifier les éléments directement depuis l'aperçu

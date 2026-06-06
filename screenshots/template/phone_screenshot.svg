@@ -22,34 +22,23 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
-     inkscape:zoom="0.4173589"
-     inkscape:cx="489.98596"
-     inkscape:cy="1235.148"
+     inkscape:zoom="1.1059801"
+     inkscape:cx="317.36556"
+     inkscape:cy="268.99218"
      inkscape:window-width="2560"
      inkscape:window-height="1299"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="callouts" />
+     inkscape:current-layer="phone_screenshot" />
   <defs
      id="defs6">
-    <clipPath
-       id="phone-clip">
-      <rect
-         x="108"
-         y="360"
-         width="864"
-         height="1774"
-         rx="48"
-         ry="48"
-         id="rect3" />
-    </clipPath>
     <filter
        id="blur"
-       x="-0.033278655"
-       y="-0.15518132"
-       width="1.0665573"
-       height="1.3103626">
+       x="-0.0336"
+       y="-0.12"
+       width="1.0672"
+       height="1.24">
       <feGaussianBlur
          stdDeviation="14"
          id="feGaussianBlur5" />
@@ -73,6 +62,17 @@
          stop-color="#3d0a9e"
          id="stop12" />
     </linearGradient>
+    <clipPath
+       id="phone-clip">
+      <rect
+         x="108"
+         y="360"
+         width="864"
+         height="1782"
+         rx="48"
+         ry="48"
+         id="rect3" />
+    </clipPath>
   </defs>
   <g
      id="background"
@@ -130,45 +130,26 @@
      transform="matrix(1.0,0,0,1.0,0,8)">
     <rect
        x="94"
-       y="350"
+       y="345.40625"
        width="892"
-       height="1796"
+       height="1771.3384"
        rx="64"
-       ry="64"
+       ry="63.121181"
        fill="#111827"
        opacity="0.14"
-       id="rect31" />
-    <rect
-       x="92"
-       y="340"
-       width="896"
-       height="1804"
-       rx="64"
-       ry="64"
-       fill="#ffffff"
-       id="rect33"
-       style="stroke-width:0.996604" />
+       id="rect31"
+       style="opacity:0.904449;fill:#5212c9;fill-opacity:1;stroke:none;stroke-width:4.96555;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:label="rect31" />
     <image
        id="app_screenshot"
        x="108"
-       y="360"
+       y="352"
        width="864"
        height="1774"
        preserveAspectRatio="xMidYMid slice"
        clip-path="url(#phone-clip)"
        xlink:href="__SCREENSHOT_PATH__"
        href="__SCREENSHOT_PATH__" />
-    <rect
-       x="108"
-       y="360"
-       width="864"
-       height="1774"
-       rx="48"
-       ry="48"
-       fill="none"
-       stroke="#e5e7eb"
-       stroke-width="2"
-       id="rect36" />
   </g>
   <g
      id="callouts"
@@ -176,18 +157,34 @@
      inkscape:label="callouts">
     <!-- Card shadow -->
     <rect
-       x="40" y="62" width="1000" height="280" rx="34" ry="34"
-       fill="#1a0a3a" opacity="0.28"
+       x="40"
+       y="62"
+       width="1000"
+       height="280"
+       rx="34"
+       ry="34"
+       fill="#1a0a3a"
+       opacity="0.28"
        filter="url(#blur)"
        id="rect39_shadow" />
     <!-- White card -->
     <rect
-       x="40" y="50" width="1000" height="280" rx="34" ry="34"
+       x="40"
+       y="50"
+       width="1000"
+       height="280"
+       rx="34"
+       ry="34"
        fill="#ffffff"
        id="rect39" />
     <!-- Accent bar -->
     <rect
-       x="72" y="92" width="13" height="188" rx="6.5" ry="6.5"
+       x="72"
+       y="92"
+       width="13"
+       height="188"
+       rx="6.5"
+       ry="6.5"
        fill="#5f00e8"
        id="accent_bar" />
     <g
